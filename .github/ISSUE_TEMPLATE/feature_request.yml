@@ -1,0 +1,50 @@
+name: Feature request
+description: Suggest an improvement to the editor, export or engine.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For a new template, use the "New template proposal" form instead. Open-ended ideas fit well in Discussions.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What are you trying to do, and what gets in the way?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: How would you like it to work?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Editor (studio)
+        - Export
+        - Engine / themes
+        - Templates
+        - Translations
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered
+
+  - type: checkboxes
+    id: contribute
+    attributes:
+      label: Contributing
+      options:
+        - label: I would like to work on this myself.

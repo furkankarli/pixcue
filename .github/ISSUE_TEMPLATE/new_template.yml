@@ -1,0 +1,56 @@
+name: New template proposal
+description: Propose a new motion graphics template.
+labels: [template]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Great templates are useful in many videos, work in horizontal and vertical formats, and look right in every theme. Agreeing on the design here first saves rework. See docs/templates.md for how templates are built.
+
+  - type: input
+    id: name
+    attributes:
+      label: Template name
+      placeholder: Countdown, Quote card, Poll…
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: When would a creator use it?
+    validations:
+      required: true
+
+  - type: textarea
+    id: fields
+    attributes:
+      label: Fields
+      description: What can the user edit? Use the field types text, long text, number, color, boolean, select and list.
+      placeholder: |
+        - title (text)
+        - seconds (number, 3–60)
+        - show progress ring (boolean)
+    validations:
+      required: true
+
+  - type: textarea
+    id: motion
+    attributes:
+      label: Layout and animation
+      description: How does it enter, hold and leave? How should the layout change in vertical (9:16) frames?
+    validations:
+      required: true
+
+  - type: textarea
+    id: references
+    attributes:
+      label: Sketches or references
+      description: Sketches, mockups or short clips. Use original or freely licensed material only, with no platform logos.
+
+  - type: checkboxes
+    id: contribute
+    attributes:
+      label: Contributing
+      options:
+        - label: I would like to build this template myself.

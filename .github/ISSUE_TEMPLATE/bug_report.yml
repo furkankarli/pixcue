@@ -1,0 +1,105 @@
+name: Bug report
+description: Something renders, exports or behaves incorrectly.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! Please search existing issues first. For security problems, see SECURITY.md instead.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you see, and what did you expect instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Choose the Shorts format
+        2. Pick the "Lower third" template with the pixel theme
+        3. Export for CapCut mobile
+        4. ...
+    validations:
+      required: true
+
+  - type: input
+    id: link
+    attributes:
+      label: Setup link
+      description: Pixcue keeps the whole setup in the URL. Paste the link from your address bar so we can open the exact same state.
+
+  - type: dropdown
+    id: editor
+    attributes:
+      label: Video editor
+      description: Where did you use the exported file?
+      options:
+        - DaVinci Resolve
+        - Adobe Premiere Pro
+        - Final Cut Pro
+        - CapCut (desktop)
+        - CapCut (mobile)
+        - Instagram Edits
+        - Other
+        - Not related to exporting
+    validations:
+      required: true
+
+  - type: dropdown
+    id: export-format
+    attributes:
+      label: Export format
+      options:
+        - Transparent MOV (PNG codec)
+        - Green screen MP4
+        - Transparent WebM
+        - PNG sequence (zip)
+        - Not related to exporting
+    validations:
+      required: true
+
+  - type: dropdown
+    id: frame
+    attributes:
+      label: Video format
+      options:
+        - YouTube 1920×1080
+        - YouTube 3840×2160
+        - Shorts / TikTok / Reels 1080×1920
+        - Instagram post 1080×1350
+        - Square 1080×1080
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - Windows
+        - macOS
+        - Linux
+        - Android
+        - iOS / iPadOS
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and version
+      placeholder: Chrome 142, Safari 26, Firefox 145…
+    validations:
+      required: true
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Screenshots, recordings or console errors
+      description: Drag files here. Console errors (F12 → Console) help a lot for export problems.

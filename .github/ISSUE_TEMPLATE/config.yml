@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions and help
+    url: https://github.com/furkankarli/pixcue/discussions
+    about: Ask how to do something or share an idea in Discussions.
+  - name: Report a security vulnerability
+    url: https://github.com/furkankarli/pixcue/security/advisories/new
+    about: Please report security problems privately, not as public issues.
