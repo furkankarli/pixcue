@@ -1,0 +1,26 @@
+{
+  "name": "pixcue",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Free, open-source, browser-based motion graphics for video creators.",
+  "license": "MIT",
+  "author": "Furkan Karlı and Pixcue contributors",
+  "homepage": "https://github.com/furkankarli/pixcue#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/furkankarli/pixcue.git"
+  },
+  "bugs": "https://github.com/furkankarli/pixcue/issues",
+  "type": "module",
+  "packageManager": "pnpm@12.18.0",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "typecheck": "pnpm -r --parallel typecheck"
+  },
+  "devDependencies": {
+    "@types/node": "^24",
+    "typescript": "^7.0.2"
+  }
+}
