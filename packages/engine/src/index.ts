@@ -10,3 +10,4 @@
 export * from './canvas.ts';
 export * from './color.ts';
 export * from './math.ts';
+export * from './text.ts';
