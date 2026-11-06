@@ -14,6 +14,10 @@ const config: UserConfig = {
       ['engine', 'export', 'templates', 'studio', 'i18n', 'repo', 'deps', 'release'],
     ],
     'scope-empty': [2, 'never'],
+    // Bodies and footers often hold URLs and release notes (Dependabot); only
+    // the header length matters for readable history.
+    'body-max-line-length': [0],
+    'footer-max-line-length': [0],
   },
 };
 
