@@ -16,6 +16,11 @@ updates:
       prefix: build(deps)
     labels: [dependencies]
     open-pull-requests-limit: 10
+    ignore:
+      # @types/node follows the Node.js major in .nvmrc, not the latest Node.
+      # Bump both together, by hand, when the project moves to a new LTS.
+      - dependency-name: "@types/node"
+        update-types: [version-update:semver-major]
     groups:
       npm-minor-and-patch:
         update-types: [minor, patch]
