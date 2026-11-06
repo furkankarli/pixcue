@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+*.tsbuildinfo
+
+# Tooling caches and output
+.wrangler/
+coverage/
+.vitest-attachments/
+**/__snapshots__/__diff__/
+**/__snapshots__/__actual__/
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+.dev.vars*
+*.local
+
+# Editors and OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Logs
+*.log
+
+# Prototype used as a porting source; never committed
+reference/

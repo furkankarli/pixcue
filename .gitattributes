@@ -1,0 +1,21 @@
+# Normalize all text files to LF in the repository and working tree.
+* text=auto eol=lf
+
+# Binary assets: never diff or normalize.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.mp4 binary
+*.mov binary
+*.webm binary
+*.zip binary
+*.ttf binary
+*.otf binary
+*.woff binary
+*.woff2 binary
+
+# Generated lockfile: collapse in GitHub diffs.
+pnpm-lock.yaml linguist-generated=true -diff
