@@ -7,4 +7,4 @@
  *
  * Must not depend on any other @pixcue package or on a UI framework.
  */
-export {};
+export * from './canvas.ts';
