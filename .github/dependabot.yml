@@ -1,0 +1,37 @@
+# Weekly dependency updates. Minor and patch bumps arrive as one grouped PR per
+# ecosystem; major bumps get their own PR so they can be reviewed separately.
+# Commit messages follow the repo's Conventional Commits rules.
+version: 2
+
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    # Matches pnpm's minimumReleaseAge guard (pnpm-workspace.yaml).
+    cooldown:
+      default-days: 3
+    commit-message:
+      prefix: build(deps)
+    labels: [dependencies]
+    open-pull-requests-limit: 10
+    groups:
+      npm-minor-and-patch:
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directories:
+      - /
+      - /.github/actions/setup
+    schedule:
+      interval: weekly
+      day: monday
+    cooldown:
+      default-days: 3
+    commit-message:
+      prefix: ci(deps)
+    labels: [dependencies]
+    groups:
+      actions-minor-and-patch:
+        update-types: [minor, patch]
