@@ -60,7 +60,7 @@ release, pick the previous version.
 
 ## Project structure
 
-```
+```text
 apps/studio          Editor UI (Solid + Rsbuild). The only package using a UI framework.
 packages/engine      Frames, safe areas, themes, animation/drawing helpers, pixel engine
 packages/templates   Built-in templates, one file per template
@@ -93,7 +93,7 @@ flow is in [docs/architecture.md](docs/architecture.md).
 Every commit follows [Conventional Commits](https://www.conventionalcommits.org)
 with a required scope:
 
-```
+```text
 <type>(<scope>): <summary in the imperative, lower case>
 ```
 
@@ -110,7 +110,7 @@ with a required scope:
 
 Examples:
 
-```
+```text
 feat(templates): add countdown template
 fix(export): write correct duration for 25 fps MOV files
 docs(repo): explain how to update visual snapshots
