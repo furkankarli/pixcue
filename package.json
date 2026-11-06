@@ -18,6 +18,8 @@
   },
   "scripts": {
     "prepare": "lefthook install",
+    "dev": "pnpm --filter studio dev",
+    "build": "pnpm --filter studio build",
     "check": "biome check .",
     "check:fix": "biome check --write .",
     "typecheck": "tsc -p tsconfig.json && pnpm -r --parallel typecheck",
