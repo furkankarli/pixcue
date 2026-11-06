@@ -40,10 +40,6 @@ pnpm install   # installs dependencies and the git hooks (lefthook)
 pnpm dev       # studio at http://localhost:3000
 ```
 
-pnpm refuses package versions published less than a day ago
-(`minimumReleaseAge` in `pnpm-workspace.yaml`). If an install fails on a brand-new
-release, pick the previous version.
-
 ### Scripts
 
 | Command                         | What it does                                                |
