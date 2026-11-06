@@ -9,9 +9,6 @@ updates:
     schedule:
       interval: weekly
       day: monday
-    # Matches pnpm's minimumReleaseAge guard (pnpm-workspace.yaml).
-    cooldown:
-      default-days: 3
     commit-message:
       prefix: build(deps)
     labels: [dependencies]
@@ -32,8 +29,6 @@ updates:
     schedule:
       interval: weekly
       day: monday
-    cooldown:
-      default-days: 3
     commit-message:
       prefix: ci(deps)
     labels: [dependencies]

@@ -2,8 +2,8 @@ packages:
   - apps/*
   - packages/*
 
-# Supply-chain guard: do not install versions published less than a day ago.
-minimumReleaseAge: 1440
+# Always allow the newest releases (pnpm delays brand-new versions by default).
+minimumReleaseAge: 0
 
 # Dependencies allowed (true) or denied (false) to run install scripts.
 allowBuilds:
