@@ -24,7 +24,8 @@
     "test": "vitest run --project unit",
     "test:watch": "vitest --project unit",
     "test:visual": "vitest run --project visual",
-    "test:visual:update": "vitest run --project visual --update"
+    "test:visual:update": "vitest run --project visual --update",
+    "test:formats": "vitest run --project formats"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.6.5",

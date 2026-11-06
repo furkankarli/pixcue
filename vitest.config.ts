@@ -1,12 +1,15 @@
 import { defineConfig } from 'vitest/config';
 
 const VISUAL = '**/*.visual.test.ts';
+const FORMATS = '**/*.format.test.ts';
 
 /**
- * Two projects across the whole workspace:
- * - unit:   fast logic tests (`*.test.ts`)
- * - visual: render chosen frames to PNG and compare with committed baselines
- *           (`*.visual.test.ts`)
+ * Three projects across the whole workspace:
+ * - unit:    fast logic tests (`*.test.ts`)
+ * - visual:  render chosen frames to PNG and compare with committed baselines
+ *            (`*.visual.test.ts`)
+ * - formats: export short clips and validate them with ffprobe; needs ffmpeg
+ *            on PATH (`*.format.test.ts`)
  */
 export default defineConfig({
   test: {
@@ -17,7 +20,7 @@ export default defineConfig({
         test: {
           name: 'unit',
           include: ['packages/*/test/**/*.test.ts', 'apps/*/src/**/*.test.ts'],
-          exclude: [VISUAL, '**/node_modules/**'],
+          exclude: [VISUAL, FORMATS, '**/node_modules/**'],
         },
       },
       {
@@ -25,6 +28,14 @@ export default defineConfig({
         test: {
           name: 'visual',
           include: [`packages/*/test/${VISUAL}`],
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'formats',
+          include: [`packages/*/test/${FORMATS}`],
+          testTimeout: 60_000,
         },
       },
     ],
