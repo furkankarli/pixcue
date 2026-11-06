@@ -1,0 +1,15 @@
+{
+  "name": "@pixcue/export",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Framework-free exporters: PNG sequence zip, transparent MOV, MP4 and WebM via WebCodecs.",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  }
+}
