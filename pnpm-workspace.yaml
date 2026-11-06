@@ -4,3 +4,8 @@ packages:
 
 # Supply-chain guard: do not install versions published less than a day ago.
 minimumReleaseAge: 1440
+
+# Dependencies allowed (true) or denied (false) to run install scripts.
+allowBuilds:
+  # Git hooks are installed by the root "prepare" script instead.
+  lefthook: false
