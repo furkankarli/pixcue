@@ -25,10 +25,12 @@
     "test:watch": "vitest --project unit",
     "test:visual": "vitest run --project visual",
     "test:visual:update": "vitest run --project visual --update",
-    "test:formats": "vitest run --project formats"
+    "test:formats": "vitest run --project formats",
+    "changeset": "changeset"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.6.5",
+    "@changesets/cli": "^3.0.3",
     "@commitlint/cli": "^21.2.4",
     "@commitlint/config-conventional": "^21.2.4",
     "@commitlint/types": "^21.2.3",
