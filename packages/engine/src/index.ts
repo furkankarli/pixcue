@@ -8,3 +8,5 @@
  * Must not depend on any other @pixcue package or on a UI framework.
  */
 export * from './canvas.ts';
+export * from './color.ts';
+export * from './math.ts';
