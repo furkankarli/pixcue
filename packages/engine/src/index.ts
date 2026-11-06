@@ -14,3 +14,4 @@ export * from './layout.ts';
 export * from './math.ts';
 export * from './safe-areas.ts';
 export * from './text.ts';
+export * from './vector/draw.ts';
