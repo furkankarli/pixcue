@@ -7,5 +7,7 @@ minimumReleaseAge: 1440
 
 # Dependencies allowed (true) or denied (false) to run install scripts.
 allowBuilds:
+  esbuild: true
   # Git hooks are installed by the root "prepare" script instead.
   lefthook: false
+  workerd: true
