@@ -3,6 +3,9 @@ import { defineConfig } from 'vitest/config';
 const VISUAL = '**/*.visual.test.ts';
 const FORMATS = '**/*.format.test.ts';
 
+// Points the engine at a Node.js canvas and registers the theme fonts.
+const setupFiles = ['packages/engine/testing/setup.ts'];
+
 /**
  * Three projects across the whole workspace:
  * - unit:    fast logic tests (`*.test.ts`)
@@ -14,6 +17,7 @@ const FORMATS = '**/*.format.test.ts';
 export default defineConfig({
   test: {
     passWithNoTests: true,
+    setupFiles,
     projects: [
       {
         extends: true,
