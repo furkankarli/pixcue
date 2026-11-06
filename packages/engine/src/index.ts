@@ -9,5 +9,7 @@
  */
 export * from './canvas.ts';
 export * from './color.ts';
+export * from './frame.ts';
 export * from './math.ts';
+export * from './safe-areas.ts';
 export * from './text.ts';
