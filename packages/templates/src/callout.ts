@@ -65,6 +65,7 @@ interface VectorBox {
   readonly titleAscent: number;
   readonly titleDescent: number;
   readonly subBaseline: number;
+  readonly subDescent: number;
   readonly dotY: number;
 }
 
@@ -92,6 +93,7 @@ const vector: VectorScene<CalloutFields, VectorBox> = {
       titleAscent: ascent,
       titleDescent: descent,
       subBaseline,
+      subDescent: Math.ceil(sub.actualBoundingBoxDescent),
       dotY,
     };
   },
@@ -105,13 +107,14 @@ const vector: VectorScene<CalloutFields, VectorBox> = {
     const end = { x: X(160 + box.textWidth + 30), y: box.lineY };
 
     // The leader line draws out to the label; the anchor pops in on top of it.
+    // At the end the text goes first, then the line retracts into the anchor.
     theme.leader(
       c,
       [dot, elbow, end],
-      envelope(t, dur, 0.18, 0.84, 0.58, 0.12, enter, exit),
+      envelope(t, dur, 0.18, 0.84, 0.55, 0.14, enter, exit),
       accent,
     );
-    const dotIn = envelope(t, dur, 0, 0.32, 0.72, 0.4, pop, exit);
+    const dotIn = envelope(t, dur, 0, 0.32, 0.3, 0.02, pop, exit);
     if (dotIn > 0) {
       c.save();
       c.translate(dot.x, dot.y);
@@ -121,33 +124,42 @@ const vector: VectorScene<CalloutFields, VectorBox> = {
     }
 
     // Title above the line, subtitle below it, each in the theme's reveal.
-    const tf = themeFont(theme, 'display', TITLE_SIZE);
-    const title = themeCase(theme, fields.title, locale);
-    const tw = textWidth(c, title, tf) + 16;
+    // The reveal area covers everything the heading treatment draws: its
+    // outline and, in pop, the offset copy that reaches right and down.
+    const drop = theme.headingDrop;
     const textX = left ? elbow.x - 10 : elbow.x + 10;
     const align = left ? 'right' : 'left';
-    const top = box.titleBaseline - box.titleAscent - 8;
+    const area = (width: number) => ({
+      x: (left ? textX - width : textX) - 9,
+      w: width + 9 + drop + 4,
+    });
+
+    const tf = themeFont(theme, 'display', TITLE_SIZE);
+    const title = themeCase(theme, fields.title, locale);
+    const ta = area(textWidth(c, title, tf));
+    const top = box.titleBaseline - box.titleAscent - 9;
     theme.reveal(
       c,
-      envelope(t, dur, 0.62, 1.22, 0.5, 0.06, linear, linear),
-      left ? elbow.x - tw - 2 : elbow.x + 2,
+      envelope(t, dur, 0.62, 1.22, 0.85, 0.45, linear, exit),
+      ta.x,
       top,
-      tw,
-      box.titleAscent + box.titleDescent + 16,
+      ta.w,
+      box.titleBaseline + box.titleDescent + drop + 4 - top,
       accent,
       () => theme.heading(c, title, textX, box.titleBaseline, tf, align, undefined, accent),
     );
 
     const sf = themeFont(theme, 'body', SUB_SIZE, 700);
-    const sw = textWidth(c, fields.subtitle, sf) + 16;
+    const sa = area(textWidth(c, fields.subtitle, sf));
     const subColor = accentTextColor(theme, accent) === '#111111' ? '#fff' : accent;
+    const subTop = box.lineY + SUB_GAP - 6;
     theme.reveal(
       c,
-      envelope(t, dur, 1.0, 1.4, 0.3, 0.04, linear, linear),
-      left ? elbow.x - sw - 2 : elbow.x + 2,
-      box.lineY + SUB_GAP - 4,
-      sw,
-      box.subBaseline - box.lineY + 2,
+      envelope(t, dur, 1.0, 1.4, 1.0, 0.62, linear, exit),
+      sa.x,
+      subTop,
+      sa.w,
+      box.subBaseline + box.subDescent + drop + 4 - subTop,
       accent,
       () => theme.heading(c, fields.subtitle, textX, box.subBaseline, sf, align, subColor, '#111'),
     );
