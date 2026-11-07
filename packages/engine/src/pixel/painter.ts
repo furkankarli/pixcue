@@ -9,6 +9,10 @@ import type { PixelText, Sprite } from './raster.ts';
 export interface Painter {
   /** Size of one grid pixel in output pixels. */
   readonly px: number;
+  /** Where the graphic's origin sits on the grid, in cells. */
+  readonly origin: { readonly x: number; readonly y: number };
+  /** Size of the whole frame's grid, in cells (for animating in from off-screen). */
+  readonly grid: { readonly width: number; readonly height: number };
   rect(x: number, y: number, w: number, h: number, color: string): void;
   /** Draws a sprite, or the part of it inside the source rectangle. */
   img(s: Sprite, x: number, y: number, sx?: number, sy?: number, sw?: number, sh?: number): void;
@@ -44,10 +48,19 @@ const NEIGHBOURS = [
   [0, -1],
 ] as const;
 
-export function createPainter(c: Ctx2D, ox: number, oy: number, px: number): Painter {
+export function createPainter(
+  c: Ctx2D,
+  ox: number,
+  oy: number,
+  px: number,
+  gridWidth = 0,
+  gridHeight = 0,
+): Painter {
   const pops: [Sprite, number, number, number][] = [];
   const P: Painter = {
     px,
+    origin: { x: ox, y: oy },
+    grid: { width: gridWidth, height: gridHeight },
     rect(x, y, w, h, color) {
       const rw = Math.round(w);
       const rh = Math.round(h);

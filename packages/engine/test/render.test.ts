@@ -79,6 +79,33 @@ describe('render', () => {
     expect(pixelAt(ctx, bounds.x + 1, bounds.y + 1)).toEqual([255, 0, 0, 255]);
   });
 
+  it('tells pixel scenes their theme, origin and grid size', () => {
+    const seen: unknown[] = [];
+    const probe: Scene<null> = {
+      vector: block.vector as never,
+      pixel: {
+        measure: ({ theme }) => {
+          seen.push(theme.id);
+          return { w: 10, h: 10 };
+        },
+        draw: (P) => {
+          seen.push(P.origin, P.grid);
+        },
+      },
+    };
+    const frame = createFrame('youtube');
+    const { ctx } = createTestCanvas(frame.pixelWidth, frame.pixelHeight);
+    render(ctx, 0, {
+      frame,
+      theme: resolveTheme('pixel'),
+      scene: probe,
+      fields: null,
+      duration: 1,
+      layout,
+    });
+    expect(seen).toEqual(['pixel', { x: 16, y: 158 }, { width: 320, height: 180 }]);
+  });
+
   it('doubles pixel cells at 4K', () => {
     expect(run('youtube-4k', 'pixel').bounds.width).toBe(480);
   });

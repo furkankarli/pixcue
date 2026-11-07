@@ -9,7 +9,7 @@ import type { Frame } from './frame.ts';
 import { fitScale, type Layout, place, type Size } from './layout.ts';
 import { clamp } from './math.ts';
 import { createPainter, type Painter } from './pixel/painter.ts';
-import type { Theme, VectorTheme } from './theme.ts';
+import type { PixelTheme, Theme, VectorTheme } from './theme.ts';
 
 /** What every scene receives besides the time. */
 export interface SceneArgs<F> {
@@ -38,8 +38,12 @@ export interface VectorScene<F, B extends Size = Size> {
 
 /** How a template draws with the pixel theme, in pixel-grid units. */
 export interface PixelScene<F, B extends Size = Size> {
-  measure(args: SceneArgs<F>): B;
-  draw(P: Painter, t: number, args: SceneArgs<F> & { readonly box: B }): void;
+  measure(args: SceneArgs<F> & { readonly theme: PixelTheme }): B;
+  draw(
+    P: Painter,
+    t: number,
+    args: SceneArgs<F> & { readonly theme: PixelTheme; readonly box: B },
+  ): void;
 }
 
 /** A template's drawing code for both rendering paths. */
@@ -79,8 +83,8 @@ export interface Bounds {
   readonly height: number;
 }
 
-/** Output pixels per pixel-grid cell at 1080p and scale 1. */
-const PIXEL_BASE = 6;
+/** Output pixels per pixel-grid cell at 1080p and scale 1 (so 1 cell = 6 design units). */
+export const PIXEL_BASE = 6;
 
 /** Size of one pixel-theme grid cell in output pixels for a user scale. */
 export function pixelSize(scale: number, frame: Frame): number {
@@ -144,7 +148,7 @@ export function render<F>(ctx: Ctx2D, t: number, state: RenderState<F>): Bounds 
     locale: state.locale ?? 'en',
   };
   return theme.kind === 'pixel'
-    ? renderPixel(ctx, t, state, args)
+    ? renderPixel(ctx, t, state, { ...args, theme })
     : renderVector(ctx, t, state, { ...args, theme });
 }
 
@@ -172,7 +176,7 @@ function renderPixel<F>(
   ctx: Ctx2D,
   t: number,
   { frame, scene, layout }: RenderState<F>,
-  args: SceneArgs<F>,
+  args: SceneArgs<F> & { readonly theme: PixelTheme },
 ): Bounds {
   const box = scene.pixel.measure(args);
   const { unit, safeArea } = frame;
@@ -189,7 +193,7 @@ function renderPixel<F>(
   const at = place({ w: (box.w * px) / unit, h: (box.h * px) / unit }, frame, layout);
   const gx = Math.round((at.x * unit) / px);
   const gy = Math.round((at.y * unit) / px);
-  const P = createPainter(g, gx, gy, px);
+  const P = createPainter(g, gx, gy, px, gw, gh);
   scene.pixel.draw(P, t, { ...args, box });
 
   const smoothing = ctx.imageSmoothingEnabled;
