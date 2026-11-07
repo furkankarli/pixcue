@@ -47,3 +47,5 @@ export function createTestCanvas(
   if (!ctx) throw new Error('Canvas 2D is not available');
   return { canvas, ctx };
 }
+
+export { expectToMatchSnapshot, type SnapshotOptions } from './snapshot.ts';
