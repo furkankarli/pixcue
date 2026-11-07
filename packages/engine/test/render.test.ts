@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Ctx2D } from '../src/canvas.ts';
-import { createFrame, type FramePresetId } from '../src/frame.ts';
+import { createFrame, type FramePresetId, scaleFrame } from '../src/frame.ts';
 import type { Layout } from '../src/layout.ts';
 import { render, type Scene } from '../src/render.ts';
 import { resolveTheme, type ThemeId } from '../src/theme.ts';
@@ -140,6 +140,22 @@ describe('render', () => {
     render(ctx, 0, base);
     render(ctx, 0, { ...base, locale: 'tr' });
     expect(seen).toEqual(['en', 'tr']);
+  });
+
+  it('renders a scaled preview with the same layout', () => {
+    const full = run('youtube', 'tech').bounds;
+    const frame = scaleFrame(createFrame('youtube'), 480);
+    const { ctx } = createTestCanvas(frame.pixelWidth, frame.pixelHeight);
+    const small = render(ctx, 1, {
+      frame,
+      theme: resolveTheme('tech'),
+      scene: block,
+      fields: { color: '#ff0000' },
+      duration: 5,
+      layout,
+    });
+    expect(small.x).toBeCloseTo(full.x / 4);
+    expect(small.width).toBeCloseTo(full.width / 4);
   });
 
   it('is deterministic', () => {

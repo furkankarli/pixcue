@@ -92,3 +92,18 @@ export function createFrame(preset: FramePresetId): Frame {
     unit,
   };
 }
+
+/**
+ * The same frame rendered at a different output width (for previews and
+ * thumbnails). Layout is unchanged; only the output pixel size and `unit`
+ * scale, so a preview looks exactly like the export.
+ */
+export function scaleFrame(frame: Frame, pixelWidth: number): Frame {
+  const factor = pixelWidth / frame.pixelWidth;
+  return {
+    ...frame,
+    pixelWidth: Math.round(frame.pixelWidth * factor),
+    pixelHeight: Math.round(frame.pixelHeight * factor),
+    unit: frame.unit * factor,
+  };
+}
