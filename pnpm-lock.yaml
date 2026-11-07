@@ -230,6 +230,9 @@ importers:
 
   packages/export:
     devDependencies:
+      '@napi-rs/canvas':
+        specifier: ^1.1.0
+        version: 1.1.0
       '@types/node':
         specifier: ^24.19.2
         version: 24.19.2
