@@ -4,14 +4,17 @@ import { FormatPicker } from './components/FormatPicker.tsx';
 import { Inspector } from './components/Inspector.tsx';
 import { LanguagePicker } from './components/LanguagePicker.tsx';
 import { Library } from './components/Library.tsx';
+import { PresetsDialog } from './components/PresetsDialog.tsx';
+import { ShareButton } from './components/ShareButton.tsx';
 import { Stage } from './components/Stage.tsx';
 import { Transport } from './components/Transport.tsx';
 import { locale, t } from './i18n.ts';
 import { wide } from './media.ts';
-import { DownloadIcon } from './ui/icons.tsx';
+import { BookmarkIcon, DownloadIcon } from './ui/icons.tsx';
 
 export function App() {
   const [exporting, setExporting] = createSignal(false);
+  const [presetsOpen, setPresetsOpen] = createSignal(false);
   createEffect(() => {
     document.documentElement.lang = locale();
   });
@@ -22,7 +25,19 @@ export function App() {
         <span class="brand">Pixcue</span>
         <FormatPicker />
         <div class="topbar-actions">
-          <LanguagePicker />
+          <ShareButton />
+          <button
+            type="button"
+            class="button responsive"
+            onClick={() => setPresetsOpen(true)}
+            aria-label={t('editor.topbar.presets')}
+          >
+            <BookmarkIcon />
+            <span class="button-label">{t('editor.topbar.presets')}</span>
+          </button>
+          <span class="wide-only">
+            <LanguagePicker />
+          </span>
           <button type="button" class="button primary" onClick={() => setExporting(true)}>
             <DownloadIcon />
             {t('editor.topbar.export')}
@@ -49,7 +64,11 @@ export function App() {
           />
         </aside>
       </main>
+      <footer class="app-footer narrow-only">
+        <LanguagePicker />
+      </footer>
       <ExportDialog open={exporting()} onClose={() => setExporting(false)} />
+      <PresetsDialog open={presetsOpen()} onClose={() => setPresetsOpen(false)} />
     </div>
   );
 }

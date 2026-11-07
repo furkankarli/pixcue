@@ -967,3 +967,126 @@ textarea.input {
     padding: 0 10px;
   }
 }
+
+/* ---------- Share, presets ---------- */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  z-index: 20;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.toast:not(:empty) {
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: var(--text);
+  color: var(--surface);
+  font-weight: 700;
+  font-size: 14px;
+  box-shadow: var(--shadow);
+}
+
+.dialog-small {
+  width: min(480px, calc(100vw - 32px));
+}
+
+.preset-form {
+  display: flex;
+  gap: 8px;
+}
+
+.preset-list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.preset-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  border-top: 1px solid var(--border);
+}
+
+.preset-list li:first-child {
+  border-top: 0;
+}
+
+.preset-load {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  padding: 6px 4px;
+  border: 0;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.preset-load strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.preset-load span {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* Narrow screens: icon-only secondary buttons, compact top bar. */
+@media (max-width: 760px) {
+  .button.responsive {
+    width: 36px;
+    padding: 0;
+  }
+
+  .button.responsive .button-label {
+    display: none;
+  }
+
+  .topbar {
+    gap: 8px;
+    padding: 0 10px;
+  }
+
+  .topbar-actions {
+    gap: 6px;
+  }
+
+  .format-picker select,
+  .language-picker select {
+    max-width: 128px;
+  }
+}
+
+@media (max-width: 420px) {
+  .brand {
+    display: none;
+  }
+}
+
+/* The language picker sits in the top bar on wide screens, at the bottom on phones. */
+.app-footer {
+  padding: 0 var(--gap) calc(var(--gap) + env(safe-area-inset-bottom, 0px));
+}
+
+.narrow-only {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .wide-only {
+    display: none;
+  }
+
+  .narrow-only {
+    display: block;
+  }
+}
