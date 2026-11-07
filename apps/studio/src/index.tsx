@@ -1,9 +1,10 @@
-// Theme fonts (and the UI font, Manrope), self-hosted.
+// Theme fonts (and the UI font, Manrope), self-hosted. JetBrains Mono: tech labels.
 import '@fontsource/manrope/500.css';
 import '@fontsource/manrope/700.css';
 import '@fontsource/manrope/800.css';
 import '@fontsource/chakra-petch/700.css';
 import '@fontsource/anton/400.css';
+import '@fontsource/jetbrains-mono/700.css';
 import { render } from 'solid-js/web';
 import { App } from './App.tsx';
 import './styles.css';
