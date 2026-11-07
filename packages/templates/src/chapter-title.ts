@@ -87,7 +87,7 @@ const vector: VectorScene<ChapterTitleFields, VectorBox> = {
     const n = letters.chars.length;
 
     // Accent line grows from the center, with small end caps.
-    const line = envelope(t, dur, 0, 0.45, 0.6, 0.2, enter, exit);
+    const line = envelope(t, dur, 0, 0.45, 0.45, 0.08, enter, exit);
     const half = (box.w / 2 - 70) * line;
     if (half > 0.5) {
       theme.rule(c, cx - half, box.lineY, half * 2, 9, accent);
@@ -97,19 +97,22 @@ const vector: VectorScene<ChapterTitleFields, VectorBox> = {
       });
     }
 
-    // Letters drop onto their place above the line, then fall through it.
+    // Letters drop onto their place above the line, then fall through it,
+    // last to first, within a fixed spread whatever the title length.
+    const outAt = dur - 0.85;
+    const stagger = Math.min(0.025, 0.2 / Math.max(1, n - 1));
     withClip(c, -200, -400, box.w + 400, box.lineY - 2 + 400, () => {
       letters.chars.forEach((ch, i) => {
         const p = (t - 0.2 - i * 0.035) / 0.5;
         if (p <= 0) return;
-        const out = t > dur - 0.58 ? exit((t - (dur - 0.58) - (n - 1 - i) * 0.016) / 0.32) : 0;
+        const out = t > outAt ? exit((t - outAt - (n - 1 - i) * stagger) / 0.4) : 0;
         const y = box.baseline + (1 - pop(p)) * -140 + out * 260;
         theme.heading(c, ch, x0 + (letters.xs[i] ?? 0), y, tf, 'left', undefined, accent);
       });
     });
 
-    // Chapter label pops in under the line.
-    const kickerIn = envelope(t, dur, 0.55, 0.95, 0.52, 0.12, pop, exit);
+    // Chapter label pops in under the line, and is the first to leave.
+    const kickerIn = envelope(t, dur, 0.55, 0.95, 0.95, 0.65, pop, exit);
     if (fields.kicker && kickerIn > 0) {
       const label = labelText(theme, fields.kicker, locale);
       const size = theme.chip(c, label, 0, 0, KICKER_SIZE, accent, false);
