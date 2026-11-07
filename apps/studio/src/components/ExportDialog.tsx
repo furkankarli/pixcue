@@ -25,6 +25,9 @@ import { CloseIcon, DownloadIcon } from '../ui/icons.tsx';
 const EDITOR_KEY = 'pixcue.editor.v1';
 const hasVideoEncoder = typeof window !== 'undefined' && 'VideoEncoder' in window;
 
+/** Key colors to try, in order, when picking one the graphic does not use. */
+const KEY_ORDER: readonly KeyColor[] = ['green', 'blue', 'magenta'];
+
 function savedEditor(): EditorId {
   try {
     const v = localStorage.getItem(EDITOR_KEY);
@@ -32,7 +35,9 @@ function savedEditor(): EditorId {
   } catch {
     // Use the default below.
   }
-  return 'davinci';
+  // On a phone the file is for a phone editor.
+  const touch = typeof matchMedia !== 'undefined' && matchMedia('(pointer: coarse)').matches;
+  return touch ? 'capcut-mobile' : 'davinci';
 }
 
 type Status =
@@ -46,6 +51,8 @@ export function ExportDialog(props: { open: boolean; onClose: () => void }) {
   const [editor, setEditor] = createSignal<EditorId>(savedEditor());
   const [format, setFormat] = createSignal<ExportFormat>(EDITORS[savedEditor()].formats[0]);
   const [keyColor, setKeyColor] = createSignal<KeyColor>('green');
+  // Until someone picks a key color, use the first one the graphic leaves free.
+  const [keyPicked, setKeyPicked] = createSignal(false);
   const [chromaKey, setChromaKey] = createSignal(true);
   const [status, setStatus] = createSignal<Status>({ kind: 'idle' });
   let controller: AbortController | null = null;
@@ -72,6 +79,10 @@ export function ExportDialog(props: { open: boolean; onClose: () => void }) {
   const running = () => status().kind === 'running';
   const mobile = () => EDITORS[editor()].mobile;
   // Only checked while the chroma key MP4 is chosen; re-runs when the graphic changes.
+  createEffect(() => {
+    if (!props.open || format() !== 'mp4-key' || keyPicked()) return;
+    setKeyColor(KEY_ORDER.find((k) => !keyConflict(k)) ?? 'green');
+  });
   const conflict = createMemo(
     () => props.open && format() === 'mp4-key' && keyConflict(keyColor()),
   );
@@ -194,6 +205,9 @@ export function ExportDialog(props: { open: boolean; onClose: () => void }) {
               )}
             </For>
           </div>
+          <Show when={format() !== 'mp4-key' && !mobile()}>
+            <p class="field-help">{t('editor.export.phoneHint')}</p>
+          </Show>
         </fieldset>
 
         <Show when={format() === 'mp4-key'}>
@@ -202,7 +216,10 @@ export function ExportDialog(props: { open: boolean; onClose: () => void }) {
             <Segmented
               label={t('editor.export.keyColor')}
               value={keyColor()}
-              onChange={setKeyColor}
+              onChange={(k) => {
+                setKeyPicked(true);
+                setKeyColor(k);
+              }}
               options={(Object.keys(KEY_COLORS) as KeyColor[]).map((k) => ({
                 value: k,
                 label: t(`editor.export.keyColors.${k}`),

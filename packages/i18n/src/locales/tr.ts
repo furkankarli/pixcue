@@ -118,6 +118,8 @@ export default defineLocale({
         editorQuestion: 'Hangi editörü kullanıyorsun?',
         format: 'Format',
         recommended: 'Önerilen',
+        phoneHint:
+          'Telefona ya da mesajlaşma uygulamasıyla mı göndereceksin? MP4’ü seç: telefonlar saydam MOV, WebM ve PNG dosyalarını açamaz.',
         editors: {
           davinci: 'DaVinci Resolve',
           premiere: 'Premiere Pro',

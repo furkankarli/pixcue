@@ -122,6 +122,8 @@ export default {
         editorQuestion: 'Which editor do you use?',
         format: 'Format',
         recommended: 'Recommended',
+        phoneHint:
+          'Sending it to a phone or through a messaging app? Choose the MP4: phones cannot open transparent MOV, WebM or PNG files.',
         editors: {
           davinci: 'DaVinci Resolve',
           premiere: 'Premiere Pro',
