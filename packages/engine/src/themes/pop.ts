@@ -64,17 +64,6 @@ export const pop: VectorTheme = {
   headingDrop: 16,
   label: { uppercase: true, tracking: 0.04, tone: 'text' },
   motion: { enter: easeOutBack, exit: easeInOut, pop: easeOutBack },
-  tagStyle: { radius: 0, outline: INK },
-
-  panel(c, x, y, w, h) {
-    c.fillStyle = INK;
-    c.fillRect(x + 12, y + 12, w, h);
-    c.fillStyle = '#fff';
-    c.fillRect(x, y, w, h);
-    c.lineWidth = 5;
-    c.strokeStyle = INK;
-    c.strokeRect(x + 2.5, y + 2.5, w - 5, h - 5);
-  },
 
   card(c, x, y, w, h, accent) {
     const shape = () => roundRectPath(c, x, y, w, h, 6);

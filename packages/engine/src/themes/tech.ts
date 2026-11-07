@@ -36,16 +36,6 @@ export const tech: VectorTheme = {
   headingDrop: 2,
   label: { uppercase: true, tracking: 0.14, tone: 'accent' },
   motion: { enter: easeOutExpo, exit: easeIn, pop: easeOutExpo },
-  tagStyle: { radius: 5, outline: undefined },
-
-  panel(c, x, y, w, h) {
-    roundRectPath(c, x, y, w, h, 6);
-    c.fillStyle = 'rgba(11,14,19,.92)';
-    c.fill();
-    c.strokeStyle = 'rgba(255,255,255,.09)';
-    c.lineWidth = 2;
-    c.stroke();
-  },
 
   card(c, x, y, w, h, accent) {
     const cut = Math.min(22, h * 0.18);

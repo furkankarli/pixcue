@@ -67,10 +67,6 @@ export interface VectorTheme {
   readonly headingDrop: number;
   readonly label: LabelStyle;
   readonly motion: ThemeMotion;
-  /** Legacy tag style, used until every template draws tags with `chip`. */
-  readonly tagStyle: { readonly radius: number; readonly outline: string | undefined };
-  /** Legacy card surface, used until every template draws with `card`. */
-  panel(c: Ctx2D, x: number, y: number, w: number, h: number): void;
   /** A card surface in the theme's style. */
   card(c: Ctx2D, x: number, y: number, w: number, h: number, accent: string): void;
   button(c: Ctx2D, x: number, y: number, w: number, h: number, fill: string): void;

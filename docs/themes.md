@@ -16,7 +16,7 @@ What every vector theme provides (see `VectorTheme` in
 
 | Part             | Used for                                                         |
 | ---------------- | ---------------------------------------------------------------- |
-| `panel`          | Card surfaces: lower third, spec card, score card, pros and cons |
+| `card`           | Card surfaces: lower third, spec card, score card, pros and cons |
 | `chip`           | Small labels: tags, chapter numbers                              |
 | `label`          | Captions in the theme's label font, tracking and case            |
 | `heading`        | Large text over video, with the theme's treatment                |

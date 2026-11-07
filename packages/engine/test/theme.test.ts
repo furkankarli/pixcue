@@ -22,10 +22,10 @@ describe('themes', () => {
   });
 
   it.each(vector.map((t) => [t.id, t] as const))(
-    '%s draws a panel, button and heading',
+    '%s draws a card, button and heading',
     (_, theme) => {
       const { ctx } = createTestCanvas(400, 200);
-      theme.panel(ctx, 20, 20, 300, 120);
+      theme.card(ctx, 20, 20, 300, 120, theme.accent);
       theme.button(ctx, 40, 40, 120, 60, theme.accent);
       theme.heading(ctx, 'Ağ', 60, 120, themeFont(theme, 'display', 48), 'left');
       const data = ctx.getImageData(0, 0, 400, 200).data;

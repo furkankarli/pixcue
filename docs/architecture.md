@@ -48,7 +48,7 @@ Rules that keep this healthy:
             │
             ▼
  Frame { width, height, orientation, safeArea }   ← engine presets + safe-areas config
- Theme { fonts, colors, panel, button }           ← engine themes + user accent/font
+ Theme { fonts, colors, motion, card, chip, … }   ← engine themes + user accent/font
  Fields = defaults(locale, platform) + user edits ← templates: resolveFields (validated)
             │
             ▼
@@ -103,7 +103,8 @@ A template's drawing code is a `Scene` with two parts, one per rendering path:
 
 - **Vector** (tech, pop, sade): `measure` returns the graphic's natural size in
   design units, then `draw` paints one frame with Canvas 2D, taking fonts,
-  colors, panels, buttons and headings from the theme.
+  colors, motion and every surface (cards, chips, meters, reveals…) from the
+  theme's kit, described in [themes.md](themes.md).
 - **Pixel**: `measure` returns a size in grid cells, then `draw` paints with a
   `Painter` on a low-resolution grid that is scaled up without smoothing (6
   output pixels per cell at 1080p). Sprites that "pop" are drawn afterwards at

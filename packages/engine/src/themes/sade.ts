@@ -42,18 +42,6 @@ export const sade: VectorTheme = {
   headingDrop: 4,
   label: { uppercase: true, tracking: 0.08, tone: 'sub' },
   motion: { enter: easeInOut, exit: easeInOut, pop: easeOut },
-  tagStyle: { radius: 5, outline: undefined },
-
-  panel(c, x, y, w, h) {
-    c.save();
-    c.shadowColor = 'rgba(0,0,0,.28)';
-    c.shadowBlur = 40;
-    c.shadowOffsetY = 12;
-    roundRectPath(c, x, y, w, h, 20);
-    c.fillStyle = '#fff';
-    c.fill();
-    c.restore();
-  },
 
   card(c, x, y, w, h) {
     c.save();
