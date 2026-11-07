@@ -86,6 +86,26 @@ export default defineLocale({
           following: 'Takip ediliyor',
         },
       },
+      scoreCard: {
+        name: 'Puan kartı',
+        fields: {
+          title: 'Ürün adı',
+          score: 'Puan',
+          max: 'Üzerinden',
+          label: 'Puan etiketi',
+          categories: 'Kategoriler',
+          categoryName: 'Kategori',
+          categoryScore: 'Puan',
+        },
+        sample: {
+          title: 'Kablosuz Kulaklık',
+          label: 'Genel puan',
+          category1: 'Tasarım',
+          category2: 'Performans',
+          category3: 'Yazılım',
+          category4: 'Fiyat / performans',
+        },
+      },
     },
   },
 });

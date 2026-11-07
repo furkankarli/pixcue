@@ -12,5 +12,6 @@ export * from './callout.ts';
 export * from './chapter-title.ts';
 export * from './lower-third.ts';
 export * from './registry.ts';
+export * from './score-card.ts';
 export * from './spec-card.ts';
 export * from './subscribe.ts';

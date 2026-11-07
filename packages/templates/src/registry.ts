@@ -2,6 +2,7 @@ import type { Template } from './api.ts';
 import { callout } from './callout.ts';
 import { chapterTitle } from './chapter-title.ts';
 import { lowerThird } from './lower-third.ts';
+import { scoreCard } from './score-card.ts';
 import { specCard } from './spec-card.ts';
 import { subscribe } from './subscribe.ts';
 
@@ -12,6 +13,7 @@ export const TEMPLATES: readonly Template[] = [
   specCard,
   callout,
   subscribe,
+  scoreCard,
 ];
 
 export function findTemplate(id: string): Template | undefined {

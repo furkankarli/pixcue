@@ -90,6 +90,26 @@ export default {
           following: 'Following',
         },
       },
+      scoreCard: {
+        name: 'Score card',
+        fields: {
+          title: 'Product name',
+          score: 'Score',
+          max: 'Out of',
+          label: 'Score label',
+          categories: 'Categories',
+          categoryName: 'Category',
+          categoryScore: 'Score',
+        },
+        sample: {
+          title: 'Wireless Headphones',
+          label: 'Overall',
+          category1: 'Design',
+          category2: 'Performance',
+          category3: 'Software',
+          category4: 'Value for money',
+        },
+      },
     },
   },
 } satisfies { code: string; name: string; messages: MessageTree };
