@@ -18,9 +18,18 @@ describe('upper', () => {
     expect(upper('pixcue studio')).toBe('PIXCUE STUDIO');
   });
 
-  it('follows an explicit locale', () => {
-    expect(upper('istanbul', 'tr')).toBe('İSTANBUL');
-    expect(upper('istanbul', 'en')).toBe('ISTANBUL');
+  it('uses Turkish rules for Turkish copy', () => {
+    expect(upper('pil', 'tr')).toBe('PİL');
+    expect(upper('dinamik', 'tr-TR')).toBe('DİNAMİK');
+  });
+
+  it('keeps guessing from the text for other languages', () => {
+    expect(upper('driver', 'en')).toBe('DRIVER');
+    expect(upper('sürücü icin', 'en')).toBe('SÜRÜCÜ İCİN');
+  });
+
+  it('is idempotent', () => {
+    expect(upper(upper('dinamik', 'tr'))).toBe('DİNAMİK');
   });
 });
 

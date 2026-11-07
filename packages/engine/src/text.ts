@@ -1,13 +1,21 @@
 const TURKISH_LETTERS = /[çğıöşüÇĞİÖŞÜ]/;
 
+/** Languages whose capital of "i" is "İ". */
+const DOTTED_I_LOCALES = /^(tr|az)(-|$)/i;
+
 /**
- * Uppercases text for display. With a `locale`, uses that language's rules.
- * Without one, guesses: text containing Turkish letters uses Turkish rules, so
- * "istanbul'da" becomes "İSTANBUL'DA" while "pixcue" becomes "PIXCUE".
+ * Uppercases text for display.
+ *
+ * - When the copy is Turkish (or Azerbaijani), Turkish rules: "pil" → "PİL".
+ * - Otherwise the text decides: text containing Turkish letters uses Turkish
+ *   rules ("istanbul'da güzel" → "İSTANBUL'DA GÜZEL"), anything else the
+ *   default rules ("pixcue" → "PIXCUE").
+ *
+ * Idempotent, so already uppercased text can be passed again.
  */
 export function upper(text: string, locale?: string): string {
   const s = String(text ?? '');
-  if (locale) return s.toLocaleUpperCase(locale);
+  if (locale && DOTTED_I_LOCALES.test(locale)) return s.toLocaleUpperCase(locale);
   return TURKISH_LETTERS.test(s) ? s.toLocaleUpperCase('tr-TR') : s.toUpperCase();
 }
 

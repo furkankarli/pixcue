@@ -43,6 +43,7 @@ describe('themes', () => {
   it('capitalizes headings only in uppercase themes, with Turkish rules', () => {
     expect(themeCase(THEMES.tech, 'kutu açılışı')).toBe('KUTU AÇILIŞI');
     expect(themeCase(THEMES.sade, 'kutu açılışı')).toBe('kutu açılışı');
+    expect(themeCase(THEMES.tech, 'pil', 'tr')).toBe('PİL');
   });
 
   it('keeps accent text readable on the pop theme', () => {

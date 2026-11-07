@@ -297,9 +297,9 @@ export function themeFont(
   return `${weight} ${size}px ${theme.fonts.body}`;
 }
 
-/** Applies the theme's capitalization to heading text. */
-export function themeCase(theme: VectorTheme, text: string): string {
-  return theme.uppercase ? upper(text) : String(text ?? '');
+/** Applies the theme's capitalization to heading text, following the copy locale. */
+export function themeCase(theme: VectorTheme, text: string, locale?: string): string {
+  return theme.uppercase ? upper(text, locale) : String(text ?? '');
 }
 
 /** Color for text that "uses the accent", adjusted for themes that need contrast. */
