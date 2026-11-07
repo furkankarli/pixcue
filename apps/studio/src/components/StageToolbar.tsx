@@ -3,8 +3,9 @@
  * right (safe area, app buttons, stage background). Preview aids are browser
  * preferences and never change the export.
  */
-import { createUniqueId, For, type JSX } from 'solid-js';
+import { createUniqueId, For, type JSX, Show } from 'solid-js';
 import { t } from '../i18n.ts';
+import { wide } from '../media.ts';
 import { CheckerIcon, DarkIcon, LightIcon, PhoneIcon, SafeAreaIcon } from '../ui/icons.tsx';
 import {
   platformUi,
@@ -15,7 +16,7 @@ import {
   setStageBackground,
   stageBackground,
 } from '../view.ts';
-import { FormatPicker } from './FormatPicker.tsx';
+import { FormatChips, FormatPicker } from './FormatPicker.tsx';
 
 function Toggle(props: {
   label: string;
@@ -46,40 +47,56 @@ const BACKGROUNDS: readonly {
   { value: 'light', icon: LightIcon },
 ];
 
-export function StageToolbar() {
+/** Preview aids: safe area, app buttons and the stage background. */
+export function StageTools() {
   const name = createUniqueId();
   return (
-    <div class="stage-toolbar">
-      <FormatPicker />
-      <div class="stage-tools">
-        <Toggle label={t('editor.stage.safeArea')} pressed={safeArea()} onChange={setSafeArea}>
-          <SafeAreaIcon />
-        </Toggle>
-        <Toggle
-          label={t('editor.stage.platformUi')}
-          pressed={platformUi()}
-          onChange={setPlatformUi}
-        >
-          <PhoneIcon />
-        </Toggle>
-        <fieldset class="icon-segmented">
-          <legend class="visually-hidden">{t('editor.stage.background')}</legend>
-          <For each={BACKGROUNDS}>
-            {(b) => (
-              <label class="icon-segment" title={t(`editor.stage.backgrounds.${b.value}`)}>
-                <input
-                  type="radio"
-                  name={name}
-                  checked={stageBackground() === b.value}
-                  onChange={() => setStageBackground(b.value)}
-                />
-                <b.icon />
-                <span class="visually-hidden">{t(`editor.stage.backgrounds.${b.value}`)}</span>
-              </label>
-            )}
-          </For>
-        </fieldset>
-      </div>
+    <div class="stage-tools">
+      <Toggle label={t('editor.stage.safeArea')} pressed={safeArea()} onChange={setSafeArea}>
+        <SafeAreaIcon />
+      </Toggle>
+      <Toggle label={t('editor.stage.platformUi')} pressed={platformUi()} onChange={setPlatformUi}>
+        <PhoneIcon />
+      </Toggle>
+      <fieldset class="icon-segmented">
+        <legend class="visually-hidden">{t('editor.stage.background')}</legend>
+        <For each={BACKGROUNDS}>
+          {(b) => (
+            <label class="icon-segment" title={t(`editor.stage.backgrounds.${b.value}`)}>
+              <input
+                type="radio"
+                name={name}
+                checked={stageBackground() === b.value}
+                onChange={() => setStageBackground(b.value)}
+              />
+              <b.icon />
+              <span class="visually-hidden">{t(`editor.stage.backgrounds.${b.value}`)}</span>
+            </label>
+          )}
+        </For>
+      </fieldset>
     </div>
+  );
+}
+
+/**
+ * The bar above the stage. Wide screens: the format menu and the preview
+ * aids. Phones: the formats as chips; the aids move to the transport bar.
+ */
+export function StageToolbar() {
+  return (
+    <Show
+      when={wide()}
+      fallback={
+        <div class="stage-toolbar compact">
+          <FormatChips />
+        </div>
+      }
+    >
+      <div class="stage-toolbar">
+        <FormatPicker />
+        <StageTools />
+      </div>
+    </Show>
   );
 }

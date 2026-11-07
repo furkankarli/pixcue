@@ -4,11 +4,15 @@
  */
 import { createMemo, Show } from 'solid-js';
 import { locale, t } from '../i18n.ts';
+import { wide } from '../media.ts';
 import { displayTime, playing, seek, togglePlay } from '../playback.ts';
 import { duration } from '../store.ts';
 import { PauseIcon, PlayIcon, SkipBackIcon } from '../ui/icons.tsx';
+import { StageTools } from './StageToolbar.tsx';
 
 export function Transport(props: { hintId: string }) {
+  // On phones the preview aids take the hint's place; the hint stays for
+  // screen readers, since it describes the stage.
   const number = createMemo(
     () => new Intl.NumberFormat(locale(), { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
   );
@@ -42,9 +46,12 @@ export function Transport(props: { hintId: string }) {
           </Show>
         </button>
       </div>
-      <p class="transport-hint" id={props.hintId}>
+      <p class="transport-hint" classList={{ 'visually-hidden': !wide() }} id={props.hintId}>
         {t('editor.stage.dragHint')}
       </p>
+      <Show when={!wide()}>
+        <StageTools />
+      </Show>
     </div>
   );
 }

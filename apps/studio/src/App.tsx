@@ -80,10 +80,19 @@ export function App() {
           </aside>
         </Show>
 
-        <section class="stage-column" aria-label={t('editor.stage.label')}>
+        {/* Phones: the format chips sit above the stage and scroll away. */}
+        <Show when={!wide()}>
           <StageToolbar />
-          <Stage hintId="stage-hint" />
-          <Transport hintId="stage-hint" />
+        </Show>
+
+        <section class="stage-column" aria-label={t('editor.stage.label')}>
+          <Show when={wide()}>
+            <StageToolbar />
+          </Show>
+          <div class="monitor">
+            <Stage hintId="stage-hint" />
+            <Transport hintId="stage-hint" />
+          </div>
         </section>
 
         <Timeline />

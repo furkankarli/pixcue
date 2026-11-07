@@ -179,10 +179,15 @@ a {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   grid-template-areas:
+    "toolbar"
     "stage"
     "timeline"
     "inspector";
   flex: 1;
+}
+
+.stage-toolbar.compact {
+  grid-area: toolbar;
 }
 
 .library-panel {
@@ -620,6 +625,76 @@ optgroup {
 .icon-segment:has(input:focus-visible) {
   outline: 1px solid var(--fg);
   outline-offset: 1px;
+}
+
+/* The monitor: the stage and its transport, kept together. */
+.monitor {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--bg);
+}
+
+/* Format chips (phones): one row that scrolls sideways. */
+.stage-toolbar.compact {
+  height: auto;
+  padding: 0;
+}
+
+.format-chips {
+  display: flex;
+  gap: var(--space-1);
+  min-inline-size: 0;
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  scroll-snap-type: x proximity;
+}
+
+.format-chip {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-2);
+  height: 32px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-2);
+  background: var(--surface-2);
+  color: var(--fg-2);
+  font-weight: 500;
+  white-space: nowrap;
+  scroll-snap-align: start;
+  cursor: pointer;
+  transition:
+    background-color var(--quick),
+    color var(--quick);
+}
+
+.format-chip input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.format-chip:has(input:checked) {
+  background: var(--fg);
+  color: var(--bg);
+}
+
+.format-chip:has(input:focus-visible) {
+  outline: 1px solid var(--fg);
+  outline-offset: 2px;
+}
+
+.format-shape {
+  flex: none;
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1.5px currentColor;
 }
 
 /* The pasteboard: a dot grid, with the frame in the middle. */
@@ -1984,5 +2059,90 @@ input[type="range"].hue-slider::-webkit-slider-thumb {
 
   .format-picker select {
     max-width: 150px;
+  }
+}
+
+/* ---------- Phones and narrow windows ---------- */
+@media (max-width: 1099px) {
+  :root {
+    --topbar-h: 48px;
+  }
+
+  .wordmark {
+    padding: 3px 4px;
+  }
+
+  /* Three-pixel LEDs: still crisp, half the height. */
+  .wordmark svg {
+    width: auto;
+    height: 27px;
+  }
+
+  /* The preview stays in view while the panel below scrolls. */
+  .stage-column {
+    position: sticky;
+    top: calc(var(--topbar-h) + env(safe-area-inset-top, 0px));
+    z-index: 5;
+    background: var(--bg);
+    box-shadow: inset 0 -1px var(--line);
+  }
+
+  .stage {
+    max-height: 36dvh;
+    padding: var(--space-3);
+  }
+
+  .transport {
+    grid-template-columns: auto 1fr auto;
+    height: 48px;
+    padding: 0 var(--space-3);
+  }
+
+  .transport .transport-buttons {
+    justify-self: center;
+  }
+
+  .transport .stage-tools {
+    margin-left: 0;
+  }
+
+  .transport .tool-button {
+    width: var(--control-h);
+    padding: 0;
+    justify-content: center;
+  }
+
+  .transport .icon-segmented {
+    margin-left: 0;
+  }
+
+  .transport .icon-segment {
+    width: 26px;
+  }
+
+  .timecode-now {
+    font-size: 14px;
+  }
+
+  .ruler {
+    height: 24px;
+  }
+
+  .tick-label {
+    bottom: 8px;
+    font-size: 10px;
+  }
+
+  .track {
+    height: 44px;
+    padding: 4px 0;
+  }
+
+  .clip {
+    height: 36px;
+  }
+
+  .filmstrip {
+    height: 32px;
   }
 }

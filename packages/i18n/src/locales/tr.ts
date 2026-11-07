@@ -69,7 +69,7 @@ export default defineLocale({
           dark: 'Koyu',
           light: 'Açık',
         },
-        dragHint: 'Grafiği sürükle ya da ok tuşlarıyla taşı. Çift tık veya Home konumu sıfırlar.',
+        dragHint: 'Sürükle ya da ok tuşlarıyla taşı. Home sıfırlar.',
         loading: 'Fontlar yükleniyor…',
       },
       style: {
