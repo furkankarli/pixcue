@@ -28,6 +28,18 @@ export const easeOutBack: Easing = (p) => {
   return 1 + c3 * (x - 1) ** 3 + c1 * (x - 1) ** 2;
 };
 
+/** Exponential ease-out: very fast start, precise stop (HUD-like). */
+export const easeOutExpo: Easing = (p) => {
+  const x = clamp(p);
+  return x === 1 ? 1 : 1 - 2 ** (-10 * x);
+};
+
+/** Exponential ease-in. */
+export const easeInExpo: Easing = (p) => {
+  const x = clamp(p);
+  return x === 0 ? 0 : 2 ** (10 * x - 10);
+};
+
 /**
  * Animates in, holds, then animates out: the standard life cycle of an element.
  *

@@ -111,12 +111,12 @@ const vector: VectorScene<LowerThirdFields> = {
       c.translate(cx, cy);
       c.scale(tagIn, tagIn);
       c.translate(-cx, -cy);
-      roundRectPath(c, 30, Y0 - 36, tw, 34, theme.chip.radius);
+      roundRectPath(c, 30, Y0 - 36, tw, 34, theme.tagStyle.radius);
       c.fillStyle = accent;
       c.fill();
-      if (theme.chip.outline) {
+      if (theme.tagStyle.outline) {
         c.lineWidth = 4;
-        c.strokeStyle = theme.chip.outline;
+        c.strokeStyle = theme.tagStyle.outline;
         c.stroke();
       }
       fillTextAt(c, s, 45, Y0 - 12, f, onColor(accent));

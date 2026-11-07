@@ -1,6 +1,11 @@
 import type { Ctx2D } from './canvas.ts';
+import type { Easing } from './math.ts';
 import { upper } from './text.ts';
-import { roundRectPath } from './vector/draw.ts';
+import { fillTracked, type Point, trackedWidth } from './themes/kit.ts';
+import { pop } from './themes/pop.ts';
+import { sade } from './themes/sade.ts';
+import { SEMANTIC_COLORS, type SemanticColors } from './themes/semantic.ts';
+import { tech } from './themes/tech.ts';
 
 export interface FontFace {
   /** CSS font family list, e.g. `"Chakra Petch", Manrope, sans-serif`. */
@@ -21,30 +26,36 @@ export interface VectorThemeColors {
   readonly sweep: string;
 }
 
-/** Colors with a fixed meaning, shared by every theme. */
-export interface SemanticColors {
-  /** Good things: pros, checks. */
-  readonly positive: string;
-  /** Bad things: cons. */
-  readonly negative: string;
-  /** Celebration sparks and confetti, next to the accent and white. */
-  readonly spark: string;
+export { SEMANTIC_COLORS, type SemanticColors } from './themes/semantic.ts';
+
+/** How a theme moves: easings for entering, leaving and popping elements. */
+export interface ThemeMotion {
+  readonly enter: Easing;
+  readonly exit: Easing;
+  readonly pop: Easing;
 }
 
-export const SEMANTIC_COLORS: SemanticColors = {
-  positive: '#22C55E',
-  negative: '#EF4444',
-  spark: '#FFD43B',
-};
+/** Small captions and chip text: case, letter spacing (em) and color. */
+export interface LabelStyle {
+  readonly uppercase: boolean;
+  readonly tracking: number;
+  readonly tone: 'accent' | 'sub' | 'text';
+}
 
-/** A theme drawn with vector Canvas 2D: fonts, colors and a few shape styles. */
+export type MarkerKind = 'dot' | 'plus' | 'minus';
+
+/**
+ * A theme drawn with vector Canvas 2D. Beyond fonts and colors, it draws every
+ * recurring element (see docs/themes.md), so templates look consistent within
+ * a theme and distinct across themes.
+ */
 export interface VectorTheme {
   readonly kind: 'vector';
   readonly id: 'tech' | 'pop' | 'sade';
   /** Default accent color; users can override it. */
   readonly accent: string;
   readonly semantic: SemanticColors;
-  readonly fonts: { readonly display: FontFace; readonly body: string };
+  readonly fonts: { readonly display: FontFace; readonly body: string; readonly label: FontFace };
   /** Whether headings are set in capitals. */
   readonly uppercase: boolean;
   readonly colors: VectorThemeColors;
@@ -52,11 +63,16 @@ export interface VectorTheme {
   readonly accentText: string | undefined;
   /** Corner radius of icon tiles inside buttons. */
   readonly iconRadius: number;
-  /** Style of small label chips (for example the lower third's tag). */
-  readonly chip: { readonly radius: number; readonly outline: string | undefined };
+  readonly label: LabelStyle;
+  readonly motion: ThemeMotion;
+  /** Legacy tag style, used until every template draws tags with `chip`. */
+  readonly tagStyle: { readonly radius: number; readonly outline: string | undefined };
+  /** Legacy card surface, used until every template draws with `card`. */
   panel(c: Ctx2D, x: number, y: number, w: number, h: number): void;
+  /** A card surface in the theme's style. */
+  card(c: Ctx2D, x: number, y: number, w: number, h: number, accent: string): void;
   button(c: Ctx2D, x: number, y: number, w: number, h: number, fill: string): void;
-  /** Large text with the theme's treatment (shadow, offset outline…). */
+  /** Large text over video with the theme's treatment (shadow, offset outline…). */
   heading(
     c: Ctx2D,
     text: string,
@@ -67,6 +83,52 @@ export interface VectorTheme {
     color?: string,
     accent?: string,
   ): void;
+  /**
+   * A small label (tag, chapter number) with its top-left at `(x, y)`; `size`
+   * is the font size. With `draw: false` it only measures.
+   */
+  chip(
+    c: Ctx2D,
+    text: string,
+    x: number,
+    y: number,
+    size: number,
+    accent: string,
+    draw?: boolean,
+  ): { w: number; h: number };
+  /** An accent bar or line. */
+  rule(c: Ctx2D, x: number, y: number, w: number, h: number, color: string): void;
+  /** A separator, drawn from the left up to `progress` (0–1) of its width. */
+  divider(c: Ctx2D, x: number, y: number, w: number, progress: number): void;
+  /** A horizontal meter filled to `value` (0–1). */
+  meter(c: Ctx2D, x: number, y: number, w: number, h: number, value: number, color: string): void;
+  /** A circular meter filled clockwise from the top to `value` (0–1). */
+  ring(c: Ctx2D, cx: number, cy: number, r: number, value: number, color: string): void;
+  /** A badge or anchor point; `t` (seconds) drives idle animation. */
+  marker(
+    c: Ctx2D,
+    cx: number,
+    cy: number,
+    size: number,
+    kind: MarkerKind,
+    color: string,
+    t: number,
+  ): void;
+  /** A connector line through `points`, drawn up to `progress` (0–1) of its length. */
+  leader(c: Ctx2D, points: readonly Point[], progress: number, color: string): void;
+  /** Reveals what `draw` paints inside the rectangle as `progress` goes 0 → 1. */
+  reveal(
+    c: Ctx2D,
+    progress: number,
+    x: number,
+    y: number,
+    w: number,
+    h: number,
+    color: string,
+    draw: () => void,
+  ): void;
+  /** Feedback for a click or tap at `(x, y)`; `age` goes 0 → 1 over the effect. */
+  burst(c: Ctx2D, x: number, y: number, age: number, color: string, seed: number): void;
 }
 
 /** The pixel theme renders through the pixel engine with bitmap fonts. */
@@ -79,169 +141,6 @@ export interface PixelTheme {
 
 export type Theme = VectorTheme | PixelTheme;
 export type ThemeId = Theme['id'];
-
-const tech: VectorTheme = {
-  kind: 'vector',
-  id: 'tech',
-  semantic: SEMANTIC_COLORS,
-  accent: '#00E5FF',
-  fonts: {
-    display: { family: '"Chakra Petch", Manrope, sans-serif', weight: 700 },
-    body: 'Manrope, sans-serif',
-  },
-  uppercase: true,
-  colors: {
-    text: '#FFFFFF',
-    sub: '#A7B1BF',
-    line: 'rgba(255,255,255,.14)',
-    neutral: '#3A414B',
-    sweep: 'rgba(255,255,255,.16)',
-  },
-  accentText: undefined,
-  iconRadius: 14,
-  chip: { radius: 5, outline: undefined },
-  panel(c, x, y, w, h) {
-    roundRectPath(c, x, y, w, h, 6);
-    c.fillStyle = 'rgba(11,14,19,.92)';
-    c.fill();
-    c.strokeStyle = 'rgba(255,255,255,.09)';
-    c.lineWidth = 2;
-    c.stroke();
-  },
-  button(c, x, y, w, h, fill) {
-    roundRectPath(c, x, y, w, h, 14);
-    c.fillStyle = fill;
-    c.fill();
-    c.save();
-    roundRectPath(c, x, y, w, h, 14);
-    c.clip();
-    c.fillStyle = 'rgba(255,255,255,.16)';
-    c.fillRect(x, y, w, h * 0.42);
-    c.restore();
-    roundRectPath(c, x, y, w, h, 14);
-    c.strokeStyle = 'rgba(0,0,0,.35)';
-    c.lineWidth = 3;
-    c.stroke();
-  },
-  heading(c, text, x, y, font, align, color) {
-    c.save();
-    c.font = font;
-    c.textAlign = align;
-    c.shadowColor = 'rgba(0,0,0,.6)';
-    c.shadowBlur = 26;
-    c.shadowOffsetY = 4;
-    c.fillStyle = color ?? '#fff';
-    c.fillText(text, x, y);
-    c.restore();
-  },
-};
-
-const pop: VectorTheme = {
-  kind: 'vector',
-  id: 'pop',
-  semantic: SEMANTIC_COLORS,
-  accent: '#FFD21F',
-  fonts: {
-    display: { family: 'Anton, Impact, sans-serif', weight: 400 },
-    body: 'Manrope, sans-serif',
-  },
-  uppercase: true,
-  colors: {
-    text: '#111111',
-    sub: '#4A4A4A',
-    line: 'rgba(0,0,0,.14)',
-    neutral: '#2B2B2B',
-    sweep: 'rgba(255,210,31,.35)',
-  },
-  accentText: '#111111',
-  iconRadius: 12,
-  chip: { radius: 0, outline: '#111' },
-  panel(c, x, y, w, h) {
-    c.fillStyle = '#111';
-    c.fillRect(x + 12, y + 12, w, h);
-    c.fillStyle = '#fff';
-    c.fillRect(x, y, w, h);
-    c.lineWidth = 5;
-    c.strokeStyle = '#111';
-    c.strokeRect(x + 2.5, y + 2.5, w - 5, h - 5);
-  },
-  button(c, x, y, w, h, fill) {
-    roundRectPath(c, x + 9, y + 9, w, h, 16);
-    c.fillStyle = '#111';
-    c.fill();
-    roundRectPath(c, x, y, w, h, 16);
-    c.fillStyle = fill;
-    c.fill();
-    c.lineWidth = 5;
-    c.strokeStyle = '#111';
-    c.stroke();
-  },
-  heading(c, text, x, y, font, align, color, accent) {
-    c.save();
-    c.font = font;
-    c.textAlign = align;
-    c.lineJoin = 'round';
-    c.lineWidth = 14;
-    c.strokeStyle = '#111';
-    c.strokeText(text, x + 9, y + 9);
-    c.fillStyle = accent ?? '#FFD21F';
-    c.fillText(text, x + 9, y + 9);
-    c.strokeText(text, x, y);
-    c.fillStyle = color ?? '#fff';
-    c.fillText(text, x, y);
-    c.restore();
-  },
-};
-
-const sade: VectorTheme = {
-  kind: 'vector',
-  id: 'sade',
-  semantic: SEMANTIC_COLORS,
-  accent: '#3D5AFE',
-  fonts: { display: { family: 'Manrope, sans-serif', weight: 800 }, body: 'Manrope, sans-serif' },
-  uppercase: false,
-  colors: {
-    text: '#15171A',
-    sub: '#5C6370',
-    line: 'rgba(0,0,0,.1)',
-    neutral: '#6B7280',
-    sweep: 'rgba(61,90,254,.10)',
-  },
-  accentText: undefined,
-  iconRadius: 37,
-  chip: { radius: 5, outline: undefined },
-  panel(c, x, y, w, h) {
-    c.save();
-    c.shadowColor = 'rgba(0,0,0,.28)';
-    c.shadowBlur = 40;
-    c.shadowOffsetY = 12;
-    roundRectPath(c, x, y, w, h, 20);
-    c.fillStyle = '#fff';
-    c.fill();
-    c.restore();
-  },
-  button(c, x, y, w, h, fill) {
-    c.save();
-    c.shadowColor = 'rgba(0,0,0,.28)';
-    c.shadowBlur = 26;
-    c.shadowOffsetY = 8;
-    roundRectPath(c, x, y, w, h, h / 2);
-    c.fillStyle = fill;
-    c.fill();
-    c.restore();
-  },
-  heading(c, text, x, y, font, align, color) {
-    c.save();
-    c.font = font;
-    c.textAlign = align;
-    c.shadowColor = 'rgba(0,0,0,.45)';
-    c.shadowBlur = 32;
-    c.shadowOffsetY = 6;
-    c.fillStyle = color ?? '#fff';
-    c.fillText(text, x, y);
-    c.restore();
-  },
-};
 
 const pixel: PixelTheme = {
   kind: 'pixel',
@@ -314,4 +213,59 @@ export function themeCase(theme: VectorTheme, text: string, locale?: string): st
 /** Color for text that "uses the accent", adjusted for themes that need contrast. */
 export function accentTextColor(theme: VectorTheme, accent: string): string {
   return theme.accentText ?? accent;
+}
+
+/** Canvas font string for the theme's label font at `size`. */
+export function labelFont(theme: VectorTheme, size: number): string {
+  return `${theme.fonts.label.weight} ${size}px ${theme.fonts.label.family}`;
+}
+
+/** Label color for the theme: the accent, secondary text or main text. */
+export function labelColor(theme: VectorTheme, accent: string): string {
+  if (theme.label.tone === 'accent') return accentTextColor(theme, accent);
+  return theme.label.tone === 'sub' ? theme.colors.sub : theme.colors.text;
+}
+
+/** Applies the label style's case. */
+export function labelText(theme: VectorTheme, text: string, locale?: string): string {
+  return theme.label.uppercase ? upper(text, locale) : String(text ?? '');
+}
+
+/** Width of a label in the theme's style. */
+export function labelWidth(
+  c: Ctx2D,
+  theme: VectorTheme,
+  text: string,
+  size: number,
+  locale?: string,
+): number {
+  return trackedWidth(
+    c,
+    labelText(theme, text, locale),
+    labelFont(theme, size),
+    theme.label.tracking * size,
+  );
+}
+
+/** Draws a caption in the theme's label style; returns its width. */
+export function drawLabel(
+  c: Ctx2D,
+  theme: VectorTheme,
+  text: string,
+  x: number,
+  y: number,
+  size: number,
+  color: string,
+  options: { readonly align?: CanvasTextAlign; readonly locale?: string } = {},
+): number {
+  return fillTracked(
+    c,
+    labelText(theme, text, options.locale),
+    x,
+    y,
+    labelFont(theme, size),
+    color,
+    theme.label.tracking * size,
+    options.align,
+  );
 }

@@ -2,9 +2,11 @@ import { describe, expect, it } from 'vitest';
 import {
   clamp,
   easeIn,
+  easeInExpo,
   easeInOut,
   easeOut,
   easeOutBack,
+  easeOutExpo,
   envelope,
   linear,
   seededRandom,
@@ -23,7 +25,7 @@ describe('clamp', () => {
 });
 
 describe('easings', () => {
-  it.each([linear, easeOut, easeIn, easeInOut, easeOutBack])(
+  it.each([linear, easeOut, easeIn, easeInOut, easeOutBack, easeOutExpo, easeInExpo])(
     '%o starts at 0 and ends at 1',
     (e) => {
       expect(e(0)).toBeCloseTo(0, 10);

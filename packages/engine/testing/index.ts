@@ -14,6 +14,7 @@ const FONTS: readonly [file: string, family: string][] = [
   ['Manrope-Medium.ttf', 'Manrope'],
   ['Manrope-Bold.ttf', 'Manrope'],
   ['Manrope-ExtraBold.ttf', 'Manrope'],
+  ['JetBrainsMono-Bold.ttf', 'JetBrains Mono'],
 ];
 
 let ready = false;

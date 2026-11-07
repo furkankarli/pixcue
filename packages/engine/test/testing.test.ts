@@ -10,7 +10,7 @@ const width = (font: string, text: string) => {
 describe('test fonts', () => {
   it('loads every theme font family', () => {
     const fallback = width('700 40px sans-serif', 'Pixcue');
-    for (const family of ['"Chakra Petch"', 'Anton', 'Manrope']) {
+    for (const family of ['"Chakra Petch"', 'Anton', 'Manrope', '"JetBrains Mono"']) {
       expect(width(`700 40px ${family}`, 'Pixcue'), family).not.toBeCloseTo(fallback, 1);
     }
   });
@@ -25,7 +25,7 @@ describe('test fonts', () => {
     // A missing glyph falls back to another font and changes the width
     // relative to the base letter by a large amount; accented letters should
     // be as wide as their base letters (± a little).
-    for (const family of ['"Chakra Petch"', 'Anton', 'Manrope']) {
+    for (const family of ['"Chakra Petch"', 'Anton', 'Manrope', '"JetBrains Mono"']) {
       for (const [accented, base] of [
         ['Ğ', 'G'],
         ['Ş', 'S'],
