@@ -30,6 +30,18 @@ export default {
           subtitle: 'Sound, battery life and connection tests',
         },
       },
+      chapterTitle: {
+        name: 'Chapter title',
+        fields: {
+          kicker: 'Chapter label',
+          kickerHelp: 'Shown under the line. Leave empty to hide it.',
+          title: 'Title',
+        },
+        sample: {
+          kicker: 'Chapter 01',
+          title: 'Unboxing',
+        },
+      },
     },
   },
 } satisfies { code: string; name: string; messages: MessageTree };

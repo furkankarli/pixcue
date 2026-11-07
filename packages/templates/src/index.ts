@@ -8,5 +8,6 @@
  * Depends on @pixcue/engine and @pixcue/i18n only.
  */
 export * from './api.ts';
+export * from './chapter-title.ts';
 export * from './lower-third.ts';
 export * from './registry.ts';

@@ -26,6 +26,18 @@ export default defineLocale({
           subtitle: 'Ses, pil ömrü ve bağlantı testleri',
         },
       },
+      chapterTitle: {
+        name: 'Bölüm başlığı',
+        fields: {
+          kicker: 'Bölüm etiketi',
+          kickerHelp: 'Çizginin altında görünür. Boş bırakırsan gizlenir.',
+          title: 'Başlık',
+        },
+        sample: {
+          kicker: 'Bölüm 01',
+          title: 'Kutu açılışı',
+        },
+      },
     },
   },
 });
