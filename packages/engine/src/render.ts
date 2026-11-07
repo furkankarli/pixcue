@@ -18,6 +18,8 @@ export interface SceneArgs<F> {
   readonly duration: number;
   readonly frame: Frame;
   readonly accent: string;
+  /** BCP 47 language of the copy, e.g. `"tr"`; use it for number formats and casing. */
+  readonly locale: string;
 }
 
 /**
@@ -65,6 +67,8 @@ export interface RenderState<F> {
   readonly duration: number;
   readonly layout: Layout;
   readonly background?: Background | undefined;
+  /** Language of the copy; defaults to English. */
+  readonly locale?: string | undefined;
 }
 
 /** Where the graphic ended up, in output pixels. */
@@ -132,7 +136,13 @@ export function render<F>(ctx: Ctx2D, t: number, state: RenderState<F>): Bounds 
   ctx.clearRect(0, 0, frame.pixelWidth, frame.pixelHeight);
   paintBackground(ctx, frame, state.background);
 
-  const args: SceneArgs<F> = { fields, duration, frame, accent: theme.accent };
+  const args: SceneArgs<F> = {
+    fields,
+    duration,
+    frame,
+    accent: theme.accent,
+    locale: state.locale ?? 'en',
+  };
   return theme.kind === 'pixel'
     ? renderPixel(ctx, t, state, args)
     : renderVector(ctx, t, state, { ...args, theme });

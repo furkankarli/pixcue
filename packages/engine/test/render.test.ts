@@ -88,6 +88,33 @@ describe('render', () => {
     expect(pixelAt(ctx, 0, 0)).toEqual([0, 255, 0, 255]);
   });
 
+  it('passes the locale to scenes, defaulting to English', () => {
+    const seen: string[] = [];
+    const probe: Scene<null> = {
+      vector: {
+        measure: (_c, { locale }) => {
+          seen.push(locale);
+          return { w: 10, h: 10 };
+        },
+        draw: () => {},
+      },
+      pixel: { measure: () => ({ w: 1, h: 1 }), draw: () => {} },
+    };
+    const frame = createFrame('square');
+    const { ctx } = createTestCanvas(frame.pixelWidth, frame.pixelHeight);
+    const base = {
+      frame,
+      theme: resolveTheme('sade'),
+      scene: probe,
+      fields: null,
+      duration: 1,
+      layout,
+    };
+    render(ctx, 0, base);
+    render(ctx, 0, { ...base, locale: 'tr' });
+    expect(seen).toEqual(['en', 'tr']);
+  });
+
   it('is deterministic', () => {
     const a = run('reels', 'pixel').ctx.getImageData(0, 0, 1080, 1920).data;
     const b = run('reels', 'pixel').ctx.getImageData(0, 0, 1080, 1920).data;
