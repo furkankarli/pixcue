@@ -36,6 +36,17 @@ jobs:
       - name: Visual snapshot tests
         run: pnpm test:visual
 
+      - name: Upload visual diffs
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: visual-diffs
+          path: |
+            packages/*/test/**/__snapshots__/__diff__/
+            packages/*/test/**/__snapshots__/__actual__/
+          if-no-files-found: ignore
+          retention-days: 7
+
       - name: Build studio
         run: pnpm --filter studio build
 
