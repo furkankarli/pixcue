@@ -1,5 +1,6 @@
 import type { Ctx2D } from '../canvas.ts';
-import { clamp, easeInOut } from '../math.ts';
+import { clamp, easeInOut, easeOut } from '../math.ts';
+import { tapPhase } from '../tap.ts';
 
 /** Adds a rounded-rectangle path. The radius is limited to half the shorter side. */
 export function roundRectPath(c: Ctx2D, x: number, y: number, w: number, h: number, r: number) {
@@ -178,6 +179,45 @@ export function drawIcon(
   icon(c);
   c.fillStyle = fill;
   c.fill();
+  c.restore();
+}
+
+/**
+ * A touch indicator for a finger tap at `(x, y)` (see `tapPhase`): a
+ * translucent disc that presses down, and a ring that spreads as the finger
+ * lifts. A dark halo keeps it visible on light buttons.
+ */
+export function drawTap(c: Ctx2D, x: number, y: number, t: number, at: number, r = 40): void {
+  const s = tapPhase(t, at);
+  if (!s) return;
+  c.save();
+  if (s.ripple !== null) {
+    const k = easeOut(s.ripple);
+    const radius = r * (0.85 + 1.6 * k);
+    c.globalAlpha = (1 - s.ripple) * 0.9;
+    c.beginPath();
+    c.arc(x, y, radius, 0, Math.PI * 2);
+    c.lineWidth = 9 * (1 - s.ripple) + 2;
+    c.strokeStyle = 'rgba(0,0,0,0.25)';
+    c.stroke();
+    c.lineWidth = 5 * (1 - s.ripple) + 1;
+    c.strokeStyle = '#fff';
+    c.stroke();
+  }
+  if (s.alpha > 0) {
+    const radius = r * (1.3 - 0.3 * s.appear) * (1 - 0.18 * s.press);
+    c.globalAlpha = s.alpha;
+    c.beginPath();
+    c.arc(x, y, radius, 0, Math.PI * 2);
+    c.fillStyle = `rgba(255,255,255,${0.32 + 0.28 * s.press})`;
+    c.fill();
+    c.lineWidth = 10;
+    c.strokeStyle = 'rgba(0,0,0,0.22)';
+    c.stroke();
+    c.lineWidth = 4;
+    c.strokeStyle = '#fff';
+    c.stroke();
+  }
   c.restore();
 }
 
