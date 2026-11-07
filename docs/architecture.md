@@ -52,7 +52,7 @@ Rules that keep this healthy:
  Copy  { subscribe | follow … }                   ← i18n, by locale and platform
             │
             ▼
- template.render(ctx, t, state)                   ← deterministic: same input, same pixels
+ render(ctx, t, state) → template scene          ← deterministic: same input, same pixels
             │
             ├──► preview canvas (studio, requestAnimationFrame + scrubber)
             │
@@ -71,12 +71,50 @@ Rules that keep this healthy:
 
 ### Frames and safe areas
 
-Templates never assume 1920×1080. Every render receives the frame: width,
-height, orientation and a safe area. The presets are YouTube 1920×1080 and
-3840×2160, Shorts/TikTok/Reels 1080×1920, Instagram post 1080×1350 and square
-1080×1080. Vertical safe areas keep graphics away from platform UI (top tabs,
-the bottom caption area and the right-hand action buttons). The exact insets
-live in one config file in the engine so they can be tuned in one place.
+Templates never assume 1920×1080. They draw in **design units**, where the short
+side of every frame is 1080 units, and the engine scales to the output size: one
+design unit is one pixel at 1080p and two pixels at 4K. A template therefore
+looks the same in every resolution of the same shape.
+
+Every render receives a `Frame`: size in design units, orientation
+(`horizontal`, `vertical` or `square`), the safe area, the output size in pixels
+and the platform. The presets are:
+
+| Preset                      | Output               | Platform                               |
+| --------------------------- | -------------------- | -------------------------------------- |
+| `youtube`, `youtube-4k`     | 1920×1080, 3840×2160 | YouTube                                |
+| `shorts`, `tiktok`, `reels` | 1080×1920            | YouTube, TikTok, Instagram             |
+| `vertical`                  | 1080×1920            | any (strictest safe area of the three) |
+| `instagram-post`            | 1080×1350            | Instagram                              |
+| `square`                    | 1080×1080            | any                                    |
+
+Vertical safe areas keep graphics away from platform UI (top tabs, the bottom
+caption area and the right-hand action buttons). The exact insets live in one
+file, [`packages/engine/src/safe-areas.ts`](../packages/engine/src/safe-areas.ts),
+so they can be tuned in one place.
+
+The user picks one of nine anchor positions, a drag offset and a scale. The
+engine anchors the graphic inside the safe area and shrinks it if it would not
+fit.
+
+### Scenes and the two rendering paths
+
+A template's drawing code is a `Scene` with two parts, one per rendering path:
+
+- **Vector** (tech, pop, sade): `measure` returns the graphic's natural size in
+  design units, then `draw` paints one frame with Canvas 2D, taking fonts,
+  colors, panels, buttons and headings from the theme.
+- **Pixel**: `measure` returns a size in grid cells, then `draw` paints with a
+  `Painter` on a low-resolution grid that is scaled up without smoothing (6
+  output pixels per cell at 1080p). Sprites that "pop" are drawn afterwards at
+  full resolution in whole-number steps, which keeps them crisp.
+
+`render(ctx, t, state)` clears the canvas, paints an optional background (a solid
+color for green-screen exports, or an image for previews), picks the path from
+the theme, places the graphic and returns its bounds in output pixels.
+
+The engine creates its offscreen canvases through a factory: `OffscreenCanvas`
+in browsers, and a Node.js canvas in tests (`@pixcue/engine/testing`).
 
 ### Determinism
 
