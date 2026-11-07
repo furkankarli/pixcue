@@ -46,8 +46,9 @@ picture.
   secondary text.
 - **Lines and data.** Dashed dividers with ticks, segmented meters and rings,
   bracketed chips (`[ REVIEW ]`).
-- **Motion.** Fast and exact: exponential ease-out, no overshoot. Text is
-  revealed by a bright scan line; elements flicker briefly as they power on.
+- **Motion.** Fast and exact: exponential ease-out, no overshoot; exits
+  accelerate away on a cubic curve. Text is revealed by a bright scan line;
+  elements flicker briefly as they power on.
 
 ## Pop: comic pop art
 
@@ -61,8 +62,9 @@ sticker sheet.
 - **Color.** Saturated accent, black and white, used at full strength.
 - **Lines and data.** Chunky outlined dividers, striped meters with outlines,
   starburst markers.
-- **Motion.** Bouncy: strong overshoot, squash and stretch, quick stagger.
-  Text is revealed by a solid accent block that wipes away.
+- **Motion.** Bouncy: strong overshoot, squash and stretch, quick stagger;
+  exits ease in and out. Text is revealed by a solid accent block that wipes
+  away.
 
 ## Clean (Sade): Swiss minimal
 

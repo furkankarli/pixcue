@@ -4,7 +4,7 @@
  * motion. See docs/themes.md.
  */
 import { mix, onColor } from '../color.ts';
-import { clamp, easeIn, easeOutBack } from '../math.ts';
+import { clamp, easeInOut, easeOutBack } from '../math.ts';
 import type { VectorTheme } from '../theme.ts';
 import { blockReveal, roundRectPath } from '../vector/draw.ts';
 import { fillTracked, halftone, partialPolyline, starPath, trackedWidth } from './kit.ts';
@@ -63,7 +63,7 @@ export const pop: VectorTheme = {
   iconRadius: 12,
   headingDrop: 16,
   label: { uppercase: true, tracking: 0.04, tone: 'text' },
-  motion: { enter: easeOutBack, exit: easeIn, pop: easeOutBack },
+  motion: { enter: easeOutBack, exit: easeInOut, pop: easeOutBack },
   tagStyle: { radius: 0, outline: INK },
 
   panel(c, x, y, w, h) {

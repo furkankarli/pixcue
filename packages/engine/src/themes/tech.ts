@@ -3,7 +3,7 @@
  * and corner brackets, monospace data labels, segmented meters, scan-line
  * reveals and fast, exact motion. See docs/themes.md.
  */
-import { clamp, easeInExpo, easeOutExpo } from '../math.ts';
+import { clamp, easeIn, easeOutExpo } from '../math.ts';
 import type { VectorTheme } from '../theme.ts';
 import { roundRectPath } from '../vector/draw.ts';
 import { chamferPath, cornerBrackets, fillTracked, partialPolyline, trackedWidth } from './kit.ts';
@@ -35,7 +35,7 @@ export const tech: VectorTheme = {
   iconRadius: 14,
   headingDrop: 2,
   label: { uppercase: true, tracking: 0.14, tone: 'accent' },
-  motion: { enter: easeOutExpo, exit: easeInExpo, pop: easeOutExpo },
+  motion: { enter: easeOutExpo, exit: easeIn, pop: easeOutExpo },
   tagStyle: { radius: 5, outline: undefined },
 
   panel(c, x, y, w, h) {
