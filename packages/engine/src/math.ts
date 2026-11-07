@@ -30,6 +30,13 @@ export const easeOutBack: Easing = (p) => {
   return 1 + c3 * (x - 1) ** 3 + c1 * (x - 1) ** 2;
 };
 
+/** Ease-in that first pulls back a little below 0 ("anticipation"). */
+export const easeInBack: Easing = (p) => {
+  const x = clamp(p);
+  const c1 = 1.70158;
+  return (c1 + 1) * x ** 3 - c1 * x ** 2;
+};
+
 /** Exponential ease-out: very fast start, precise stop (HUD-like). */
 export const easeOutExpo: Easing = (p) => {
   const x = clamp(p);

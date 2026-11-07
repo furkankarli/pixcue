@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   clamp,
   easeIn,
+  easeInBack,
   easeInExpo,
   easeInOut,
   easeOut,
@@ -25,7 +26,7 @@ describe('clamp', () => {
 });
 
 describe('easings', () => {
-  it.each([linear, easeOut, easeIn, easeInOut, easeOutBack, easeOutExpo, easeInExpo])(
+  it.each([linear, easeOut, easeIn, easeInOut, easeOutBack, easeInBack, easeOutExpo, easeInExpo])(
     '%o starts at 0 and ends at 1',
     (e) => {
       expect(e(0)).toBeCloseTo(0, 10);
@@ -42,8 +43,12 @@ describe('easings', () => {
   });
 
   it('starts exactly at 0, so hidden elements stay hidden', () => {
-    for (const e of [easeOut, easeIn, easeInOut, easeOutBack, easeOutExpo, easeInExpo])
+    for (const e of [easeOut, easeIn, easeInOut, easeOutBack, easeInBack, easeOutExpo, easeInExpo])
       expect(e(0)).toBe(0);
+  });
+
+  it('pulls back below 0 with easeInBack', () => {
+    expect(Math.min(...[0.1, 0.2, 0.3, 0.4].map(easeInBack))).toBeLessThan(0);
   });
 
   it('overshoots with easeOutBack', () => {
