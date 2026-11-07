@@ -12,6 +12,7 @@ export * from './color.ts';
 export * from './frame.ts';
 export * from './layout.ts';
 export * from './math.ts';
+export * from './pixel/fonts.ts';
 export * from './safe-areas.ts';
 export * from './text.ts';
 export * from './theme.ts';
