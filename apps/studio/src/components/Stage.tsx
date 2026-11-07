@@ -1,6 +1,6 @@
 /**
- * The live preview. The canvas is rendered at its on-screen size (not the
- * export size), which keeps playback smooth on phones; layout is identical.
+ * The live preview. The canvas is rendered near its on-screen size, not the
+ * export size, which keeps playback smooth on phones; layout is identical.
  */
 import { type Bounds, render, scaleFrame } from '@pixcue/engine';
 import { createEffect, createMemo, createSignal, onCleanup, onMount, Show } from 'solid-js';
@@ -9,6 +9,9 @@ import { displayTime } from '../playback.ts';
 import { actions, edits, fontsVersion, frame, renderState } from '../store.ts';
 import { platformUi, safeArea, stageBackground } from '../view.ts';
 import { PlatformOverlay, SafeAreaOverlay } from './Overlays.tsx';
+
+/** Smallest preview resolution, as the frame's short side in pixels. */
+const MIN_SHORT_SIDE = 720;
 
 /** Extra hit area around the graphic for dragging, in CSS pixels. */
 const GRAB_MARGIN = 16;
@@ -36,10 +39,16 @@ export function Stage() {
     return { w: width, h: width / aspect };
   });
 
+  // Draw at least MIN_SHORT_SIDE pixels on the short side and let the browser
+  // scale down: a phone-sized preview would otherwise put the pixel theme on
+  // its coarsest grid, where pops jump in one or two steps instead of easing.
   const output = createMemo(() => {
+    const f = frame();
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const pixelWidth = Math.max(1, Math.min(frame().pixelWidth, Math.round(size().w * dpr)));
-    return scaleFrame(frame(), pixelWidth);
+    const floor =
+      f.pixelWidth * Math.min(1, MIN_SHORT_SIDE / Math.min(f.pixelWidth, f.pixelHeight));
+    const pixelWidth = Math.round(Math.min(f.pixelWidth, Math.max(size().w * dpr, floor)));
+    return scaleFrame(f, Math.max(1, pixelWidth));
   });
 
   // Resize and draw in one effect: with two, the draw could run first, see

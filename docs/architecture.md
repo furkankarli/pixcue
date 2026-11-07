@@ -178,8 +178,9 @@ they keep following the defaults for the user's language and the platform.
 - **Preview-only settings** (safe area, app UI mock, stage background) are
   separate browser preferences and are not shared.
 
-The preview renders at its on-screen size with `scaleFrame`, which keeps
-playback smooth on phones; exports render at the full frame size. Fonts are
+The preview renders near its on-screen size with `scaleFrame`, but never
+below 720 pixels on the short side, so the pixel theme keeps enough grid
+cells for its pops to step smoothly; exports render at the full frame size. Fonts are
 self-hosted through Fontsource, and canvases redraw once they have loaded.
 
 ## Hosting
