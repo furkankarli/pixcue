@@ -4,7 +4,7 @@
  * motion. See docs/themes.md.
  */
 import { mix, onColor } from '../color.ts';
-import { clamp, easeInOut, easeOutBack } from '../math.ts';
+import { clamp, easeInOut, easeOut, easeOutBack, seededRandom } from '../math.ts';
 import type { VectorTheme } from '../theme.ts';
 import { blockReveal, roundRectPath } from '../vector/draw.ts';
 import { fillTracked, halftone, partialPolyline, starPath, trackedWidth } from './kit.ts';
@@ -241,21 +241,37 @@ export const pop: VectorTheme = {
     blockReveal(c, progress, x, y, w, h, color, draw);
   },
 
-  burst(c, x, y, age, color, seed) {
+  burst(c, x, y, age, color, seed, w = 110, h = 110) {
     if (age <= 0 || age >= 1) return;
-    // A hollow comic burst, so the button under it stays visible.
-    const k = easeOutBack(Math.min(1, age * 2.5));
-    const fade = age > 0.6 ? 1 - (age - 0.6) / 0.4 : 1;
+    // Comic impact lines that shoot out from the target's top and bottom.
+    const k = easeOut(Math.min(1, age * 1.8));
+    const fade = age > 0.55 ? 1 - (age - 0.55) / 0.45 : 1;
+    const hw = w / 2 + 10;
+    const hh = h / 2 + 10;
     c.save();
     c.globalAlpha *= fade;
-    c.lineJoin = 'round';
-    starPath(c, x, y, 110 * k, 78 * k, 12, seed);
-    c.lineWidth = 12;
-    c.strokeStyle = INK;
-    c.stroke();
-    c.lineWidth = 6;
-    c.strokeStyle = color;
-    c.stroke();
+    c.lineCap = 'round';
+    const lines = 18;
+    for (let i = 0; i < lines; i++) {
+      const angle = (i / lines) * Math.PI * 2 + (seededRandom(seed + i) - 0.5) * 0.3;
+      const dx = Math.cos(angle);
+      const dy = Math.sin(angle);
+      // Above and below only: sideways rays would cross neighbouring buttons.
+      if (Math.abs(dy) < 0.4) continue;
+      // Where the ray leaves the target's box.
+      const edge = Math.min(hw / Math.max(Math.abs(dx), 1e-3), hh / Math.max(Math.abs(dy), 1e-3));
+      const length = (22 + seededRandom(seed + i + 9) * 26) * (0.35 + 0.65 * k);
+      const from = edge + 4 + 30 * k;
+      c.beginPath();
+      c.moveTo(x + dx * from, y + dy * from);
+      c.lineTo(x + dx * (from + length), y + dy * (from + length));
+      c.lineWidth = 11;
+      c.strokeStyle = INK;
+      c.stroke();
+      c.lineWidth = 5;
+      c.strokeStyle = color;
+      c.stroke();
+    }
     c.restore();
   },
 };

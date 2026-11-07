@@ -271,24 +271,23 @@ export const tech: VectorTheme = {
     }
   },
 
-  burst(c, x, y, age, color, seed) {
+  burst(c, x, y, age, color, _seed, w = 110, h = 110) {
     if (age <= 0 || age >= 1) return;
+    // Corner brackets lock on around the target, then spread and fade.
     const k = easeOutExpo(age);
+    const pad = 8 + 34 * k;
+    const bw = w + pad * 2;
+    const bh = h + pad * 2;
     c.save();
     c.globalAlpha *= 1 - age;
     c.strokeStyle = color;
     c.shadowColor = color;
     c.shadowBlur = 14;
     c.lineWidth = 3;
-    const r = 30 + 110 * k;
-    cornerBrackets(c, x - r, y - r, r * 2, r * 2, r * 0.35);
-    for (let i = 0; i < 8; i++) {
-      const a = (i / 8) * Math.PI * 2 + seed;
-      c.beginPath();
-      c.moveTo(x + Math.cos(a) * r * 0.6, y + Math.sin(a) * r * 0.6);
-      c.lineTo(x + Math.cos(a) * r * 0.85, y + Math.sin(a) * r * 0.85);
-      c.stroke();
-    }
+    cornerBrackets(c, x - bw / 2, y - bh / 2, bw, bh, Math.min(bw, bh) * 0.22);
+    c.globalAlpha *= 0.35;
+    c.lineWidth = 1.5;
+    c.strokeRect(x - bw / 2 + 6, y - bh / 2 + 6, bw - 12, bh - 12);
     c.restore();
   },
 };

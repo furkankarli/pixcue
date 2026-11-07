@@ -205,15 +205,18 @@ export const sade: VectorTheme = {
     c.restore();
   },
 
-  burst(c, x, y, age, color) {
+  burst(c, x, y, age, color, _seed, w = 110, h = 110) {
     if (age <= 0 || age >= 1) return;
+    // A soft outline that follows the button's shape outwards.
     const k = easeOut(age);
+    const pad = 4 + 26 * k;
+    const bw = w + pad * 2;
+    const bh = h + pad * 2;
     c.save();
     c.globalAlpha *= (1 - age) * 0.8;
     c.strokeStyle = color;
     c.lineWidth = 4 * (1 - age) + 1;
-    c.beginPath();
-    c.arc(x, y, 24 + 90 * k, 0, Math.PI * 2);
+    roundRectPath(c, x - bw / 2, y - bh / 2, bw, bh, bh / 2);
     c.stroke();
     c.restore();
   },

@@ -125,8 +125,21 @@ export interface VectorTheme {
     color: string,
     draw: () => void,
   ): void;
-  /** Feedback for a click or tap at `(x, y)`; `age` goes 0 → 1 over the effect. */
-  burst(c: Ctx2D, x: number, y: number, age: number, color: string, seed: number): void;
+  /**
+   * Feedback for a click or tap on a target `w`×`h` centred on `(x, y)`;
+   * `age` goes 0 → 1 over the effect. It stays outside the target, so the
+   * label on it remains readable.
+   */
+  burst(
+    c: Ctx2D,
+    x: number,
+    y: number,
+    age: number,
+    color: string,
+    seed: number,
+    w?: number,
+    h?: number,
+  ): void;
 }
 
 /** The pixel theme renders through the pixel engine with bitmap fonts. */
