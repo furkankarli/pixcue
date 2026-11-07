@@ -271,7 +271,13 @@ export default defineLocale({
           done: 'Tıklandıktan sonraki yazı',
           like: 'Beğeni butonu',
           bell: 'Bildirim zili',
-          cursor: 'Fare imleci',
+          pointer: 'İşaretçi',
+          pointerHelp:
+            'Otomatik: telefonda izlenen dikey ve kare formatlarda parmakla dokunma, yatay videoda fare imleci gösterir.',
+          pointerAuto: 'Otomatik',
+          pointerCursor: 'Fare',
+          pointerTap: 'Dokunma',
+          pointerNone: 'Yok',
         },
         sample: {
           subscribe: 'Abone ol',

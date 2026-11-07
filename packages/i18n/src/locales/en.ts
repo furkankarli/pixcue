@@ -274,7 +274,13 @@ export default {
           done: 'Text after the click',
           like: 'Like button',
           bell: 'Notification bell',
-          cursor: 'Mouse pointer',
+          pointer: 'Pointer',
+          pointerHelp:
+            'Automatic shows a finger tap in vertical and square formats, which are watched on phones, and a mouse pointer in horizontal video.',
+          pointerAuto: 'Automatic',
+          pointerCursor: 'Mouse',
+          pointerTap: 'Tap',
+          pointerNone: 'None',
         },
         sample: {
           subscribe: 'Subscribe',

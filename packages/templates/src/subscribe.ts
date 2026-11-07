@@ -1,7 +1,8 @@
 /**
- * Subscribe button: a pointer clicks "Subscribe" (or "Follow" outside
- * YouTube), then the like and bell buttons, with bursts on each click.
- * Bottom-center.
+ * Subscribe button: "Subscribe" (or "Follow" outside YouTube), then the like
+ * and bell buttons are pressed in turn, each with the theme's burst. A mouse
+ * pointer clicks them in horizontal video; in vertical and square formats,
+ * watched on phones, a finger taps them instead. Bottom-center.
  */
 import {
   bellIcon,
@@ -9,9 +10,8 @@ import {
   customSprite,
   drawCursor,
   drawIcon,
-  easeIn,
+  drawTap,
   easeInOut,
-  easeOut,
   easeOutBack,
   type Frame,
   fillTextAt,
@@ -19,6 +19,7 @@ import {
   luminance,
   mix,
   onColor,
+  type Painter,
   PIXEL_FONT_BOLD,
   type PixelScene,
   type PixelText,
@@ -31,13 +32,13 @@ import {
   SPRITES,
   type Sprite,
   seededRandom,
+  tapPhase,
   textWidth,
   themeCase,
   themeFont,
   thumbIcon,
   upper,
   type VectorScene,
-  withAlpha,
   withClip,
 } from '@pixcue/engine';
 import { type DefaultContext, defineTemplate, type FieldValues, field } from './api.ts';
@@ -67,7 +68,17 @@ const fields = {
   }),
   like: field.boolean({ label: 'templates.subscribe.fields.like', default: true }),
   bell: field.boolean({ label: 'templates.subscribe.fields.bell', default: isYouTube }),
-  cursor: field.boolean({ label: 'templates.subscribe.fields.cursor', default: true }),
+  pointer: field.select({
+    label: 'templates.subscribe.fields.pointer',
+    help: 'templates.subscribe.fields.pointerHelp',
+    options: [
+      { value: 'auto', label: 'templates.subscribe.fields.pointerAuto' },
+      { value: 'cursor', label: 'templates.subscribe.fields.pointerCursor' },
+      { value: 'tap', label: 'templates.subscribe.fields.pointerTap' },
+      { value: 'none', label: 'templates.subscribe.fields.pointerNone' },
+    ],
+    default: 'auto',
+  }),
 };
 
 export type SubscribeFields = FieldValues<typeof fields>;
@@ -82,6 +93,12 @@ const FIRST_FRAME = 1 / 30;
 
 /** Thumbs-up on YouTube, heart everywhere else. */
 const likeKind = (frame: Frame) => (frame.platform === 'youtube' ? 'thumb' : 'heart');
+
+/** The pointer to show: automatic means a tap wherever viewers watch on phones. */
+function pointerKind(pointer: SubscribeFields['pointer'], frame: Frame): 'cursor' | 'tap' | 'none' {
+  if (pointer !== 'auto') return pointer;
+  return frame.orientation === 'horizontal' ? 'cursor' : 'tap';
+}
 
 type Point = readonly [number, number];
 
@@ -151,7 +168,9 @@ const vector: VectorScene<SubscribeFields, VectorBox> = {
   draw(c, t, { fields, theme, accent, frame, duration: dur, box: g }) {
     const Hb = 110;
     const y = 24;
-    const out = dur - 0.6;
+    const { exit } = theme.motion;
+    // Buttons leave in reverse: bell, like, then the main button.
+    const out = dur - 0.95;
     const ws = g.w0 + (g.w1 - g.w0) * easeInOut((t - A1) / 0.3);
     const done = t >= A1;
     const shift = (g.w1 - ws) / 2;
@@ -162,7 +181,7 @@ const vector: VectorScene<SubscribeFields, VectorBox> = {
     const bellFinal = likeFinal + (fields.like ? 136 : 0);
 
     const pop = (start: number, outAt: number) =>
-      t >= outAt ? 1 - easeIn((t - outAt) / 0.25) : easeOutBack((t - start) / 0.36);
+      t >= outAt ? 1 - exit((t - outAt) / 0.4) : easeOutBack((t - start) / 0.36);
     const bump = (a: number) =>
       t >= a && t < a + 0.28 ? 1 + 0.09 * Math.sin((Math.PI * (t - a)) / 0.28) : 1;
     const press = (a: number) => (t >= a - 0.1 && t < a ? 6 : 0);
@@ -272,48 +291,24 @@ const vector: VectorScene<SubscribeFields, VectorBox> = {
     }
     c.restore();
 
-    // A ring and confetti burst on every click.
+    // The theme's burst on every press.
     const hits: [number, number, number, number][] = [[A1, shift0 + g.w0 * 0.55, y + 60, 0]];
     if (fields.like) hits.push([A2, likeFinal + 55, y + 55, 20]);
     if (fields.bell) hits.push([A3, bellFinal + 55, y + 55, 40]);
-    const confetti = [accent, '#ffffff', theme.semantic.spark];
-    for (const [a, bx, by, seed] of hits) {
-      const age = t - a;
-      if (age < 0 || age > 0.7) continue;
-      const k = easeOut(age / 0.7);
-      if (age < 0.45) {
-        c.beginPath();
-        c.arc(bx, by, 20 + 110 * easeOut(age / 0.45), 0, Math.PI * 2);
-        c.strokeStyle = '#fff';
-        c.lineWidth = 5 * (1 - age / 0.45) + 1;
-        withAlpha(c, 1 - age / 0.45, () => c.stroke());
-      }
-      for (let i = 0; i < 16; i++) {
-        const angle = (i / 16) * Math.PI * 2 + seededRandom(seed + i) * 0.4;
-        const dist = (80 + seededRandom(seed + i + 7) * 70) * k;
-        const size = 14 * (1 - k) + 3;
-        const px = bx + Math.cos(angle) * dist;
-        const py = by + Math.sin(angle) * dist;
-        c.fillStyle = confetti[i % 3] ?? accent;
-        withAlpha(c, 1 - k * 0.8, () => {
-          c.save();
-          c.translate(px, py);
-          c.rotate(angle + k * 2);
-          c.fillRect(-size / 2, -size / 6, size, size / 3);
-          c.fillRect(-size / 6, -size / 2, size / 3, size);
-          c.restore();
-        });
-      }
-    }
+    for (const [a, bx, by, seed] of hits) theme.burst(c, bx, by, (t - a) / 0.7, accent, seed);
 
-    if (fields.cursor) {
+    const targets: [number, Point | null][] = [
+      [A1, [shift0 + g.w0 * 0.55, y + 64]],
+      [A2, fields.like ? [likeFinal + 58, y + 62] : null],
+      [A3, fields.bell ? [bellFinal + 58, y + 62] : null],
+    ];
+    const kind = pointerKind(fields.pointer, frame);
+    if (kind === 'tap') {
+      for (const [a, p] of targets) if (p) drawTap(c, p[0], p[1] + 6, t, a);
+    } else if (kind === 'cursor') {
       const p = pointerPath(
         t,
-        [
-          [shift0 + g.w0 * 0.55, y + 64],
-          fields.like ? [likeFinal + 62, y + 66] : null,
-          fields.bell ? [bellFinal + 62, y + 66] : null,
-        ],
+        targets.map(([, p]) => p),
         [g.w + 260, y + 420],
       );
       if (p) drawCursor(c, p[0], p[1] + (p[2] ? 4 : 0), p[2] ? 1.75 : 1.9);
@@ -393,6 +388,40 @@ function iconButtonSprite(
   });
 }
 
+/** Rows of a pixel ring of radius `r` cells, `thickness` cells wide. */
+function ringRows(r: number, thickness: number): string[] {
+  const rows: string[] = [];
+  for (let y = -r; y <= r; y++) {
+    let row = '';
+    for (let x = -r; x <= r; x++) {
+      const d = Math.hypot(x, y);
+      row += d <= r + 0.3 && d > r - thickness + 0.3 ? 'W' : '.';
+    }
+    rows.push(row);
+  }
+  return rows;
+}
+
+/**
+ * A finger tap in pixels (see `tapPhase`): a ring that lands and tightens as
+ * it presses, then a thin ring that spreads in whole steps. Drawn as pops so
+ * it sits above the buttons, which are pops too.
+ */
+function pixelTap(P: Painter, x: number, y: number, t: number, at: number): void {
+  const s = tapPhase(t, at);
+  if (!s) return;
+  const ring = (r: number, thickness: number) =>
+    bitmapSprite(ringRows(r, thickness), { W: '#FFFFFF' }, true);
+  if (s.ripple !== null && s.ripple < 0.9) {
+    const r = [7, 9, 11][Math.min(2, Math.floor(s.ripple * 3))] ?? 11;
+    P.pop(ring(r, 1), x - r - 1, y - r - 1, P.px);
+  }
+  if (s.alpha >= 0.5) {
+    const r = s.appear < 0.6 ? 7 : s.press > 0.5 ? 4 : 5;
+    P.pop(ring(r, 2), x - r - 1, y - r - 1, P.px);
+  }
+}
+
 const BELL_SHAKE = [-1, -1, 1, 1, -1, -1, 1, 1, -1, 1, -1, 1, 0, 0, -1, 1, 0];
 
 const pixel: PixelScene<SubscribeFields, PixelBox> = {
@@ -420,6 +449,7 @@ const pixel: PixelScene<SubscribeFields, PixelBox> = {
   },
 
   draw(P, t, { fields, accent, theme, frame, duration: dur, box: b }) {
+    // Buttons leave in reverse: bell, like, then the main button.
     const out = dur - 0.95;
     const px = P.px;
     const ws = Math.round(b.w0 + (b.w1 - b.w0) * easeInOut((t - A1) / 0.3));
@@ -506,14 +536,18 @@ const pixel: PixelScene<SubscribeFields, PixelBox> = {
       }
     }
 
-    if (fields.cursor) {
+    const targets: [number, Point | null][] = [
+      [A1, [shift0 + Math.round(b.w0 * 0.55), 13]],
+      [A2, fields.like ? [likeFinal + 13, 13] : null],
+      [A3, fields.bell ? [bellFinal + 13, 13] : null],
+    ];
+    const kind = pointerKind(fields.pointer, frame);
+    if (kind === 'tap') {
+      for (const [a, p] of targets) if (p) pixelTap(P, p[0], p[1], t, a);
+    } else if (kind === 'cursor') {
       const p = pointerPath(
         t,
-        [
-          [shift0 + Math.round(b.w0 * 0.55), 13],
-          fields.like ? [likeFinal + 13, 13] : null,
-          fields.bell ? [bellFinal + 13, 13] : null,
-        ],
+        targets.map(([, p]) => p),
         [b.w + 44, 70],
       );
       if (p) {
