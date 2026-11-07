@@ -28,7 +28,8 @@
     "test:visual": "vitest run --project visual",
     "test:visual:update": "vitest run --project visual --update",
     "test:formats": "vitest run --project formats",
-    "changeset": "changeset"
+    "changeset": "changeset",
+    "new-template": "node scripts/new-template.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.6.6",
