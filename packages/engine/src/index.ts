@@ -16,6 +16,7 @@ export * from './pixel/fonts.ts';
 export * from './pixel/painter.ts';
 export * from './pixel/raster.ts';
 export * from './pixel/timing.ts';
+export * from './render.ts';
 export * from './safe-areas.ts';
 export * from './text.ts';
 export * from './theme.ts';
