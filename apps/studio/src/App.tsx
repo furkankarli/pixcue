@@ -1,22 +1,23 @@
 /**
  * The editor shell: a top bar, the template library, the stage with its
- * toolbar, the inspector, and the timeline across the bottom. On narrow
+ * toolbar, the inspector, the timeline, and a status bar along the bottom. On narrow
  * screens the panels stack and the library becomes an inspector tab.
  */
 import { createEffect, createSignal, onCleanup, Show } from 'solid-js';
 import { ExportDialog } from './components/ExportDialog.tsx';
 import { Inspector } from './components/Inspector.tsx';
-import { LanguagePicker } from './components/LanguagePicker.tsx';
 import { Library } from './components/Library.tsx';
 import { PresetsDialog } from './components/PresetsDialog.tsx';
 import { ShareButton } from './components/ShareButton.tsx';
 import { Stage } from './components/Stage.tsx';
 import { StageToolbar } from './components/StageToolbar.tsx';
+import { StatusBar } from './components/StatusBar.tsx';
 import { Timeline } from './components/Timeline.tsx';
 import { locale, t } from './i18n.ts';
 import { wide } from './media.ts';
 import { togglePlay } from './playback.ts';
 import { BookmarkIcon, DownloadIcon } from './ui/icons.tsx';
+import { PixelWordmark } from './ui/PixelWordmark.tsx';
 
 /** Whether a key press belongs to a control that uses the key itself. */
 const ownsKeys = (target: EventTarget | null) =>
@@ -45,7 +46,9 @@ export function App() {
   return (
     <div class="app">
       <header class="topbar">
-        <span class="brand">Pixcue</span>
+        <h1 class="brand">
+          <PixelWordmark />
+        </h1>
         <div class="topbar-actions">
           <ShareButton />
           <button
@@ -57,9 +60,6 @@ export function App() {
             <BookmarkIcon />
             <span class="button-label">{t('editor.topbar.presets')}</span>
           </button>
-          <Show when={wide()}>
-            <LanguagePicker />
-          </Show>
           <button type="button" class="button primary" onClick={() => setExporting(true)}>
             <DownloadIcon />
             {t('editor.topbar.export')}
@@ -96,11 +96,7 @@ export function App() {
         </aside>
       </main>
 
-      <Show when={!wide()}>
-        <footer class="app-footer">
-          <LanguagePicker />
-        </footer>
-      </Show>
+      <StatusBar />
       <ExportDialog open={exporting()} onClose={() => setExporting(false)} />
       <PresetsDialog open={presetsOpen()} onClose={() => setPresetsOpen(false)} />
     </div>

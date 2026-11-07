@@ -45,6 +45,10 @@ export default defineLocale({
         style: 'Stil',
         layout: 'Yerleşim',
       },
+      status: {
+        openSource: 'GitHub’da açık kaynak',
+        local: 'Tarayıcında çalışır, hiçbir şey yüklenmez.',
+      },
       timeline: {
         label: 'Zaman çizelgesi',
         toStart: 'Başa dön',

@@ -3,6 +3,7 @@
  * pair them with visible text or an aria-label.
  */
 import type { LucideProps } from 'lucide-solid';
+import ArrowUpRight from 'lucide-solid/icons/arrow-up-right';
 import Bookmark from 'lucide-solid/icons/bookmark';
 import ChevronDown from 'lucide-solid/icons/chevron-down';
 import ChevronUp from 'lucide-solid/icons/chevron-up';
@@ -50,3 +51,4 @@ export const PhoneIcon = icon(Smartphone);
 export const CheckerIcon = icon(Grid2x2);
 export const DarkIcon = icon(Moon);
 export const LightIcon = icon(Sun);
+export const ExternalIcon = icon(ArrowUpRight);

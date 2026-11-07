@@ -49,6 +49,10 @@ export default {
         style: 'Style',
         layout: 'Layout',
       },
+      status: {
+        openSource: 'Open source on GitHub',
+        local: 'Runs in your browser. Nothing is uploaded.',
+      },
       timeline: {
         label: 'Timeline',
         toStart: 'Go to start',

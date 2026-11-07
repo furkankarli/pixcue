@@ -1,7 +1,7 @@
-// The UI font (Inter) and the theme fonts, self-hosted. JetBrains Mono: tech labels.
-import '@fontsource/inter/400.css';
-import '@fontsource/inter/500.css';
-import '@fontsource/inter/600.css';
+// The UI fonts (Geist, Geist Mono) and the theme fonts, self-hosted.
+// JetBrains Mono: tech labels.
+import '@fontsource-variable/geist';
+import '@fontsource-variable/geist-mono';
 import '@fontsource/manrope/500.css';
 import '@fontsource/manrope/700.css';
 import '@fontsource/manrope/800.css';
