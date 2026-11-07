@@ -141,7 +141,7 @@ const pixel: PixelScene<TitleCardFields, PixelBox> = {
 
   draw(P, t, { accent, duration, box }) {
     // Pop in from the second frame (so the first stays empty), pop out at the end.
-    const k = popScale(t, 1 / 30, duration - 0.3, P.px);
+    const k = popScale(t, 1 / 30, duration - 0.55, P.px);
     if (k === 0) return;
     const panel = pixelPanel(box.w, box.h - 3, PIXEL_PANEL_FILL);
     if (k !== P.px) {
@@ -150,7 +150,7 @@ const pixel: PixelScene<TitleCardFields, PixelBox> = {
     }
     P.img(panel, 0, 0);
     P.rect(4, 4, 2, box.h - 11, accent);
-    P.text(box.title, 8, 3, typedVisible(t, 0.3, box.title.length, duration - 0.6));
+    P.text(box.title, 8, 3, typedVisible(t, 0.3, box.title.length, duration - 1.1));
   },
 };
 

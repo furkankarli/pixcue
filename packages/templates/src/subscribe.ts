@@ -420,7 +420,7 @@ const pixel: PixelScene<SubscribeFields, PixelBox> = {
   },
 
   draw(P, t, { fields, accent, theme, frame, duration: dur, box: b }) {
-    const out = dur - 0.6;
+    const out = dur - 0.95;
     const px = P.px;
     const ws = Math.round(b.w0 + (b.w1 - b.w0) * easeInOut((t - A1) / 0.3));
     const done = t >= A1;

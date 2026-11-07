@@ -146,7 +146,7 @@ const pixel: PixelScene<ChapterTitleFields, PixelBox> = {
     const chars = Array.from(upper(fields.title, locale));
     const n = chars.length;
 
-    const line = envelope(t, dur, 0, 0.38, 0.5, 0.2, easeInOut, easeInOut);
+    const line = envelope(t, dur, 0, 0.38, 0.55, 0.1, easeInOut, easeInOut);
     const half = Math.round((b.w / 2 - 5) * line);
     if (half > 0) {
       P.rect(cx - half - 1, ly - 1, half * 2 + 2, 4, '#000000');
@@ -159,14 +159,16 @@ const pixel: PixelScene<ChapterTitleFields, PixelBox> = {
       }
     }
 
-    const outT = dur - 0.6;
+    // Letters leave last to first, spread over at most 0.3 s whatever the length.
+    const outT = dur - 0.95;
+    const stagger = Math.min(0.03, 0.3 / Math.max(1, n - 1));
     chars.forEach((ch, i) => {
       if (ch === ' ') return;
       const p = (t - (0.16 + i * 0.05)) / 0.3;
       if (p <= 0) return;
       let yo = Math.round(-(1 - easeOutBack(p)) * 26);
       if (t > outT) {
-        const q = (t - outT - (n - 1 - i) * 0.02) / 0.28;
+        const q = (t - outT - (n - 1 - i) * stagger) / 0.4;
         if (q >= 1) return;
         if (q > 0) yo -= Math.round(easeIn(q) * 34);
       }
@@ -200,7 +202,7 @@ const pixel: PixelScene<ChapterTitleFields, PixelBox> = {
         b.chip,
         Math.round(cx - b.chip.w / 2),
         ly + 6,
-        popScale(t, 0.42 + n * 0.05, dur - 0.62, P.px),
+        popScale(t, 0.42 + n * 0.05, dur - 1.1, P.px),
       );
     }
   },

@@ -6,6 +6,7 @@ import {
   accentTextColor,
   clamp,
   decimalsOf,
+  easeInOut,
   easeOut,
   envelope,
   fillTextAt,
@@ -21,7 +22,6 @@ import {
   textWidth,
   themeCase,
   themeFont,
-  typedCount,
   typedVisible,
   upper,
   type VectorScene,
@@ -259,7 +259,7 @@ const pixel: PixelScene<ScoreCardFields, PixelBox> = {
   draw(P, t, { fields, accent, locale, duration: dur, box: b }) {
     const w = b.w;
     const panel = pixelPanel(w, b.ph, PIXEL_PANEL_FILL);
-    const k = popScale(t, FIRST_FRAME, dur - 0.32, P.px);
+    const k = popScale(t, FIRST_FRAME, dur - 0.55, P.px);
     if (k === 0) return;
     // The whole panel pops; its content appears once it has settled.
     if (k !== P.px || t < 0.1) {
@@ -274,7 +274,7 @@ const pixel: PixelScene<ScoreCardFields, PixelBox> = {
       b.title,
       Math.round((w - b.title.w) / 2),
       5,
-      typedVisible(t, 0.3, b.title.length, dur - 0.7),
+      typedVisible(t, 0.3, b.title.length, dur - 1.15),
     );
 
     // The number counts up in steps of its own precision.
@@ -292,7 +292,7 @@ const pixel: PixelScene<ScoreCardFields, PixelBox> = {
       b.label,
       Math.round((w - b.label.w) / 2),
       b.yLabel,
-      typedVisible(t, 0.7, b.label.length, dur - 0.7),
+      typedVisible(t, 0.7, b.label.length, dur - 1.2),
     );
 
     // Ten blocks fill up to the score, flashing as they land.
@@ -300,7 +300,9 @@ const pixel: PixelScene<ScoreCardFields, PixelBox> = {
     const bw = 7;
     const bx0 = Math.round((w - (blocks * (bw + 1) - 1)) / 2);
     const target = clamp(score / max) * blocks;
-    const fill = target * clamp((t - 0.9) / 1.0);
+    // Bars drain before the panel pops away.
+    const drain = 1 - easeInOut((t - (dur - 1.2)) / 0.5);
+    const fill = target * clamp((t - 0.9) / 1.0) * drain;
     for (let j = 0; j < blocks; j++) {
       const x = bx0 + j * (bw + 1);
       P.rect(x, b.yBlocks, bw, bw, '#000000');
@@ -321,10 +323,10 @@ const pixel: PixelScene<ScoreCardFields, PixelBox> = {
       const y = b.yCategories + i * 19;
       const st = 1.2 + i * 0.2;
       if (t < st) return;
-      P.text(name, 8, y, typedCount(t, st, name.length));
-      P.text(value, w - 8 - value.w, y, typedCount(t, st + 0.1, value.length));
+      P.text(name, 8, y, typedVisible(t, st, name.length, dur - 1.2));
+      P.text(value, w - 8 - value.w, y, typedVisible(t, st + 0.1, value.length, dur - 1.2));
       const v = fields.categories[i]?.score ?? 0;
-      const filled = clamp(v / max) * 10 * clamp((t - st - 0.15) / 0.6);
+      const filled = clamp(v / max) * 10 * clamp((t - st - 0.15) / 0.6) * drain;
       const segment = Math.floor((w - 16 - 9) / 10);
       for (let j = 0; j < 10; j++) {
         const x = 8 + j * (segment + 1);

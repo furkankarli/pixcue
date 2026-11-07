@@ -5,6 +5,7 @@
 import {
   accentTextColor,
   bitmapSprite,
+  easeInOut,
   envelope,
   linear,
   mix,
@@ -186,7 +187,7 @@ const pixel: PixelScene<CalloutFields, PixelBox> = {
     for (let i = 1; i <= Math.abs(qx - ex); i++) horizontal.push([ex + (left ? -i : i), ey]);
 
     // A square ring pulses around the marker while the callout is up.
-    if (t > 0.25 && t < dur - 0.35) {
+    if (t > 0.25 && t < dur - 0.5) {
       const r = 4 + Math.floor(((t % 0.9) / 0.9) * 4);
       const cx = px + 1;
       const cy = py + 1;
@@ -198,9 +199,13 @@ const pixel: PixelScene<CalloutFields, PixelBox> = {
       }
     }
 
-    const n1 = Math.round(diagonal.length * envelope(t, dur, 0.2, 0.5, 0.6, 0.38, linear, linear));
+    // The leader retracts in reverse once the text has erased: the
+    // horizontal part first, then the diagonal, then the marker pops away.
+    const n1 = Math.round(
+      diagonal.length * envelope(t, dur, 0.2, 0.5, 0.5, 0.25, linear, easeInOut),
+    );
     const n2 = Math.round(
-      horizontal.length * envelope(t, dur, 0.48, 0.8, 0.4, 0.2, linear, linear),
+      horizontal.length * envelope(t, dur, 0.48, 0.8, 0.78, 0.5, linear, easeInOut),
     );
     P.line(diagonal, n1, accent);
     if (n1 >= diagonal.length) P.line(horizontal, n2, accent);
@@ -211,14 +216,14 @@ const pixel: PixelScene<CalloutFields, PixelBox> = {
       H: mix(accent, '#FFFFFF', 0.5),
       W: '#FFFFFF',
     });
-    P.pop(marker, px - 2, py - 2, popScale(t, FIRST_FRAME, dur - 0.35, P.px));
+    P.pop(marker, px - 2, py - 2, popScale(t, FIRST_FRAME, dur - 0.5, P.px));
 
     const s1 = 0.78;
-    const tn = typedVisible(t, s1, b.title.length, dur - 0.75);
+    const tn = typedVisible(t, s1, b.title.length, dur - 1.25);
     P.text(b.title, left ? ex - b.title.w + 2 : ex + 1, ey - b.title.h, tn);
 
     const s2 = typedEnd(s1, b.title.length) + 0.08;
-    const sn = typedVisible(t, s2, b.subtitle.length, dur - 0.85);
+    const sn = typedVisible(t, s2, b.subtitle.length, dur - 1.4);
     const sx = left ? ex - b.subtitle.w + 2 : ex + 1;
     P.text(b.subtitle, sx, ey + 3, sn);
     P.caret(b.subtitle, sx, ey + 3, sn, accent, t, s2, typedEnd(s2, b.subtitle.length) + 0.4);

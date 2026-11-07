@@ -190,16 +190,16 @@ const pixel: PixelScene<SpecCardFields, PixelBox> = {
     // Slide from beyond the right edge of the frame.
     const distance = Math.max(b.pw + 40, P.grid.width - P.origin.x);
     const slideIn = 1 - easeOut(t / 0.45);
-    const slideOut = t > dur - 0.45 ? easeIn((t - (dur - 0.45)) / 0.4) : 0;
+    const slideOut = t > dur - 0.6 ? easeIn((t - (dur - 0.6)) / 0.52) : 0;
     const off = Math.round((slideIn + slideOut) * distance);
     P.img(panel, off, 0);
 
-    const hn = typedVisible(t, 0.4, b.header.length, dur - 0.7);
+    const hn = typedVisible(t, 0.4, b.header.length, dur - 1.2);
     P.text(b.header, 8 + off, 4, hn);
     P.rect(
       8 + off,
       4 + b.header.h,
-      Math.round(14 * clamp((t - 0.55) / 0.2) * (t > dur - 0.7 ? 0 : 1)),
+      Math.round(14 * clamp((t - 0.55) / 0.2) * (1 - easeInOut((t - (dur - 1.25)) / 0.3))),
       2,
       accent,
     );
@@ -208,7 +208,7 @@ const pixel: PixelScene<SpecCardFields, PixelBox> = {
     b.rows.forEach(([label, value], i) => {
       const ry = 6 + b.header.h + 6 + i * 22;
       const st = 0.6 + i * 0.22;
-      const vanish = dur - 0.95 + (n - 1 - i) * 0.08;
+      const vanish = dur - 1.5 + (n - 1 - i) * 0.1;
       if (t > vanish) {
         // A one-frame white flash as each row disappears.
         if (t < vanish + 0.07) P.rect(off + 4, ry - 2, b.pw - 8, 21, '#FFFFFF');

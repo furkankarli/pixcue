@@ -4,7 +4,6 @@
  */
 import {
   clamp,
-  easeIn,
   easeInOut,
   easeOut,
   envelope,
@@ -172,22 +171,24 @@ const pixel: PixelScene<LowerThirdFields, PixelBox> = {
     const b = box;
     const y0 = 7;
     const panel = pixelPanel(b.pw, b.ph, PIXEL_PANEL_FILL);
-    const out = dur - 1.05;
+    // The outro runs in reverse: text erases, the tag pops away, the bar
+    // shrinks, then the panel rolls back up.
+    const out = dur - 1.3;
 
     // Panel unrolls column by column, and rolls back up at the end.
     const pin = easeOut((t - 0.1) / 0.4);
-    const pout = t > dur - 0.45 ? 1 - easeIn((t - (dur - 0.45)) / 0.35) : 1;
+    const pout = t > dur - 0.5 ? 1 - easeInOut((t - (dur - 0.5)) / 0.42) : 1;
     const cols = Math.round(b.pw * Math.min(pin, pout));
     P.img(panel, 0, y0, 0, 0, cols, panel.h);
 
     if (cols >= b.pw - 1) {
       const barIn = clamp((t - 0.42) / 0.18);
-      const barOut = t > dur - 0.55 ? clamp(1 - (t - (dur - 0.55)) / 0.1) : 1;
+      const barOut = t > dur - 0.66 ? 1 - easeInOut((t - (dur - 0.66)) / 0.16) : 1;
       const bh = Math.round((b.ph - 8) * barIn * barOut);
       P.rect(4, y0 + 4 + Math.floor((b.ph - 8 - bh) / 2), 2, bh, accent);
 
       const s1 = 0.55;
-      const n1 = typedVisible(t, s1, b.title.length, out + 0.18);
+      const n1 = typedVisible(t, s1, b.title.length, out + 0.15);
       P.text(b.title, 9, y0 + 3, n1);
       P.caret(b.title, 9, y0 + 3, n1, accent, t, s1, typedEnd(s1, b.title.length) + 0.1);
 
@@ -204,7 +205,7 @@ const pixel: PixelScene<LowerThirdFields, PixelBox> = {
     }
 
     if (fields.tag)
-      P.pop(pixelChip(upper(fields.tag, locale), accent), 8, 0, popScale(t, 0.9, dur - 1.15, P.px));
+      P.pop(pixelChip(upper(fields.tag, locale), accent), 8, 0, popScale(t, 0.9, dur - 1.2, P.px));
   },
 };
 

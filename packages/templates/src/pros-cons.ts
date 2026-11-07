@@ -237,7 +237,7 @@ const pixel: PixelScene<ProsConsFields, PixelBox> = {
       const y = b.stacked ? ci * (b.ph + 3 + PIXEL_GAP) : 0;
       const o = ci * 0.12;
       const panel = pixelPanel(b.cw, b.ph, PIXEL_PANEL_FILL);
-      const k = popScale(t, o + FIRST_FRAME, dur - 0.42 + o * 0.5, P.px);
+      const k = popScale(t, o + FIRST_FRAME, dur - 0.55 + o * 0.5, P.px);
       if (k === 0) return;
       if (k !== P.px || t < o + 0.1) {
         P.pop(panel, x, y, k);
@@ -247,13 +247,13 @@ const pixel: PixelScene<ProsConsFields, PixelBox> = {
 
       if (t > o + 0.3) P.img(pixelBox(9, 9, col.color, col.kind), x + 6, y + 6);
       const hs = o + 0.35;
-      P.text(col.title, x + 17, y + 4, typedVisible(t, hs, col.title.length, dur - 0.85));
+      P.text(col.title, x + 17, y + 4, typedVisible(t, hs, col.title.length, dur - 1.15));
 
       const n = col.items.length;
       col.items.forEach((text, i) => {
         const iy = y + 6 + 16 + 4 + i * 12;
         const st = typedEnd(hs, col.title.length) + 0.15 + i * 0.28;
-        const vanish = dur - 1.0 + (n - 1 - i) * 0.06;
+        const vanish = dur - 1.45 + (n - 1 - i) * 0.08;
         if (t < st || t > vanish + 0.07) return;
         if (t > vanish) {
           P.rect(x + 4, iy - 1, b.cw - 8, 11, '#FFFFFF');
