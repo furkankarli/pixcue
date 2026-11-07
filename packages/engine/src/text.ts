@@ -43,3 +43,17 @@ export function formatLike(raw: string, value: number): string {
   const separator = s.includes(',') ? ',' : '.';
   return value.toFixed(decimals).replace('.', separator);
 }
+
+/** Number of decimals in `value` as written, e.g. 2 for 8.25 and 0 for 10. */
+export function decimalsOf(value: number): number {
+  return (String(value).split('.')[1] ?? '').length;
+}
+
+/** Formats a number with fixed decimals in the locale's style ("8,5" in Turkish). */
+export function formatNumber(value: number, decimals: number, locale: string): string {
+  return new Intl.NumberFormat(locale, {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+    useGrouping: false,
+  }).format(value);
+}

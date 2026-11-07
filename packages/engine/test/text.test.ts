@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { formatLike, lines, pairs, parseNumber, upper } from '../src/text.ts';
+import {
+  decimalsOf,
+  formatLike,
+  formatNumber,
+  lines,
+  pairs,
+  parseNumber,
+  upper,
+} from '../src/text.ts';
 
 describe('upper', () => {
   it('uses Turkish rules when the text has Turkish letters', () => {
@@ -41,5 +49,19 @@ describe('numbers', () => {
     expect(formatLike('8,5', 7.25)).toBe('7,3');
     expect(formatLike('9.25', 4)).toBe('4.00');
     expect(formatLike('10', 6.6)).toBe('7');
+  });
+});
+
+describe('locale numbers', () => {
+  it('counts decimals', () => {
+    expect(decimalsOf(8.5)).toBe(1);
+    expect(decimalsOf(10)).toBe(0);
+    expect(decimalsOf(7.25)).toBe(2);
+  });
+
+  it('uses the locale decimal separator without grouping', () => {
+    expect(formatNumber(8.5, 1, 'tr')).toBe('8,5');
+    expect(formatNumber(8.5, 1, 'en')).toBe('8.5');
+    expect(formatNumber(1234.56, 0, 'tr')).toBe('1235');
   });
 });
