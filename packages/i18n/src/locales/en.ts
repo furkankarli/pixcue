@@ -42,6 +42,24 @@ export default {
           title: 'Unboxing',
         },
       },
+      specCard: {
+        name: 'Spec card',
+        fields: {
+          header: 'Title',
+          rows: 'Rows',
+          rowLabel: 'Label',
+          rowValue: 'Value',
+        },
+        sample: {
+          header: 'Specs',
+          row1Label: 'Driver',
+          row1Value: '40 mm dynamic',
+          row2Label: 'Battery',
+          row2Value: '30 hours',
+          row3Label: 'Connection',
+          row3Value: 'Bluetooth 5.3',
+        },
+      },
     },
   },
 } satisfies { code: string; name: string; messages: MessageTree };

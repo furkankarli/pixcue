@@ -38,6 +38,24 @@ export default defineLocale({
           title: 'Kutu açılışı',
         },
       },
+      specCard: {
+        name: 'Özellik kartı',
+        fields: {
+          header: 'Başlık',
+          rows: 'Satırlar',
+          rowLabel: 'Etiket',
+          rowValue: 'Değer',
+        },
+        sample: {
+          header: 'Özellikler',
+          row1Label: 'Sürücü',
+          row1Value: '40 mm dinamik',
+          row2Label: 'Pil',
+          row2Value: '30 saat',
+          row3Label: 'Bağlantı',
+          row3Value: 'Bluetooth 5.3',
+        },
+      },
     },
   },
 });
