@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createFrame, FRAME_PRESETS, type FramePresetId } from '../src/frame.ts';
+import { createFrame, FRAME_PRESETS, type FramePresetId, scaleFrame } from '../src/frame.ts';
 import { SAFE_AREA_INSETS } from '../src/safe-areas.ts';
 
 const ids = Object.keys(FRAME_PRESETS) as FramePresetId[];
@@ -60,5 +60,14 @@ describe('safe areas', () => {
       expect(all.bottom).toBeGreaterThanOrEqual(i.bottom);
       expect(all.left).toBeGreaterThanOrEqual(i.left);
     }
+  });
+});
+
+describe('scaleFrame', () => {
+  it('scales output pixels and unit but keeps the layout', () => {
+    const f = scaleFrame(createFrame('youtube'), 640);
+    expect(f).toMatchObject({ pixelWidth: 640, pixelHeight: 360, width: 1920, height: 1080 });
+    expect(f.unit).toBeCloseTo(1 / 3);
+    expect(f.safeArea).toEqual(createFrame('youtube').safeArea);
   });
 });

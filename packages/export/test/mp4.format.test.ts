@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { afterAll, describe, expect, it } from 'vitest';
+import { ensureAvcC, isValidAvcC } from '../src/mux/avc.ts';
 import { type EncodedSample, muxMp4 } from '../src/mux/mp4.ts';
 import { ffmpeg, ffprobe, frameHashes, hexdumpBytes, tempDir } from './ffmpeg.ts';
 
@@ -78,5 +79,57 @@ describe('H.264 MP4', () => {
         Number(f.best_effort_timestamp_time).toFixed(3),
       );
     expect(times(out)).toEqual(times(source));
+  });
+
+  it('repairs a malformed avcC so the file decodes without errors', async () => {
+    // Recreate Firefox's bug: duplicate the NAL header byte of the SPS and PPS.
+    const p = 6;
+    const spsLength = (avcC[p] ?? 0) * 256 + (avcC[p + 1] ?? 0);
+    const sps = avcC.subarray(p + 2, p + 2 + spsLength);
+    const rest = avcC.subarray(p + 2 + spsLength);
+    const ppsLength = (rest[1] ?? 0) * 256 + (rest[2] ?? 0);
+    const pps = rest.subarray(3, 3 + ppsLength);
+    const broken = new Uint8Array([
+      1,
+      avcC[1] ?? 0,
+      avcC[2] ?? 0,
+      avcC[3] ?? 0,
+      3,
+      1,
+      0,
+      spsLength + 1,
+      sps[0] ?? 0,
+      ...sps,
+      1,
+      0,
+      ppsLength + 1,
+      pps[0] ?? 0,
+      ...pps,
+    ]);
+    expect(isValidAvcC(broken)).toBe(false);
+    // Like Firefox, carry the SPS and PPS in band in the first keyframe.
+    const lengthPrefixed = (nal: Uint8Array) => [
+      0,
+      0,
+      (nal.length >> 8) & 255,
+      nal.length & 255,
+      ...nal,
+    ];
+    const [first, ...others] = samples;
+    if (!first) throw new Error('no samples');
+    const withParameterSets: EncodedSample[] = [
+      {
+        ...first,
+        data: new Uint8Array([...lengthPrefixed(sps), ...lengthPrefixed(pps), ...first.data]),
+      },
+      ...others,
+    ];
+    const repaired = ensureAvcC(broken, withParameterSets[0]?.data);
+    expect(isValidAvcC(repaired)).toBe(true);
+    const blob = muxMp4(withParameterSets, { width: 320, height: 180, fps: 30, avcC: repaired });
+    const file = tmp.file('repaired.mp4', new Uint8Array(await blob.arrayBuffer()));
+    const log = ffmpeg(['-v', 'warning', '-i', file, '-f', 'null', '-']).toString();
+    expect(log).toBe('');
+    expect(frameHashes(file)).toEqual(frameHashes(source));
   });
 });

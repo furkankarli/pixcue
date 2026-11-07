@@ -160,9 +160,26 @@ and decoded frames compared with the source.
 
 ### State and sharing
 
-The studio keeps its whole state (frame preset, template, field values, theme,
-accent, font) serializable, and mirrors it in the URL so any setup can be shared
-as a link. Named presets are stored in `localStorage`.
+The studio's state (`apps/studio/src/state/`) is plain data: format preset,
+template, theme, accent per theme, display font, frame rate and, per template,
+the edited field values and layout. Untouched fields are not stored at all, so
+they keep following the defaults for the user's language and the platform.
+
+- **Links.** The address bar always holds the current graphic in the URL
+  fragment (`#g=` + base64url JSON). Fragments never reach a server. Only the
+  current template and the values that differ from the defaults are written,
+  so links stay short.
+- **Validation.** Everything read from a link or a saved setup goes through
+  `cleanState` and `resolveFields`: unknown templates, themes, fonts, colors
+  and out-of-range numbers fall back to defaults, so a crafted link cannot
+  break the editor.
+- **Saved setups** use the same compact form in `localStorage`.
+- **Preview-only settings** (safe area, app UI mock, stage background) are
+  separate browser preferences and are not shared.
+
+The preview renders at its on-screen size with `scaleFrame`, which keeps
+playback smooth on phones; exports render at the full frame size. Fonts are
+self-hosted through Fontsource, and canvases redraw once they have loaded.
 
 ## Hosting
 

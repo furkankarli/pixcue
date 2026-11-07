@@ -7,6 +7,7 @@ import {
   forEachFrame,
   frameTimestamp,
 } from '../frames.ts';
+import { ensureAvcC } from '../mux/avc.ts';
 import { muxMp4 } from '../mux/mp4.ts';
 import { muxWebm, type WebmSample } from '../mux/webm.ts';
 
@@ -197,7 +198,8 @@ export async function exportMp4(
   if (!codecs || !config) throw new ExportUnsupportedError('h264');
   const { samples, description } = await encodeFrames(source, options, codecs, config, false);
   if (!description) throw new Error('The H.264 encoder did not provide its configuration (avcC).');
-  const mp4 = muxMp4(samples, { width, height, fps, avcC: description });
+  const avcC = ensureAvcC(description, samples.find((s) => s.key)?.data);
+  const mp4 = muxMp4(samples, { width, height, fps, avcC });
   options.onProgress?.(1);
   return mp4;
 }
