@@ -3,14 +3,15 @@
  * pixel theme), with per-category bars below. Centered.
  */
 import {
-  accentTextColor,
   clamp,
   decimalsOf,
+  drawLabel,
   easeInOut,
   easeOut,
   envelope,
   fillTextAt,
   formatNumber,
+  labelColor,
   mix,
   PIXEL_PANEL_FILL,
   type PixelScene,
@@ -18,7 +19,6 @@ import {
   pixelPanel,
   pixelTextStyles,
   popScale,
-  roundRectPath,
   textWidth,
   themeCase,
   themeFont,
@@ -81,57 +81,44 @@ const vector: VectorScene<ScoreCardFields> = {
         640,
         textWidth(c, themeCase(theme, fields.title, locale), themeFont(theme, 'display', 36)) + 90,
       ),
-      h: 440 + fields.categories.length * 72,
+      h: 448 + fields.categories.length * 72,
     };
   },
 
   draw(c, t, { fields, theme, accent, locale, duration: dur, box }) {
     const { w, h } = box;
+    const { enter, exit } = theme.motion;
     const max = fields.max;
     const score = fields.score;
-    const pan = envelope(t, dur, 0, 0.55, 0.85, 0.35);
-    const textIn = envelope(t, dur, 0.3, 0.7, 0.6, 0.35);
-    const count = easeOut((t - 0.55) / 1.3);
+    // The outro runs in reverse: bars drain, the score and title fade, then
+    // the card rolls back up.
+    const pan = envelope(t, dur, 0, 0.55, 0.62, 0.1, enter, exit);
+    const textIn = envelope(t, dur, 0.3, 0.7, 0.95, 0.6, enter, exit);
+    const count = easeOut((t - 0.55) / 1.3) * (1 - easeInOut((t - (dur - 1.25)) / 0.5));
+    const cx = w / 2;
 
-    // The panel unrolls downward.
-    withClip(c, -30, -30, w + 60, (h + 70) * pan, () => {
-      theme.panel(c, 0, 0, w, h);
+    // The card unrolls downward.
+    if (pan <= 0) return;
+    withClip(c, -40, -40, w + 80, (h + 80) * pan, () => {
+      theme.card(c, 0, 0, w, h, accent);
+
       withAlpha(c, textIn, () => {
         fillTextAt(
           c,
           themeCase(theme, fields.title, locale),
-          w / 2,
-          70,
+          cx,
+          66,
           themeFont(theme, 'display', 36),
           theme.colors.text,
           'center',
         );
+        theme.rule(c, cx - 32 * textIn, 84, 64 * textIn, 6, accent);
 
-        // Score ring fills as the number counts up.
-        const cx = w / 2;
-        const cy = 228;
-        const R = 104;
-        const end = -Math.PI / 2 + Math.PI * 2 * clamp(score / max) * count;
-        c.lineWidth = 20;
-        c.lineCap = 'round';
-        c.strokeStyle = theme.colors.line;
-        c.beginPath();
-        c.arc(cx, cy, R, 0, Math.PI * 2);
-        c.stroke();
+        // The score ring fills as the number counts up.
+        const cy = 236;
         c.save();
-        c.shadowColor = accent;
-        c.shadowBlur = 24;
-        c.strokeStyle = accent;
-        c.beginPath();
-        c.arc(cx, cy, R, -Math.PI / 2, end);
-        c.stroke();
+        theme.ring(c, cx, cy, 104, clamp(score / max) * count, accent);
         c.restore();
-        if (count > 0.02) {
-          c.beginPath();
-          c.arc(cx + Math.cos(end) * R, cy + Math.sin(end) * R, 6, 0, Math.PI * 2);
-          c.fillStyle = '#fff';
-          c.fill();
-        }
         const bump = t > 1.85 && t < 2.1 ? 1 + 0.08 * Math.sin((Math.PI * (t - 1.85)) / 0.25) : 1;
         c.save();
         c.translate(cx, cy);
@@ -155,22 +142,29 @@ const vector: VectorScene<ScoreCardFields> = {
           theme.colors.sub,
           'center',
         );
-        fillTextAt(
-          c,
-          upper(fields.label, locale),
-          cx,
-          382,
-          themeFont(theme, 'body', 22, 800),
-          accentTextColor(theme, accent),
-          'center',
-        );
+        drawLabel(c, theme, fields.label, cx, 392, 21, labelColor(theme, accent), {
+          locale,
+          align: 'center',
+        });
       });
 
-      // Category bars fill one after another.
+      // Category meters fill one after another and drain in reverse.
+      const n = fields.categories.length;
       fields.categories.forEach((cat, i) => {
-        const ry = 420 + i * 72;
-        const k = easeOut((t - (1.1 + i * 0.15)) / 0.7);
-        const a = envelope(t, dur, 0.9 + i * 0.12, 1.3 + i * 0.12, 0.6, 0.35);
+        const ry = 428 + i * 72;
+        const lead = (n - 1 - i) * 0.08;
+        const fill =
+          easeOut((t - (1.1 + i * 0.15)) / 0.7) * (1 - easeInOut((t - (dur - 1.45 + lead)) / 0.45));
+        const a = envelope(
+          t,
+          dur,
+          0.9 + i * 0.12,
+          1.3 + i * 0.12,
+          1.15 - lead,
+          0.8 - lead,
+          enter,
+          exit,
+        );
         withAlpha(c, a, () => {
           fillTextAt(
             c,
@@ -189,15 +183,9 @@ const vector: VectorScene<ScoreCardFields> = {
             theme.colors.text,
             'right',
           );
-          roundRectPath(c, 44, ry + 44, w - 88, 12, 6);
-          c.fillStyle = theme.colors.line;
-          c.fill();
-          const bw = (w - 88) * clamp(cat.score / max) * k;
-          if (bw > 1) {
-            roundRectPath(c, 44, ry + 44, bw, 12, 6);
-            c.fillStyle = accent;
-            c.fill();
-          }
+          c.save();
+          theme.meter(c, 44, ry + 42, w - 88, 14, clamp(cat.score / max) * fill, accent);
+          c.restore();
         });
       });
     });
