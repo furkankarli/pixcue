@@ -41,6 +41,11 @@ describe('easings', () => {
     expect(easeInOut(0.5)).toBeCloseTo(0.5);
   });
 
+  it('starts exactly at 0, so hidden elements stay hidden', () => {
+    for (const e of [easeOut, easeIn, easeInOut, easeOutBack, easeOutExpo, easeInExpo])
+      expect(e(0)).toBe(0);
+  });
+
   it('overshoots with easeOutBack', () => {
     expect(Math.max(...[0.6, 0.7, 0.8, 0.9].map(easeOutBack))).toBeGreaterThan(1);
   });

@@ -23,6 +23,8 @@ export const easeInOut: Easing = (p) => {
 /** Ease-out with a small overshoot past 1 before settling ("back"). */
 export const easeOutBack: Easing = (p) => {
   const x = clamp(p);
+  // Exactly 0 at the start (the formula leaves a tiny rounding error there).
+  if (x === 0) return 0;
   const c1 = 1.70158;
   const c3 = c1 + 1;
   return 1 + c3 * (x - 1) ** 3 + c1 * (x - 1) ** 2;
