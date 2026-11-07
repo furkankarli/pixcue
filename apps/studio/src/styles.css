@@ -1626,10 +1626,17 @@ input[type="range"]:focus-visible::-moz-range-thumb {
 
 .dialog-body {
   display: flex;
+  flex: 1;
   flex-direction: column;
   gap: var(--space-5);
+  min-height: 0;
   padding: var(--space-4);
   overflow: auto;
+}
+
+/* The export dialog keeps one size while choices change what it shows. */
+.dialog-export {
+  height: min(760px, calc(100dvh - 32px));
 }
 
 .dialog-footer {

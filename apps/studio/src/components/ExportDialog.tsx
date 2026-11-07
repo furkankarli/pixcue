@@ -122,7 +122,7 @@ export function ExportDialog(props: { open: boolean; onClose: () => void }) {
   return (
     <dialog
       ref={dialog}
-      class="dialog"
+      class="dialog dialog-export"
       aria-labelledby="export-title"
       onClose={close}
       onCancel={(e) => running() && e.preventDefault()}
