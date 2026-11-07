@@ -77,6 +77,16 @@ describe('resolveTheme', () => {
     );
   });
 
+  it('uses the weight that comes with a custom font', () => {
+    const t = resolveTheme('sade', { displayFont: { family: 'Bebas Neue', weight: 400 } });
+    expect(t.kind === 'vector' && t.fonts.display).toEqual({
+      family: '"Bebas Neue", Manrope, sans-serif',
+      weight: 400,
+    });
+    const keep = resolveTheme('sade', { displayFont: 'Inter' });
+    expect(keep.kind === 'vector' && keep.fonts.display.weight).toBe(800);
+  });
+
   it('does not change the built-in theme objects', () => {
     resolveTheme('tech', { accent: '#000000', displayFont: 'Inter' });
     expect(THEMES.tech.accent).toBe('#00E5FF');

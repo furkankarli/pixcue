@@ -261,8 +261,11 @@ export function isThemeId(value: string): value is ThemeId {
 export interface ThemeOptions {
   /** Accent color override (`#rrggbb`). */
   readonly accent?: string | undefined;
-  /** Display font family override, e.g. `"Bebas Neue"`. Ignored by the pixel theme. */
-  readonly displayFont?: string | undefined;
+  /**
+   * Display font override: a family name, or a family with the weight to use
+   * (for fonts that have only one weight). Ignored by the pixel theme.
+   */
+  readonly displayFont?: string | { readonly family: string; readonly weight: number } | undefined;
 }
 
 /** A theme with the user's accent and font choices applied. */
@@ -270,13 +273,19 @@ export function resolveTheme(id: ThemeId, options: ThemeOptions = {}): Theme {
   const base: Theme = THEMES[id];
   const accent = options.accent ?? base.accent;
   if (base.kind === 'pixel') return { ...base, accent };
-  const family = options.displayFont
-    ? `${quoteFamily(options.displayFont)}, ${base.fonts.display.family}`
-    : base.fonts.display.family;
+  const override =
+    typeof options.displayFont === 'string' ? { family: options.displayFont } : options.displayFont;
+  if (!override) return { ...base, accent };
   return {
     ...base,
     accent,
-    fonts: { ...base.fonts, display: { ...base.fonts.display, family } },
+    fonts: {
+      ...base.fonts,
+      display: {
+        family: `${quoteFamily(override.family)}, ${base.fonts.display.family}`,
+        weight: 'weight' in override ? override.weight : base.fonts.display.weight,
+      },
+    },
   };
 }
 
