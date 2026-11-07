@@ -3,9 +3,7 @@
  * they fit the safe area, stacked otherwise (vertical, 4:5 and square video).
  */
 import {
-  blockReveal,
   clamp,
-  easeOutBack,
   envelope,
   type Frame,
   fillTextAt,
@@ -123,67 +121,73 @@ const vector: VectorScene<ProsConsFields, VectorBox> = {
       : { w: cw * 2 + GAP, h: ch, cw, ch, stacked };
   },
 
-  draw(c, t, { fields, theme, accent, locale, duration: dur, box }) {
+  draw(c, t, { fields, theme, locale, duration: dur, box }) {
     const { cw: w, ch: h } = box;
+    const { enter, exit, pop } = theme.motion;
     columns(fields, theme.semantic).forEach((col, ci) => {
       const x = box.stacked ? 0 : ci * (w + GAP);
       const y = box.stacked ? ci * (h + GAP) : 0;
       const o = ci * 0.15;
-      const pan = envelope(t, dur, o, o + 0.55, 0.9 - o * 0.5, 0.4 - o * 0.5);
-      const head = envelope(t, dur, o + 0.3, o + 0.7, 0.7, 0.45);
+      const kind = col.plus ? 'plus' : 'minus';
+      // The outro runs in reverse: items leave last to first, then the
+      // header, then the cards close.
+      const pan = envelope(t, dur, o, o + 0.55, 0.62 - o * 0.5, 0.1 - o * 0.5, enter, exit);
+      const head = envelope(t, dur, o + 0.3, o + 0.7, 1.0, 0.65, enter, exit);
+      if (pan <= 0) return;
 
-      withClip(c, x - 30, y - 30, w + 60, (h + 70) * pan, () => {
-        theme.panel(c, x, y, w, h);
+      withClip(c, x - 40, y - 40, w + 80, (h + 80) * pan, () => {
+        // Each column's card carries its own color: green for pros, red for cons.
+        theme.card(c, x, y, w, h, col.color);
 
-        // Round +/- badge, title and accent underline.
-        withAlpha(c, head, () => {
-          const mx = x + 56;
-          const my = y + 62;
-          const ms = easeOutBack(clamp((t - o - 0.3) / 0.35));
+        // Badge, title and underline.
+        const mx = x + 58;
+        const my = y + 62;
+        const ms = pop(clamp((t - o - 0.3) / 0.35)) * head;
+        if (ms > 0.01) {
           c.save();
           c.translate(mx, my);
           c.scale(ms, ms);
-          c.fillStyle = col.color;
-          c.beginPath();
-          c.arc(0, 0, 23, 0, Math.PI * 2);
-          c.fill();
-          c.fillStyle = '#fff';
-          c.fillRect(-11, -3.5, 22, 7);
-          if (col.plus) c.fillRect(-3.5, -11, 7, 22);
+          theme.marker(c, 0, 0, 23, kind, col.color, t);
           c.restore();
+        }
+        withAlpha(c, head, () =>
           fillTextAt(
             c,
             themeCase(theme, col.title, locale),
-            x + 96,
+            x + 100,
             my + 14,
             themeFont(theme, 'display', 36),
             theme.colors.text,
-          );
-          c.fillStyle = accent;
-          c.fillRect(x + 36, y + 104, 60 * head, 5);
-        });
+          ),
+        );
+        if (head > 0) theme.rule(c, x + 36, y + 104, 60 * head, 6, col.color);
 
-        // Items: a small +/- mark, then the text uncovered by a colored block.
+        // Items: a small badge, then the text in the theme's reveal.
+        const n = col.items.length;
         col.items.forEach((text, i) => {
           const a = o + 0.6 + i * 0.15;
-          const oa = 0.68 - o * 0.5;
-          const iy = y + 128 + i * 70 + 34;
+          const oa = 1.45 - (n - 1 - i) * 0.08 - o * 0.5;
+          const top = y + 128 + i * 70;
+          const iy = top + 34;
           const f = themeFont(theme, 'body', 28, 700);
-          const v = envelope(t, dur, a, a + 0.35, oa, oa - 0.22);
-          withAlpha(c, v, () => {
-            c.fillStyle = col.color;
-            c.fillRect(x + 40, iy - 12, 16, 5);
-            if (col.plus) c.fillRect(x + 45.5, iy - 17.5, 5, 16);
-          });
-          blockReveal(
+          const v = envelope(t, dur, a, a + 0.35, oa, oa - 0.35, enter, exit);
+          if (i > 0) theme.divider(c, x + 36, top - 6, w - 72, v);
+          if (v > 0.01) {
+            c.save();
+            c.translate(x + 50, iy - 10);
+            c.scale(v, v);
+            theme.marker(c, 0, 0, 12, kind, col.color, t);
+            c.restore();
+          }
+          theme.reveal(
             c,
-            envelope(t, dur, a, a + 0.6, oa + 0.04, oa - 0.3, linear, linear),
-            x + 72,
+            envelope(t, dur, a, a + 0.6, oa, oa - 0.4, linear, exit),
+            x + 76,
             iy - 30,
             textWidth(c, text, f) + 12,
             42,
             col.color,
-            () => fillTextAt(c, text, x + 76, iy, f, theme.colors.text),
+            () => fillTextAt(c, text, x + 80, iy, f, theme.colors.text),
           );
         });
       });
