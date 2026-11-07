@@ -32,6 +32,7 @@
     "@pixcue/export": "workspace:^",
     "@pixcue/i18n": "workspace:^",
     "@pixcue/templates": "workspace:^",
+    "lucide-solid": "1.70.0",
     "solid-js": "^1.9.18"
   },
   "devDependencies": {
