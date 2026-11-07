@@ -74,6 +74,22 @@ export default {
           subtitle: 'Deep, clear bass',
         },
       },
+      subscribe: {
+        name: 'Subscribe button',
+        fields: {
+          button: 'Button text',
+          done: 'Text after the click',
+          like: 'Like button',
+          bell: 'Notification bell',
+          cursor: 'Mouse pointer',
+        },
+        sample: {
+          subscribe: 'Subscribe',
+          subscribed: 'Subscribed',
+          follow: 'Follow',
+          following: 'Following',
+        },
+      },
     },
   },
 } satisfies { code: string; name: string; messages: MessageTree };

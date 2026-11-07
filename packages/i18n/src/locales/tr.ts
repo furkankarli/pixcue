@@ -70,6 +70,22 @@ export default defineLocale({
           subtitle: 'Derin ve net bas',
         },
       },
+      subscribe: {
+        name: 'Abone ol butonu',
+        fields: {
+          button: 'Buton yazısı',
+          done: 'Tıklandıktan sonraki yazı',
+          like: 'Beğeni butonu',
+          bell: 'Bildirim zili',
+          cursor: 'Fare imleci',
+        },
+        sample: {
+          subscribe: 'Abone ol',
+          subscribed: 'Abone olundu',
+          follow: 'Takip et',
+          following: 'Takip ediliyor',
+        },
+      },
     },
   },
 });
