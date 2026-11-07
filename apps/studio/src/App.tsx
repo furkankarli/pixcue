@@ -13,6 +13,7 @@ import { Stage } from './components/Stage.tsx';
 import { StageToolbar } from './components/StageToolbar.tsx';
 import { StatusBar } from './components/StatusBar.tsx';
 import { Timeline } from './components/Timeline.tsx';
+import { Transport } from './components/Transport.tsx';
 import { locale, t } from './i18n.ts';
 import { wide } from './media.ts';
 import { togglePlay } from './playback.ts';
@@ -82,7 +83,7 @@ export function App() {
         <section class="stage-column" aria-label={t('editor.stage.label')}>
           <StageToolbar />
           <Stage />
-          <p class="stage-hint">{t('editor.stage.dragHint')}</p>
+          <Transport />
         </section>
 
         <Timeline />

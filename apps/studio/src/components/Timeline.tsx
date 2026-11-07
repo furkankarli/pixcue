@@ -1,5 +1,5 @@
 /**
- * The timeline: transport controls, a ruler, and one track holding the clip.
+ * The timeline: a ruler and one track holding the clip.
  * The clip shows a filmstrip of the graphic over time; dragging its right
  * edge changes the length. Clicking or dragging the ruler and track scrubs.
  * Both the playhead and the clip edge are keyboard sliders.
@@ -7,10 +7,9 @@
 import { render, scaleFrame } from '@pixcue/engine';
 import { createEffect, createMemo, createSignal, For, onCleanup, onMount, Show } from 'solid-js';
 import { locale, t } from '../i18n.ts';
-import { displayTime, playing, seek, togglePlay } from '../playback.ts';
+import { displayTime, seek } from '../playback.ts';
 import { MAX_DURATION } from '../state/editor-state.ts';
 import { actions, duration, fontsVersion, frame, renderState, template } from '../store.ts';
-import { PauseIcon, PlayIcon, SkipBackIcon } from '../ui/icons.tsx';
 
 /** Snap step for the clip length, in seconds. */
 const LENGTH_STEP = 0.5;
@@ -40,9 +39,6 @@ export function Timeline() {
     onCleanup(() => observer.disconnect());
   });
 
-  const number = createMemo(
-    () => new Intl.NumberFormat(locale(), { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-  );
   const short = createMemo(() => new Intl.NumberFormat(locale(), { maximumFractionDigits: 1 }));
   const seconds = (value: number) => t('editor.layout.seconds', { value: short().format(value) });
 
@@ -172,33 +168,6 @@ export function Timeline() {
   return (
     <section class="timeline" aria-label={t('editor.timeline.label')}>
       <div class="timeline-head">
-        <div class="transport-buttons">
-          <button
-            type="button"
-            class="icon-button ghost"
-            onClick={() => seek(0)}
-            aria-label={t('editor.timeline.toStart')}
-            title={t('editor.timeline.toStart')}
-          >
-            <SkipBackIcon />
-          </button>
-          <button
-            type="button"
-            class="icon-button play"
-            onClick={togglePlay}
-            aria-label={playing() ? t('editor.stage.pause') : t('editor.stage.play')}
-            aria-keyshortcuts="Space"
-            title={`${playing() ? t('editor.stage.pause') : t('editor.stage.play')} (Space)`}
-          >
-            <Show when={playing()} fallback={<PlayIcon />}>
-              <PauseIcon />
-            </Show>
-          </button>
-        </div>
-        <p class="timecode" aria-live="off">
-          <span class="timecode-now">{number().format(displayTime())}</span>
-          <span class="timecode-total">/ {number().format(duration())}</span>
-        </p>
         <div class="track-label" aria-hidden="true">
           {t(template().name)}
         </div>
