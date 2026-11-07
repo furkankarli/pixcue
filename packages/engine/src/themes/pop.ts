@@ -82,7 +82,7 @@ export const pop: VectorTheme = {
     c.save();
     shape();
     c.clip();
-    halftone(c, x, y, w, h, mix(accent, '#FFFFFF', 0.25), 16);
+    halftone(c, x, y, w, h, mix(accent, '#FFFFFF', 0.35), 16);
     c.restore();
     shape();
     c.lineWidth = 5;

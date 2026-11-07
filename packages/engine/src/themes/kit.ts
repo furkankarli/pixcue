@@ -86,7 +86,7 @@ export function cornerBrackets(
   c.stroke();
 }
 
-/** Ben-Day halftone dots that shrink away from a corner of the rectangle. */
+/** Ben-Day halftone dots that shrink away from a corner, reaching `reach` of the diagonal. */
 export function halftone(
   c: Ctx2D,
   x: number,
@@ -96,15 +96,16 @@ export function halftone(
   color: string,
   spacing: number,
   corner: 'top-right' | 'bottom-left' = 'top-right',
+  reach = 0.38,
 ): void {
   c.fillStyle = color;
   const ox = corner === 'top-right' ? x + w : x;
   const oy = corner === 'top-right' ? y : y + h;
-  const reach = Math.hypot(w, h) * 0.55;
+  const radius = Math.hypot(w, h) * reach;
   for (let row = 0, py = y + spacing / 2; py < y + h; row++, py += spacing) {
     const shift = row % 2 ? spacing / 2 : 0;
     for (let px = x + spacing / 2 + shift; px < x + w; px += spacing) {
-      const k = 1 - Math.hypot(px - ox, py - oy) / reach;
+      const k = 1 - Math.hypot(px - ox, py - oy) / radius;
       if (k <= 0) continue;
       c.beginPath();
       c.arc(px, py, (spacing / 2) * 0.85 * k, 0, Math.PI * 2);
