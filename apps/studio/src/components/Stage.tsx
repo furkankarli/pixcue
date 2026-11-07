@@ -42,17 +42,18 @@ export function Stage() {
     return scaleFrame(frame(), pixelWidth);
   });
 
-  createEffect(() => {
-    const f = output();
-    canvas.width = f.pixelWidth;
-    canvas.height = f.pixelHeight;
-  });
-
+  // Resize and draw in one effect: with two, the draw could run first, see
+  // the old canvas size and skip, leaving the stage blank until the next
+  // change (a format switch while paused).
   createEffect(() => {
     fontsVersion();
     const f = output();
+    if (canvas.width !== f.pixelWidth || canvas.height !== f.pixelHeight) {
+      canvas.width = f.pixelWidth;
+      canvas.height = f.pixelHeight;
+    }
     const ctx = canvas.getContext('2d');
-    if (!ctx || canvas.width !== f.pixelWidth) return;
+    if (!ctx) return;
     try {
       setBounds(render(ctx, displayTime(), renderState(f)));
     } catch (error) {
