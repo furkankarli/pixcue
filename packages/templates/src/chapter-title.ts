@@ -3,20 +3,18 @@
  * line, with a small chapter label under it. Centered.
  */
 import {
-  blockReveal,
   easeIn,
   easeInOut,
   easeOutBack,
   envelope,
+  labelText,
   letterPositions,
-  linear,
   type PixelScene,
   type PixelText,
   pixelChip,
   pixelTextStyles,
   popScale,
   type Sprite,
-  textWidth,
   themeCase,
   themeFont,
   upper,
@@ -42,77 +40,87 @@ const fields = {
 
 export type ChapterTitleFields = FieldValues<typeof fields>;
 
-/** Baseline of the accent line inside the graphic. */
-const LINE_Y = 196;
+/** Clear space between the lowest point of the title and the accent line. */
+const LINE_GAP = 22;
+const TITLE_SIZE = 124;
+const KICKER_SIZE = 26;
 
-const vector: VectorScene<ChapterTitleFields> = {
-  measure(c, { fields, theme }) {
+interface VectorBox {
+  readonly w: number;
+  readonly h: number;
+  /** Title baseline and the accent line, measured so descenders (Ç, Ş) clear the line. */
+  readonly baseline: number;
+  readonly lineY: number;
+}
+
+const vector: VectorScene<ChapterTitleFields, VectorBox> = {
+  measure(c, { fields, theme, accent, locale }) {
+    const title = themeCase(theme, fields.title, locale);
+    c.font = themeFont(theme, 'display', TITLE_SIZE);
+    const m = c.measureText(title || 'H');
+    const baseline = Math.ceil(m.actualBoundingBoxAscent) + 40;
+    const lineY = baseline + Math.ceil(m.actualBoundingBoxDescent) + theme.headingDrop + LINE_GAP;
+    const kicker = theme.chip(
+      c,
+      labelText(theme, fields.kicker || ' ', locale),
+      0,
+      0,
+      KICKER_SIZE,
+      accent,
+      false,
+    );
     return {
-      w:
-        Math.max(
-          textWidth(c, themeCase(theme, fields.title), themeFont(theme, 'display', 124)),
-          280,
-        ) + 220,
-      h: 300,
+      w: Math.max(m.width, kicker.w, 280) + 220,
+      h: lineY + 9 + 26 + kicker.h + 20,
+      baseline,
+      lineY,
     };
   },
 
   draw(c, t, { fields, theme, accent, locale, duration: dur, box }) {
+    const { enter, exit, pop } = theme.motion;
     const cx = box.w / 2;
     const title = themeCase(theme, fields.title, locale);
-    const tf = themeFont(theme, 'display', 124);
+    const tf = themeFont(theme, 'display', TITLE_SIZE);
     const letters = letterPositions(c, title, tf);
     const x0 = cx - letters.width / 2;
     const n = letters.chars.length;
 
-    // Accent line grows from the center, with end caps and a glint.
-    const line = envelope(t, dur, 0, 0.45, 0.6, 0.2, easeInOut, easeInOut);
+    // Accent line grows from the center, with small end caps.
+    const line = envelope(t, dur, 0, 0.45, 0.6, 0.2, enter, exit);
     const half = (box.w / 2 - 70) * line;
-    c.fillStyle = accent;
-    c.fillRect(cx - half, LINE_Y, half * 2, 9);
-    withAlpha(c, line, () => {
-      c.fillRect(cx - half - 26, LINE_Y, 12, 9);
-      c.fillRect(cx + half + 14, LINE_Y, 12, 9);
-    });
-    const gp = (t - 0.5) / 0.55;
-    if (gp > 0 && gp < 1 && half > 40) {
-      const gx = cx - half + half * 2 * easeInOut(gp);
-      withClip(c, cx - half, LINE_Y - 2, half * 2, 13, () => {
-        const g = c.createLinearGradient(gx - 70, 0, gx + 70, 0);
-        g.addColorStop(0, 'rgba(255,255,255,0)');
-        g.addColorStop(0.5, 'rgba(255,255,255,.95)');
-        g.addColorStop(1, 'rgba(255,255,255,0)');
-        c.fillStyle = g;
-        c.fillRect(gx - 70, LINE_Y - 2, 140, 13);
+    if (half > 0.5) {
+      theme.rule(c, cx - half, box.lineY, half * 2, 9, accent);
+      withAlpha(c, line, () => {
+        theme.rule(c, cx - half - 26, box.lineY, 12, 9, accent);
+        theme.rule(c, cx + half + 14, box.lineY, 12, 9, accent);
       });
     }
 
-    // Letters drop onto the line, then fall through it (clipped) at the end.
-    withClip(c, -200, -300, box.w + 400, LINE_Y + 300, () => {
+    // Letters drop onto their place above the line, then fall through it.
+    withClip(c, -200, -400, box.w + 400, box.lineY - 2 + 400, () => {
       letters.chars.forEach((ch, i) => {
         const p = (t - 0.2 - i * 0.035) / 0.5;
         if (p <= 0) return;
-        const out = t > dur - 0.58 ? easeIn((t - (dur - 0.58) - (n - 1 - i) * 0.016) / 0.32) : 0;
-        const y = LINE_Y - 36 + (1 - easeOutBack(p)) * 180 + out * 190;
+        const out = t > dur - 0.58 ? exit((t - (dur - 0.58) - (n - 1 - i) * 0.016) / 0.32) : 0;
+        const y = box.baseline + (1 - pop(p)) * -140 + out * 260;
         theme.heading(c, ch, x0 + (letters.xs[i] ?? 0), y, tf, 'left', undefined, accent);
       });
     });
 
-    // Chapter label revealed under the line.
-    if (fields.kicker) {
-      const kf = themeFont(theme, 'body', 30, 800);
-      const k = upper(fields.kicker, locale);
-      const kw = textWidth(c, k, kf) + 28;
-      blockReveal(
-        c,
-        envelope(t, dur, 0.55, 1.15, 0.52, 0.06, linear, linear),
-        cx - kw / 2,
-        LINE_Y + 24,
-        kw,
-        48,
-        accent,
-        () => theme.heading(c, k, cx, LINE_Y + 60, kf, 'center', accent, '#111'),
-      );
+    // Chapter label pops in under the line.
+    const kickerIn = envelope(t, dur, 0.55, 0.95, 0.52, 0.12, pop, exit);
+    if (fields.kicker && kickerIn > 0) {
+      const label = labelText(theme, fields.kicker, locale);
+      const size = theme.chip(c, label, 0, 0, KICKER_SIZE, accent, false);
+      const x = cx - size.w / 2;
+      const y = box.lineY + 9 + 26;
+      c.save();
+      c.translate(cx, y + size.h / 2);
+      c.scale(kickerIn, kickerIn);
+      c.translate(-cx, -(y + size.h / 2));
+      theme.chip(c, label, x, y, KICKER_SIZE, accent);
+      c.restore();
     }
   },
 };
