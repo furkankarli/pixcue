@@ -159,8 +159,10 @@ refactors need no changeset. See [.changeset/README.md](.changeset/README.md).
 - **Unit tests** live next to each package in `test/*.test.ts` and run with
   Vitest: `pnpm test`.
 - **Visual snapshot tests** (`test/*.visual.test.ts`) render chosen frames of
-  every template in every theme and format to PNG, then compare them with the
-  committed baselines in `__snapshots__/`.
+  every template in every theme and format to PNG, then compare them pixel by
+  pixel with the committed baselines in `test/__snapshots__/`. They run on a
+  Node.js canvas with the theme fonts bundled in
+  `packages/engine/testing/fonts/`, so no browser is needed.
 - **Format tests** (`test/*.format.test.ts`) export short clips and validate the
   codec, pixel format (including alpha) and frame count with ffprobe. They need
   ffmpeg installed.
@@ -178,6 +180,17 @@ Open the changed PNGs and check them before committing. Commit the new
 baselines together with the change that caused them, and say in the PR that the
 snapshots changed on purpose. Never update baselines just to make a failing
 test pass.
+
+Good to know:
+
+- A test with no baseline yet writes one when you run it locally. In CI a
+  missing baseline is an error, so commit new baselines with your change.
+- When a frame differs, the test writes `__snapshots__/__actual__/` and
+  `__snapshots__/__diff__/` images next to the baseline (git-ignored). In CI
+  they are uploaded as the `visual-diffs` artifact of the failed run.
+- Baselines are rendered on Linux, as in CI. On macOS and Windows, text can
+  rasterize slightly differently; if only anti-aliased text edges differ, rely
+  on CI and do not commit baselines rendered on those systems.
 
 ## Before you open a PR
 
