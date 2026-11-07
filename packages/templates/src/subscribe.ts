@@ -195,6 +195,13 @@ const vector: VectorScene<SubscribeFields, VectorBox> = {
       c.restore();
     };
 
+    // The theme's burst on every press, behind the buttons so it frames
+    // them without covering their labels.
+    const hits: [number, number, number, number][] = [[A1, shift0 + g.w0 * 0.55, y + 60, 0]];
+    if (fields.like) hits.push([A2, likeFinal + 55, y + 55, 20]);
+    if (fields.bell) hits.push([A3, bellFinal + 55, y + 55, 40]);
+    for (const [a, bx, by, seed] of hits) theme.burst(c, bx, by, (t - a) / 0.7, accent, seed);
+
     c.save();
     c.translate(shift, 0);
 
@@ -290,12 +297,6 @@ const vector: VectorScene<SubscribeFields, VectorBox> = {
       });
     }
     c.restore();
-
-    // The theme's burst on every press.
-    const hits: [number, number, number, number][] = [[A1, shift0 + g.w0 * 0.55, y + 60, 0]];
-    if (fields.like) hits.push([A2, likeFinal + 55, y + 55, 20]);
-    if (fields.bell) hits.push([A3, bellFinal + 55, y + 55, 40]);
-    for (const [a, bx, by, seed] of hits) theme.burst(c, bx, by, (t - a) / 0.7, accent, seed);
 
     const targets: [number, Point | null][] = [
       [A1, [shift0 + g.w0 * 0.55, y + 64]],
