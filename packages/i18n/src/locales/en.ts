@@ -180,7 +180,7 @@ export default {
         chromaMode: 'Chroma key mode',
         chromaModeHelp: 'Removes soft shadows and see-through edges so keying stays clean.',
         keyConflict:
-          'Your accent color is close to this background color, so keying would cut into the graphic. Pick another background color.',
+          'Parts of your graphic are close to this background color, so keying would cut into them. Pick another background color.',
         frameRate: 'Frame rate',
         fps: '{fps} fps',
         start: 'Export',

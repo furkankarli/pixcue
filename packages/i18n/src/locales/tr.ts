@@ -177,7 +177,7 @@ export default defineLocale({
         chromaModeHelp:
           'Yumuşak gölgeleri ve yarı saydam kenarları kaldırır, böylece arka plan temiz silinir.',
         keyConflict:
-          'Vurgu rengin bu arka plan rengine çok yakın; chroma key grafiğin bir kısmını da silebilir. Başka bir arka plan rengi seç.',
+          'Grafiğinin bazı kısımları bu arka plan rengine çok yakın; chroma key onları da silebilir. Başka bir arka plan rengi seç.',
         frameRate: 'Kare hızı',
         fps: '{fps} fps',
         start: 'Dışa aktar',
