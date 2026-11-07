@@ -1,6 +1,7 @@
 /**
- * Pros and cons: two panels listing good and bad points. Side by side when
- * they fit the safe area, stacked otherwise (vertical, 4:5 and square video).
+ * Pros and cons: two panels listing good and bad points. By default side by
+ * side when they fit the safe area and stacked otherwise (vertical, 4:5 and
+ * square video); the arrangement can also be chosen.
  */
 import {
   clamp,
@@ -61,6 +62,16 @@ const fields = {
       { text: t('templates.prosCons.sample.con2') },
     ],
   }),
+  arrangement: field.select({
+    label: 'templates.prosCons.fields.arrangement',
+    help: 'templates.prosCons.fields.arrangementHelp',
+    options: [
+      { value: 'auto', label: 'templates.prosCons.fields.arrangementAuto' },
+      { value: 'side', label: 'templates.prosCons.fields.arrangementSide' },
+      { value: 'stacked', label: 'templates.prosCons.fields.arrangementStacked' },
+    ],
+    default: 'auto',
+  }),
 };
 
 export type ProsConsFields = FieldValues<typeof fields>;
@@ -93,8 +104,13 @@ function columns(fields: ProsConsFields, colors: { positive: string; negative: s
 }
 
 /** Whether two columns of `columnWidth` (plus `gap`) are too wide for the frame. */
-const shouldStack = (frame: Frame, columnWidth: number, gap: number) =>
-  columnWidth * 2 + gap > frame.safeArea.width;
+const shouldStack = (
+  arrangement: ProsConsFields['arrangement'],
+  frame: Frame,
+  columnWidth: number,
+  gap: number,
+) =>
+  arrangement === 'auto' ? columnWidth * 2 + gap > frame.safeArea.width : arrangement === 'stacked';
 
 interface VectorBox {
   readonly w: number;
@@ -115,7 +131,7 @@ const vector: VectorScene<ProsConsFields, VectorBox> = {
     }
     const cw = Math.max(470, m + 130);
     const ch = 128 + Math.max(fields.pros.length, fields.cons.length, 1) * 70 + 30;
-    const stacked = shouldStack(frame, cw, GAP);
+    const stacked = shouldStack(fields.arrangement, frame, cw, GAP);
     return stacked
       ? { w: cw, h: ch * 2 + GAP, cw, ch, stacked }
       : { w: cw * 2 + GAP, h: ch, cw, ch, stacked };
@@ -229,7 +245,7 @@ const pixel: PixelScene<ProsConsFields, PixelBox> = {
     const n = Math.max(1, ...cols.map((col) => col.items.length));
     const ph = 6 + 16 + 4 + n * 12 + 4;
     // Grid cells are PIXEL_BASE design units wide at scale 1.
-    const stacked = shouldStack(frame, cw * PIXEL_BASE, PIXEL_GAP * PIXEL_BASE);
+    const stacked = shouldStack(fields.arrangement, frame, cw * PIXEL_BASE, PIXEL_GAP * PIXEL_BASE);
     return stacked
       ? { w: cw, h: (ph + 3) * 2 + PIXEL_GAP, columns: cols, cw, ph, stacked }
       : { w: cw * 2 + PIXEL_GAP, h: ph + 3, columns: cols, cw, ph, stacked };

@@ -326,6 +326,12 @@ export default {
           consTitle: 'Cons title',
           cons: 'Cons',
           item: 'Item',
+          arrangement: 'Arrangement',
+          arrangementHelp:
+            'Automatic puts the panels side by side when they fit and stacks them in vertical and square video.',
+          arrangementAuto: 'Automatic',
+          arrangementSide: 'Side by side',
+          arrangementStacked: 'Stacked',
         },
         sample: {
           prosTitle: 'Pros',

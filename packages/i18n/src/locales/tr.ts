@@ -323,6 +323,12 @@ export default defineLocale({
           consTitle: 'Eksiler başlığı',
           cons: 'Eksiler',
           item: 'Madde',
+          arrangement: 'Dizilim',
+          arrangementHelp:
+            'Otomatik: sığdığında paneller yan yana durur, dikey ve kare videoda üst üste dizilir.',
+          arrangementAuto: 'Otomatik',
+          arrangementSide: 'Yan yana',
+          arrangementStacked: 'Üst üste',
         },
         sample: {
           prosTitle: 'Artılar',
