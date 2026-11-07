@@ -5,9 +5,6 @@
 import {
   accentTextColor,
   bitmapSprite,
-  blockReveal,
-  easeInOut,
-  easeOutBack,
   envelope,
   linear,
   mix,
@@ -22,8 +19,6 @@ import {
   typedVisible,
   upper,
   type VectorScene,
-  withAlpha,
-  withClip,
 } from '@pixcue/engine';
 import { defineTemplate, type FieldValues, field } from './api.ts';
 
@@ -53,109 +48,107 @@ export type CalloutFields = FieldValues<typeof fields>;
 /** One frame at 30 fps: pops start here so the first frame stays empty. */
 const FIRST_FRAME = 1 / 30;
 
+/** Clear space between the text and the leader line. */
+const TITLE_GAP = 16;
+const SUB_GAP = 14;
+const TITLE_SIZE = 46;
+const SUB_SIZE = 26;
+
 interface VectorBox {
   readonly w: number;
   readonly h: number;
   readonly textWidth: number;
+  /** Height of the horizontal part of the leader line. */
+  readonly lineY: number;
+  readonly titleBaseline: number;
+  readonly titleAscent: number;
+  readonly titleDescent: number;
+  readonly subBaseline: number;
+  readonly dotY: number;
 }
 
 const vector: VectorScene<CalloutFields, VectorBox> = {
   measure(c, { fields, theme, locale }) {
-    const tw =
-      Math.max(
-        textWidth(c, themeCase(theme, fields.title, locale), themeFont(theme, 'display', 46)),
-        textWidth(c, fields.subtitle, themeFont(theme, 'body', 26, 700)),
-        120,
-      ) + 20;
-    return { w: 180 + tw + 40, h: 240, textWidth: tw };
+    c.font = themeFont(theme, 'display', TITLE_SIZE);
+    const title = c.measureText(themeCase(theme, fields.title, locale) || 'H');
+    c.font = themeFont(theme, 'body', SUB_SIZE, 700);
+    const sub = c.measureText(fields.subtitle || 'H');
+    const ascent = Math.ceil(title.actualBoundingBoxAscent);
+    const descent = Math.ceil(title.actualBoundingBoxDescent);
+    const titleBaseline = 24 + ascent;
+    const lineY = titleBaseline + descent + theme.headingDrop + TITLE_GAP;
+    // The heading treatment also reaches above the glyphs (about half of its drop).
+    const subBaseline =
+      lineY + SUB_GAP + theme.headingDrop / 2 + Math.ceil(sub.actualBoundingBoxAscent);
+    const dotY = subBaseline + 90;
+    const tw = Math.max(title.width, sub.width, 120) + 20;
+    return {
+      w: 180 + tw + 40,
+      h: dotY + 40,
+      textWidth: tw,
+      lineY,
+      titleBaseline,
+      titleAscent: ascent,
+      titleDescent: descent,
+      subBaseline,
+      dotY,
+    };
   },
 
   draw(c, t, { fields, theme, accent, locale, duration: dur, box }) {
+    const { enter, exit, pop } = theme.motion;
     const left = fields.direction === 'left';
     const X = (x: number) => (left ? box.w - x : x);
-    const dotX = X(28);
-    const dotY = 214;
-    const elbowX = X(160);
-    const elbowY = 84;
-    const endX = X(160 + box.textWidth + 30);
+    const dot = { x: X(28), y: box.dotY };
+    const elbow = { x: X(160), y: box.lineY };
+    const end = { x: X(160 + box.textWidth + 30), y: box.lineY };
 
-    const dot = envelope(t, dur, 0, 0.32, 0.72, 0.4, easeOutBack);
-    const l1 = envelope(t, dur, 0.18, 0.52, 0.58, 0.3, easeInOut, easeInOut);
-    const l2 = envelope(t, dur, 0.46, 0.84, 0.42, 0.12, easeInOut, easeInOut);
-
-    // Pulsing rings around a glowing dot.
-    if (dot > 0) {
-      for (let r = 0; r < 2; r++) {
-        const pr = (t + r * 0.5) % 1;
-        c.beginPath();
-        c.arc(dotX, dotY, 16 + 40 * pr, 0, Math.PI * 2);
-        c.strokeStyle = accent;
-        c.lineWidth = 4;
-        withAlpha(c, (1 - pr) * dot * 0.9, () => c.stroke());
-      }
+    // The leader line draws out to the label; the anchor pops in on top of it.
+    theme.leader(
+      c,
+      [dot, elbow, end],
+      envelope(t, dur, 0.18, 0.84, 0.58, 0.12, enter, exit),
+      accent,
+    );
+    const dotIn = envelope(t, dur, 0, 0.32, 0.72, 0.4, pop, exit);
+    if (dotIn > 0) {
       c.save();
-      c.shadowColor = accent;
-      c.shadowBlur = 20;
-      c.beginPath();
-      c.arc(dotX, dotY, 14 * dot, 0, Math.PI * 2);
-      c.fillStyle = accent;
-      c.fill();
+      c.translate(dot.x, dot.y);
+      c.scale(dotIn, dotIn);
+      theme.marker(c, 0, 0, 20, 'dot', accent, t);
       c.restore();
-      c.beginPath();
-      c.arc(dotX, dotY, 6 * dot, 0, Math.PI * 2);
-      c.fillStyle = '#0A1418';
-      c.fill();
     }
 
-    // Leader line: diagonal to the elbow, then horizontal under the title.
-    c.strokeStyle = accent;
-    c.lineWidth = 5;
-    c.lineCap = 'round';
-    if (l1 > 0) {
-      c.beginPath();
-      c.moveTo(dotX, dotY);
-      c.lineTo(dotX + (elbowX - dotX) * l1, dotY + (elbowY - dotY) * l1);
-      c.stroke();
-    }
-    if (l2 > 0) {
-      c.beginPath();
-      c.moveTo(elbowX, elbowY);
-      c.lineTo(elbowX + (endX - elbowX) * l2, elbowY);
-      c.stroke();
-    }
-
-    const tf = themeFont(theme, 'display', 46);
+    // Title above the line, subtitle below it, each in the theme's reveal.
+    const tf = themeFont(theme, 'display', TITLE_SIZE);
     const title = themeCase(theme, fields.title, locale);
     const tw = textWidth(c, title, tf) + 16;
-    const textX = left ? elbowX - 10 : elbowX + 10;
+    const textX = left ? elbow.x - 10 : elbow.x + 10;
     const align = left ? 'right' : 'left';
-    blockReveal(
+    const top = box.titleBaseline - box.titleAscent - 8;
+    theme.reveal(
       c,
       envelope(t, dur, 0.62, 1.22, 0.5, 0.06, linear, linear),
-      left ? elbowX - tw - 2 : elbowX + 2,
-      elbowY - 62,
+      left ? elbow.x - tw - 2 : elbow.x + 2,
+      top,
       tw,
-      56,
+      box.titleAscent + box.titleDescent + 16,
       accent,
-      () => theme.heading(c, title, textX, elbowY - 18, tf, align, undefined, accent),
+      () => theme.heading(c, title, textX, box.titleBaseline, tf, align, undefined, accent),
     );
 
-    // Subtitle slides up from under the line. While hidden its shadow would
-    // still leak into the clip, so it is not drawn at all.
-    const sub = envelope(t, dur, 1.0, 1.35, 0.3, 0.04);
-    if (sub <= 0) return;
+    const sf = themeFont(theme, 'body', SUB_SIZE, 700);
+    const sw = textWidth(c, fields.subtitle, sf) + 16;
     const subColor = accentTextColor(theme, accent) === '#111111' ? '#fff' : accent;
-    withClip(c, Math.min(elbowX, endX) - 20, elbowY + 6, Math.abs(endX - elbowX) + 60, 70, () =>
-      theme.heading(
-        c,
-        fields.subtitle,
-        textX,
-        elbowY + 44 - (1 - sub) * 50,
-        themeFont(theme, 'body', 26, 700),
-        align,
-        subColor,
-        '#111',
-      ),
+    theme.reveal(
+      c,
+      envelope(t, dur, 1.0, 1.4, 0.3, 0.04, linear, linear),
+      left ? elbow.x - sw - 2 : elbow.x + 2,
+      box.lineY + SUB_GAP - 4,
+      sw,
+      box.subBaseline - box.lineY + 2,
+      accent,
+      () => theme.heading(c, fields.subtitle, textX, box.subBaseline, sf, align, subColor, '#111'),
     );
   },
 };
