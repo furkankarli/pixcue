@@ -152,6 +152,17 @@ export const bellIcon: IconPath = (c) => {
   c.closePath();
 };
 
+/** Heart (like on TikTok and Instagram) icon. */
+export const heartIcon: IconPath = (c) => {
+  c.beginPath();
+  c.moveTo(30, 54);
+  c.bezierCurveTo(10, 40, 2, 28, 4, 18);
+  c.bezierCurveTo(6, 6, 22, 2, 30, 14);
+  c.bezierCurveTo(38, 2, 54, 6, 56, 18);
+  c.bezierCurveTo(58, 28, 50, 40, 30, 54);
+  c.closePath();
+};
+
 /** Fills an icon at `(x, y)` scaled to `size` × `size`. */
 export function drawIcon(
   c: Ctx2D,

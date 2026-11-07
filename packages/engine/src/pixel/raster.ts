@@ -342,6 +342,18 @@ export const SPRITES = {
     '.....KWK...',
     '......KK...',
   ],
+  heart: [
+    '.WWW...WWW.',
+    'WWWWW.WWWWW',
+    'WWWWWWWWWWW',
+    'WWWWWWWWWWW',
+    'WWWWWWWWWWW',
+    '.WWWWWWWWW.',
+    '..WWWWWWW..',
+    '...ggggg...',
+    '....ggg....',
+    '.....g.....',
+  ],
   play: ['DR...', 'DRR..', 'DRRR.', 'DRRRR', 'DRRR.', 'DRR..', 'DR...'],
   check: ['......X', '.....XX', 'X...XX.', 'XX.XX..', '.XXX...', '..X....'],
 } as const satisfies Record<string, readonly string[]>;

@@ -73,6 +73,10 @@ describe('sprites', () => {
     expect(s).toMatchObject({ w: 7, h: 9 });
   });
 
+  it('has the same size for every like icon', () => {
+    expect(SPRITES.heart[0]?.length).toBe(SPRITES.thumb[0]?.length);
+  });
+
   it('adds a 3-pixel drop shadow under panels', () => {
     expect(pixelPanel(40, 20, '#1C1C21')).toMatchObject({ w: 40, h: 23 });
   });
