@@ -237,6 +237,9 @@ importers:
       '@pixcue/engine':
         specifier: workspace:^
         version: link:../engine
+      '@pixcue/i18n':
+        specifier: workspace:^
+        version: link:../i18n
     devDependencies:
       '@types/node':
         specifier: ^24.19.2
