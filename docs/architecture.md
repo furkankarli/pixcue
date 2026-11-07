@@ -24,7 +24,7 @@ engine, i18n and export depend on no other Pixcue package.
 | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- |
 | `@pixcue/engine`    | Format presets, safe areas, layout, themes, animation and drawing helpers, the pixel engine and bitmap fonts, the `render` entry point | nothing                 |
 | `@pixcue/i18n`      | Locale files, language detection, typed translator                                                                                     | nothing                 |
-| `@pixcue/templates` | Built-in templates built with `defineTemplate`                                                                                         | engine, i18n            |
+| `@pixcue/templates` | The template API (`defineTemplate`, typed fields, `resolveFields`) and the built-in templates                                          | engine, i18n            |
 | `@pixcue/export`    | PNG sequence zip, MOV (PNG codec), MP4 (H.264), WebM (VP9 + alpha), the muxers and zip writer                                          | nothing                 |
 | `@pixcue/studio`    | The editor: form generation, preview, timeline, URL state, presets, export screen                                                      | everything above, Solid |
 
@@ -49,7 +49,7 @@ Rules that keep this healthy:
             ▼
  Frame { width, height, orientation, safeArea }   ← engine presets + safe-areas config
  Theme { fonts, colors, panel, button }           ← engine themes + user accent/font
- Copy  { subscribe | follow … }                   ← i18n, by locale and platform
+ Fields = defaults(locale, platform) + user edits ← templates: resolveFields (validated)
             │
             ▼
  render(ctx, t, state) → template scene          ← deterministic: same input, same pixels

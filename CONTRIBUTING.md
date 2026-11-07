@@ -208,12 +208,14 @@ its fields, and the editor builds the form from them. The full guide with a
 complete example is in [docs/templates.md](docs/templates.md). In short:
 
 1. Open a "New template" issue with a sketch or reference.
-2. Scaffold the file with `pnpm new-template` (available from v0.1).
-3. Declare the fields (text, number, color, select…) and a `render` function
-   that draws one frame at time `t`.
+2. Scaffold it: `pnpm new-template quote-card`. This creates a working
+   template, adds its strings to every locale and registers it.
+3. Declare the fields (text, number, color, select, list…) and draw one frame
+   at time `t`, once for the vector themes and once for the pixel theme.
 4. Use the frame size and safe area you are given, and lay out differently
    for vertical frames.
-5. Add visual snapshots, run the tests, add a changeset and open a PR.
+5. Run `pnpm test` and `pnpm test:visual` (the first run writes your
+   baselines), check the PNGs, add a changeset and open a PR.
 
 ## Adding a language
 
