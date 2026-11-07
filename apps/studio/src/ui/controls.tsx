@@ -100,6 +100,7 @@ export function Slider(props: {
         max={props.max}
         step={props.step}
         value={props.value}
+        style={{ '--fill': `${((props.value - props.min) / (props.max - props.min)) * 100}%` }}
         onInput={(e) => props.onInput(Number(e.currentTarget.value))}
       />
     </div>

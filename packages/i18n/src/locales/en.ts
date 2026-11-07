@@ -49,6 +49,11 @@ export default {
         style: 'Style',
         layout: 'Layout',
       },
+      timeline: {
+        label: 'Timeline',
+        toStart: 'Go to start',
+        playhead: 'Playhead',
+      },
       stage: {
         label: 'Preview',
         play: 'Play',

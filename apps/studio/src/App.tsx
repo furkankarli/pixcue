@@ -1,16 +1,29 @@
-import { createEffect, createSignal, Show } from 'solid-js';
+/**
+ * The editor shell: a top bar, the template library, the stage with its
+ * toolbar, the inspector, and the timeline across the bottom. On narrow
+ * screens the panels stack and the library becomes an inspector tab.
+ */
+import { createEffect, createSignal, onCleanup, Show } from 'solid-js';
 import { ExportDialog } from './components/ExportDialog.tsx';
-import { FormatPicker } from './components/FormatPicker.tsx';
 import { Inspector } from './components/Inspector.tsx';
 import { LanguagePicker } from './components/LanguagePicker.tsx';
 import { Library } from './components/Library.tsx';
 import { PresetsDialog } from './components/PresetsDialog.tsx';
 import { ShareButton } from './components/ShareButton.tsx';
 import { Stage } from './components/Stage.tsx';
-import { Transport } from './components/Transport.tsx';
+import { StageToolbar } from './components/StageToolbar.tsx';
+import { Timeline } from './components/Timeline.tsx';
 import { locale, t } from './i18n.ts';
 import { wide } from './media.ts';
+import { togglePlay } from './playback.ts';
 import { BookmarkIcon, DownloadIcon } from './ui/icons.tsx';
+
+/** Whether a key press belongs to a control that uses the key itself. */
+const ownsKeys = (target: EventTarget | null) =>
+  target instanceof HTMLElement &&
+  (target.isContentEditable ||
+    target.closest('input, textarea, select, button, [role="slider"], [role="tab"], dialog') !==
+      null);
 
 export function App() {
   const [exporting, setExporting] = createSignal(false);
@@ -19,44 +32,62 @@ export function App() {
     document.documentElement.lang = locale();
   });
 
+  // Space plays and pauses, as in every video editor.
+  const onKey = (e: KeyboardEvent) => {
+    if (e.code !== 'Space' || e.repeat || ownsKeys(e.target)) return;
+    if (exporting() || presetsOpen()) return;
+    e.preventDefault();
+    togglePlay();
+  };
+  document.addEventListener('keydown', onKey);
+  onCleanup(() => document.removeEventListener('keydown', onKey));
+
   return (
     <div class="app">
       <header class="topbar">
         <span class="brand">Pixcue</span>
-        <FormatPicker />
         <div class="topbar-actions">
           <ShareButton />
           <button
             type="button"
-            class="button responsive"
+            class="button ghost responsive"
             onClick={() => setPresetsOpen(true)}
             aria-label={t('editor.topbar.presets')}
           >
             <BookmarkIcon />
             <span class="button-label">{t('editor.topbar.presets')}</span>
           </button>
-          <span class="wide-only">
+          <Show when={wide()}>
             <LanguagePicker />
-          </span>
+          </Show>
           <button type="button" class="button primary" onClick={() => setExporting(true)}>
             <DownloadIcon />
             {t('editor.topbar.export')}
           </button>
         </div>
       </header>
+
       <main class="workspace">
         <Show when={wide()}>
-          <aside class="side-panel library-panel" aria-label={t('editor.tabs.templates')}>
-            <h2 class="panel-title">{t('editor.tabs.templates')}</h2>
-            <Library />
+          <aside class="panel library-panel" aria-labelledby="library-title">
+            <h2 class="panel-title" id="library-title">
+              {t('editor.tabs.templates')}
+            </h2>
+            <div class="panel-scroll">
+              <Library />
+            </div>
           </aside>
         </Show>
+
         <section class="stage-column" aria-label={t('editor.stage.label')}>
+          <StageToolbar />
           <Stage />
-          <Transport />
-          <p class="hint">{t('editor.stage.dragHint')}</p>
+          <p class="stage-hint">{t('editor.stage.dragHint')}</p>
         </section>
-        <aside class="side-panel inspector-panel">
+
+        <Timeline />
+
+        <aside class="panel inspector-panel">
           <Inspector
             tabs={
               wide() ? ['content', 'style', 'layout'] : ['templates', 'content', 'style', 'layout']
@@ -64,9 +95,12 @@ export function App() {
           />
         </aside>
       </main>
-      <footer class="app-footer narrow-only">
-        <LanguagePicker />
-      </footer>
+
+      <Show when={!wide()}>
+        <footer class="app-footer">
+          <LanguagePicker />
+        </footer>
+      </Show>
       <ExportDialog open={exporting()} onClose={() => setExporting(false)} />
       <PresetsDialog open={presetsOpen()} onClose={() => setPresetsOpen(false)} />
     </div>

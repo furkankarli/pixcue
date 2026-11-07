@@ -9,9 +9,9 @@ import { createEffect, createSignal, For, onCleanup } from 'solid-js';
 import { t } from '../i18n.ts';
 import { actions, fontsVersion, frame, renderStateFor, state } from '../store.ts';
 
-/** Card preview size in CSS pixels (16:10). */
-const CARD_W = 220;
-const CARD_H = 138;
+/** Card preview size in CSS pixels (16:9). */
+const CARD_W = 208;
+const CARD_H = 117;
 /** Offscreen render width: enough detail for the zoomed-in crop. */
 const RENDER_WIDTH = 960;
 

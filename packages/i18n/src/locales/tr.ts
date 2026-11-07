@@ -45,6 +45,11 @@ export default defineLocale({
         style: 'Stil',
         layout: 'Yerleşim',
       },
+      timeline: {
+        label: 'Zaman çizelgesi',
+        toStart: 'Başa dön',
+        playhead: 'Oynatma kafası',
+      },
       stage: {
         label: 'Önizleme',
         play: 'Oynat',
