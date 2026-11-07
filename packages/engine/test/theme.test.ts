@@ -51,6 +51,18 @@ describe('themes', () => {
   });
 });
 
+describe('semantic colors', () => {
+  it('are available on every theme, including pixel', () => {
+    for (const id of THEME_IDS) {
+      expect(THEMES[id].semantic).toEqual({
+        positive: '#22C55E',
+        negative: '#EF4444',
+        spark: '#FFD43B',
+      });
+    }
+  });
+});
+
 describe('resolveTheme', () => {
   it('uses the default accent unless overridden', () => {
     expect(resolveTheme('tech').accent).toBe('#00E5FF');

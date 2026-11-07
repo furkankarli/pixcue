@@ -21,12 +21,29 @@ export interface VectorThemeColors {
   readonly sweep: string;
 }
 
+/** Colors with a fixed meaning, shared by every theme. */
+export interface SemanticColors {
+  /** Good things: pros, checks. */
+  readonly positive: string;
+  /** Bad things: cons. */
+  readonly negative: string;
+  /** Celebration sparks and confetti, next to the accent and white. */
+  readonly spark: string;
+}
+
+export const SEMANTIC_COLORS: SemanticColors = {
+  positive: '#22C55E',
+  negative: '#EF4444',
+  spark: '#FFD43B',
+};
+
 /** A theme drawn with vector Canvas 2D: fonts, colors and a few shape styles. */
 export interface VectorTheme {
   readonly kind: 'vector';
   readonly id: 'tech' | 'pop' | 'sade';
   /** Default accent color; users can override it. */
   readonly accent: string;
+  readonly semantic: SemanticColors;
   readonly fonts: { readonly display: FontFace; readonly body: string };
   /** Whether headings are set in capitals. */
   readonly uppercase: boolean;
@@ -57,6 +74,7 @@ export interface PixelTheme {
   readonly kind: 'pixel';
   readonly id: 'pixel';
   readonly accent: string;
+  readonly semantic: SemanticColors;
 }
 
 export type Theme = VectorTheme | PixelTheme;
@@ -65,6 +83,7 @@ export type ThemeId = Theme['id'];
 const tech: VectorTheme = {
   kind: 'vector',
   id: 'tech',
+  semantic: SEMANTIC_COLORS,
   accent: '#00E5FF',
   fonts: {
     display: { family: '"Chakra Petch", Manrope, sans-serif', weight: 700 },
@@ -120,6 +139,7 @@ const tech: VectorTheme = {
 const pop: VectorTheme = {
   kind: 'vector',
   id: 'pop',
+  semantic: SEMANTIC_COLORS,
   accent: '#FFD21F',
   fonts: {
     display: { family: 'Anton, Impact, sans-serif', weight: 400 },
@@ -176,6 +196,7 @@ const pop: VectorTheme = {
 const sade: VectorTheme = {
   kind: 'vector',
   id: 'sade',
+  semantic: SEMANTIC_COLORS,
   accent: '#3D5AFE',
   fonts: { display: { family: 'Manrope, sans-serif', weight: 800 }, body: 'Manrope, sans-serif' },
   uppercase: false,
@@ -222,7 +243,12 @@ const sade: VectorTheme = {
   },
 };
 
-const pixel: PixelTheme = { kind: 'pixel', id: 'pixel', accent: '#E8100E' };
+const pixel: PixelTheme = {
+  kind: 'pixel',
+  id: 'pixel',
+  accent: '#E8100E',
+  semantic: SEMANTIC_COLORS,
+};
 
 export const THEMES = { tech, pixel, pop, sade } as const satisfies Record<ThemeId, Theme>;
 
