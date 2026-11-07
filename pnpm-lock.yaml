@@ -232,7 +232,15 @@ importers:
 
   packages/i18n: {}
 
-  packages/templates: {}
+  packages/templates:
+    dependencies:
+      '@pixcue/engine':
+        specifier: workspace:^
+        version: link:../engine
+    devDependencies:
+      '@types/node':
+        specifier: ^24.19.2
+        version: 24.19.2
 
 packages:
 

@@ -6,4 +6,4 @@
  *
  * Depends on @pixcue/engine and @pixcue/i18n only.
  */
-export {};
+export * from './lower-third.ts';
