@@ -228,7 +228,11 @@ importers:
         specifier: ^8.0.0
         version: 8.0.0
 
-  packages/export: {}
+  packages/export:
+    devDependencies:
+      '@types/node':
+        specifier: ^24.19.2
+        version: 24.19.2
 
   packages/i18n: {}
 
