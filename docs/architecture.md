@@ -62,7 +62,7 @@ Rules that keep this healthy:
                  export pipeline (one per format)
                    PNG zip : canvas → PNG → zip writer
                    MOV     : canvas → PNG → QuickTime muxer (png, depth 32)
-                   MP4     : canvas → VideoEncoder (H.264) → MP4 muxer
+                   MP4     : canvas → key color (chroma-key) → VideoEncoder (H.264) → MP4 muxer
                    WebM    : canvas → VideoEncoder (VP9 + alpha) → Matroska muxer
                         │
                         ▼
@@ -133,6 +133,30 @@ themes draw with vector Canvas 2D; the pixel theme uses the pixel engine with
 hand-made bitmap fonts that include Turkish characters. Users can override the
 accent color and choose from a curated list of Google Fonts with full Turkish
 support. The pixel theme always keeps its bitmap fonts.
+
+### Export
+
+`@pixcue/export` turns a `FrameSource` (size, frame rate, frame count and a
+`render(i)` that returns a canvas) into a file. It never sees templates, so the
+same exporters work for any drawing code.
+
+| Format             | How                                               | Needs WebCodecs |
+| ------------------ | ------------------------------------------------- | --------------- |
+| PNG sequence (zip) | Canvas PNG encoding, stored zip                   | no              |
+| Transparent MOV    | PNG frames in a QuickTime file (`png `, depth 32) | no              |
+| Green-screen MP4   | Frames composited onto a key color, H.264         | yes             |
+| Transparent WebM   | VP9 with the alpha plane in BlockAdditions        | yes             |
+
+For chroma keying, frames are composited onto pure green, blue or magenta.
+Chroma-key mode makes every pixel either fully graphic or fully background
+(alpha below 70 % is dropped), which removes soft shadows and anti-aliased
+fringes that keyers turn into halos.
+
+`EDITORS` maps each video editor to the formats it imports well (MOV for
+DaVinci Resolve, Premiere Pro and Final Cut Pro; chroma-key MP4 for CapCut and
+Instagram Edits). Every muxer is validated against ffprobe and ffmpeg in the
+`pnpm test:formats` suite: codec, pixel format including alpha, frame count,
+and decoded frames compared with the source.
 
 ### State and sharing
 
