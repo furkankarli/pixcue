@@ -33,10 +33,12 @@ template, adds its strings to every locale file and registers it. Then:
    the bottom caption area and the right-hand buttons. The engine anchors your
    graphic inside the safe area and shrinks it to fit; keep `measure` honest so
    it can.
-3. **Theme only.** Fonts, colors, panels, buttons and headings come from the
-   theme: `themeFont`, `theme.colors`, `theme.semantic` (positive, negative,
-   spark), `theme.panel`, `theme.button`, `theme.heading` and the accent. Never
-   hardcode a font family or a brand color.
+3. **Theme only.** Fonts, colors, surfaces and motion come from the theme:
+   `themeFont`, `theme.colors`, `theme.semantic` (positive, negative, spark),
+   `theme.motion`, the accent, and the kit (`theme.card`, `chip`, `rule`,
+   `divider`, `meter`, `ring`, `marker`, `leader`, `reveal`, `burst`,
+   `button`, `heading`, and `drawLabel` for captions). See
+   [themes.md](themes.md). Never hardcode a font family or a brand color.
 4. **Deterministic.** The same inputs always produce the same pixels. Do not use
    `Date.now()`, `Math.random()` or state kept between frames; use `envelope`,
    the easings and `seededRandom`.
@@ -106,9 +108,8 @@ const vector: VectorScene<TitleCardFields> = {
     const show = envelope(t, duration, 0, 0.5, 0.4, 0);
     if (show <= 0) return;
     withAlpha(c, show, () => {
-      theme.panel(c, 0, 0, box.w, box.h);
-      c.fillStyle = accent;
-      c.fillRect(0, box.h - 8, box.w * show, 8);
+      theme.card(c, 0, 0, box.w, box.h, accent);
+      theme.rule(c, 0, box.h - 8, box.w * show, 8, accent);
       const font = themeFont(theme, 'display', 64);
       const title = themeCase(theme, fields.title, locale);
       theme.heading(

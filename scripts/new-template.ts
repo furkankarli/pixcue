@@ -91,9 +91,8 @@ const vector: VectorScene<${n.pascal}Fields> = {
     const show = envelope(t, duration, 0, 0.5, 0.4, 0);
     if (show <= 0) return;
     withAlpha(c, show, () => {
-      theme.panel(c, 0, 0, box.w, box.h);
-      c.fillStyle = accent;
-      c.fillRect(0, box.h - 8, box.w * show, 8);
+      theme.card(c, 0, 0, box.w, box.h, accent);
+      theme.rule(c, 0, box.h - 8, box.w * show, 8, accent);
       const font = themeFont(theme, 'display', 64);
       const title = themeCase(theme, fields.title, locale);
       theme.heading(c, title, box.w / 2, 104 + (1 - show) * 20, font, 'center', theme.colors.text, accent);
