@@ -56,6 +56,20 @@ export default defineLocale({
           row3Value: 'Bluetooth 5.3',
         },
       },
+      callout: {
+        name: 'İşaretçi',
+        fields: {
+          title: 'Başlık',
+          subtitle: 'Alt yazı',
+          direction: 'Yön',
+          right: 'Sağa',
+          left: 'Sola',
+        },
+        sample: {
+          title: '40 mm sürücü',
+          subtitle: 'Derin ve net bas',
+        },
+      },
     },
   },
 });

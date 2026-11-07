@@ -60,6 +60,20 @@ export default {
           row3Value: 'Bluetooth 5.3',
         },
       },
+      callout: {
+        name: 'Callout',
+        fields: {
+          title: 'Title',
+          subtitle: 'Subtitle',
+          direction: 'Direction',
+          right: 'Right',
+          left: 'Left',
+        },
+        sample: {
+          title: '40 mm driver',
+          subtitle: 'Deep, clear bass',
+        },
+      },
     },
   },
 } satisfies { code: string; name: string; messages: MessageTree };
