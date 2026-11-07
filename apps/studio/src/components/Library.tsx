@@ -94,10 +94,7 @@ function Thumbnail(props: { template: Template; active: boolean }) {
       onFocus={play}
       onBlur={stop}
     >
-      <span
-        class="template-thumb"
-        style={{ 'aspect-ratio': `${frame().width} / ${frame().height}` }}
-      >
+      <span class="template-thumb">
         <canvas ref={canvas} />
       </span>
       <span class="template-name">{t(props.template.name)}</span>
