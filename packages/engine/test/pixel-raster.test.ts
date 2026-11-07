@@ -3,6 +3,7 @@ import { context2d } from '../src/canvas.ts';
 import { PIXEL_FONT_BOLD, PIXEL_FONT_SMALL } from '../src/pixel/fonts.ts';
 import {
   bitmapSprite,
+  customSprite,
   pixelChip,
   pixelPanel,
   pixelTextStyles,
@@ -75,6 +76,20 @@ describe('sprites', () => {
 
   it('has the same size for every like icon', () => {
     expect(SPRITES.heart[0]?.length).toBe(SPRITES.thumb[0]?.length);
+  });
+
+  it('draws custom sprites once per key', () => {
+    let draws = 0;
+    const make = () =>
+      customSprite('test-dot', 2, 2, (c) => {
+        draws++;
+        c.fillStyle = '#fff';
+        c.fillRect(0, 0, 1, 1);
+      });
+    const a = make();
+    expect(make()).toBe(a);
+    expect(draws).toBe(1);
+    expect(ascii(a)).toEqual(['#.', '..']);
   });
 
   it('adds a 3-pixel drop shadow under panels', () => {

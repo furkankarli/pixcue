@@ -393,6 +393,18 @@ export const pixelTextStyles = {
   plain: (text: string, color: string) => rasterizeText(text, PIXEL_FONT_SMALL, { fill: color }),
 };
 
+/**
+ * A template-specific sprite, drawn once per `key` and reused across frames.
+ * The key must capture everything that changes the drawing.
+ */
+export function customSprite(key: string, w: number, h: number, draw: (c: Ctx2D) => void): Sprite {
+  return cached(shapeCache, `custom|${key}|${w}|${h}`, 300, () => {
+    const { canvas, c } = newSprite(w, h);
+    draw(c);
+    return { canvas, w, h };
+  });
+}
+
 /** A small accent-colored label chip. */
 export function pixelChip(text: string, accent: string): Sprite {
   return cached(shapeCache, `chip|${text}${accent}`, Number.POSITIVE_INFINITY, () => {
