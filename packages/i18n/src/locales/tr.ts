@@ -106,6 +106,25 @@ export default defineLocale({
           category4: 'Fiyat / performans',
         },
       },
+      prosCons: {
+        name: 'Artılar ve eksiler',
+        fields: {
+          prosTitle: 'Artılar başlığı',
+          pros: 'Artılar',
+          consTitle: 'Eksiler başlığı',
+          cons: 'Eksiler',
+          item: 'Madde',
+        },
+        sample: {
+          prosTitle: 'Artılar',
+          pro1: 'Üç bağlantı modu',
+          pro2: 'Uzun pil ömrü',
+          pro3: 'Rahat kullanım',
+          consTitle: 'Eksiler',
+          con1: 'Şarj kutusu yok',
+          con2: 'Mikrofon ortalama',
+        },
+      },
     },
   },
 });

@@ -110,6 +110,25 @@ export default {
           category4: 'Value for money',
         },
       },
+      prosCons: {
+        name: 'Pros and cons',
+        fields: {
+          prosTitle: 'Pros title',
+          pros: 'Pros',
+          consTitle: 'Cons title',
+          cons: 'Cons',
+          item: 'Item',
+        },
+        sample: {
+          prosTitle: 'Pros',
+          pro1: 'Three connection modes',
+          pro2: 'Long battery life',
+          pro3: 'Comfortable fit',
+          consTitle: 'Cons',
+          con1: 'No charging case',
+          con2: 'Average microphone',
+        },
+      },
     },
   },
 } satisfies { code: string; name: string; messages: MessageTree };
