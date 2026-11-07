@@ -63,6 +63,8 @@ export interface VectorTheme {
   readonly accentText: string | undefined;
   /** Corner radius of icon tiles inside buttons. */
   readonly iconRadius: number;
+  /** How far `heading`'s treatment (offset copy, outline) reaches below the glyphs. */
+  readonly headingDrop: number;
   readonly label: LabelStyle;
   readonly motion: ThemeMotion;
   /** Legacy tag style, used until every template draws tags with `chip`. */

@@ -61,6 +61,7 @@ export const pop: VectorTheme = {
   },
   accentText: INK,
   iconRadius: 12,
+  headingDrop: 16,
   label: { uppercase: true, tracking: 0.04, tone: 'text' },
   motion: { enter: easeOutBack, exit: easeIn, pop: easeOutBack },
   tagStyle: { radius: 0, outline: INK },

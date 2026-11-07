@@ -33,6 +33,7 @@ export const tech: VectorTheme = {
   },
   accentText: undefined,
   iconRadius: 14,
+  headingDrop: 2,
   label: { uppercase: true, tracking: 0.14, tone: 'accent' },
   motion: { enter: easeOutExpo, exit: easeInExpo, pop: easeOutExpo },
   tagStyle: { radius: 5, outline: undefined },

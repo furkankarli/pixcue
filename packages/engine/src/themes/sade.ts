@@ -39,6 +39,7 @@ export const sade: VectorTheme = {
   },
   accentText: undefined,
   iconRadius: 37,
+  headingDrop: 4,
   label: { uppercase: true, tracking: 0.08, tone: 'sub' },
   motion: { enter: easeInOut, exit: easeInOut, pop: easeOut },
   tagStyle: { radius: 5, outline: undefined },
