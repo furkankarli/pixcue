@@ -31,7 +31,8 @@ Requirements:
 - Node.js 24 (`nvm use` reads [`.nvmrc`](.nvmrc))
 - pnpm, through Corepack: `corepack enable`. The version comes from
   `packageManager` in `package.json`.
-- ffmpeg, only to run the export format tests (`pnpm test:formats`)
+- ffmpeg with libx264 and libvpx (most distributions' full builds), only to run
+  the export format tests (`pnpm test:formats`)
 
 ```sh
 git clone https://github.com/<you>/pixcue.git
