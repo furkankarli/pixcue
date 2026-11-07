@@ -59,16 +59,16 @@ const Y0 = 46;
 const PANEL_H = 150;
 
 const vector: VectorScene<LowerThirdFields> = {
-  measure(c, { fields, theme }) {
+  measure(c, { fields, theme, locale }) {
     const w =
       Math.max(
-        textWidth(c, themeCase(theme, fields.title), themeFont(theme, 'display', 58)),
+        textWidth(c, themeCase(theme, fields.title, locale), themeFont(theme, 'display', 58)),
         textWidth(c, fields.subtitle, themeFont(theme, 'body', 28, 700)),
       ) + 96;
     return { w: Math.max(w, 380), h: 200 };
   },
 
-  draw(c, t, { fields, theme, accent, duration: dur, box }) {
+  draw(c, t, { fields, theme, accent, locale, duration: dur, box }) {
     const w = box.w;
     const bar = envelope(t, dur, 0, 0.42, 0.55, 0.15, easeOutBack, easeIn);
     const pan = envelope(t, dur, 0.12, 0.7, 0.75, 0.3);
@@ -103,7 +103,7 @@ const vector: VectorScene<LowerThirdFields> = {
     // Tag chip pops in above the panel.
     if (fields.tag && tagIn > 0) {
       const f = themeFont(theme, 'body', 20, 800);
-      const s = upper(fields.tag);
+      const s = upper(fields.tag, locale);
       const tw = textWidth(c, s, f) + 30;
       const cx = 30 + tw / 2;
       const cy = Y0 - 19;
@@ -124,7 +124,7 @@ const vector: VectorScene<LowerThirdFields> = {
     }
 
     // Title letters rise into place one by one, and drop out at the end.
-    const title = themeCase(theme, fields.title);
+    const title = themeCase(theme, fields.title, locale);
     const tf = themeFont(theme, 'display', 58);
     const letters = letterPositions(c, title, tf);
     withClip(c, -10, Y0 + 8, w + 20, 98, () => {
@@ -178,7 +178,7 @@ const pixel: PixelScene<LowerThirdFields, PixelBox> = {
     return { w: pw + 1, h: 7 + ph + 3, title, subtitle, pw, ph };
   },
 
-  draw(P, t, { fields, accent, duration: dur, box }) {
+  draw(P, t, { fields, accent, locale, duration: dur, box }) {
     const b = box;
     const y0 = 7;
     const panel = pixelPanel(b.pw, b.ph, PIXEL_PANEL_FILL);
@@ -213,7 +213,8 @@ const pixel: PixelScene<LowerThirdFields, PixelBox> = {
         P.rect(Math.round(5 + (b.pw - 12) * gp), y0 + 3, 3, 1, '#FFFFFF');
     }
 
-    if (fields.tag) P.pop(pixelChip(fields.tag, accent), 8, 0, popScale(t, 0.9, dur - 1.15, P.px));
+    if (fields.tag)
+      P.pop(pixelChip(upper(fields.tag, locale), accent), 8, 0, popScale(t, 0.9, dur - 1.15, P.px));
   },
 };
 

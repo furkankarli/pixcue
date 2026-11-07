@@ -57,9 +57,9 @@ const vector: VectorScene<ChapterTitleFields> = {
     };
   },
 
-  draw(c, t, { fields, theme, accent, duration: dur, box }) {
+  draw(c, t, { fields, theme, accent, locale, duration: dur, box }) {
     const cx = box.w / 2;
-    const title = themeCase(theme, fields.title);
+    const title = themeCase(theme, fields.title, locale);
     const tf = themeFont(theme, 'display', 124);
     const letters = letterPositions(c, title, tf);
     const x0 = cx - letters.width / 2;
@@ -101,7 +101,7 @@ const vector: VectorScene<ChapterTitleFields> = {
     // Chapter label revealed under the line.
     if (fields.kicker) {
       const kf = themeFont(theme, 'body', 30, 800);
-      const k = upper(fields.kicker);
+      const k = upper(fields.kicker, locale);
       const kw = textWidth(c, k, kf) + 28;
       blockReveal(
         c,
@@ -125,17 +125,17 @@ interface PixelBox {
 }
 
 const pixel: PixelScene<ChapterTitleFields, PixelBox> = {
-  measure({ fields, accent }) {
-    const full = pixelTextStyles.big(fields.title, 2, accent);
-    const chip = pixelChip(fields.kicker || ' ', accent);
+  measure({ fields, accent, locale }) {
+    const full = pixelTextStyles.big(upper(fields.title, locale), 2, accent);
+    const chip = pixelChip(upper(fields.kicker, locale) || ' ', accent);
     return { w: Math.max(full.w, chip.w) + 20, h: full.h + 5 + 2 + 4 + chip.h, full, chip };
   },
 
-  draw(P, t, { fields, accent, theme, duration: dur, box: b }) {
+  draw(P, t, { fields, accent, theme, locale, duration: dur, box: b }) {
     const cx = Math.floor(b.w / 2);
     const fx = Math.round(cx - b.full.w / 2);
     const ly = b.full.h + 3;
-    const chars = Array.from(upper(fields.title));
+    const chars = Array.from(upper(fields.title, locale));
     const n = chars.length;
 
     const line = envelope(t, dur, 0, 0.38, 0.5, 0.2, easeInOut, easeInOut);
