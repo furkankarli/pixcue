@@ -52,6 +52,7 @@ export default {
       status: {
         openSource: 'Open source on GitHub',
         local: 'Runs in your browser. Nothing is uploaded.',
+        newTab: '(opens in a new tab)',
       },
       timeline: {
         label: 'Timeline',
@@ -72,7 +73,8 @@ export default {
           dark: 'Dark',
           light: 'Light',
         },
-        dragHint: 'Drag the graphic to move it. Double-click resets the position.',
+        dragHint:
+          'Drag the graphic or use the arrow keys to move it. Double-click or Home resets it.',
         loading: 'Loading fonts…',
       },
       style: {

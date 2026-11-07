@@ -13,10 +13,15 @@ import { PlatformOverlay, SafeAreaOverlay } from './Overlays.tsx';
 /** Smallest preview resolution, as the frame's short side in pixels. */
 const MIN_SHORT_SIDE = 720;
 
+/** Arrow-key nudge, in design units (with Shift: the large one). */
+const NUDGE = 10;
+const NUDGE_LARGE = 50;
+
 /** Extra hit area around the graphic for dragging, in CSS pixels. */
 const GRAB_MARGIN = 16;
 
-export function Stage() {
+export function Stage(props: { hintId: string }) {
+  const hintId = props.hintId;
   let box!: HTMLDivElement;
   let canvas!: HTMLCanvasElement;
   const [space, setSpace] = createSignal({ w: 0, h: 0 });
@@ -106,6 +111,25 @@ export function Stage() {
       y: start.offset.y + (e.clientY - start.y) * k,
     });
   };
+  // Keyboard: arrows nudge the graphic (Shift for bigger steps), Home resets.
+  const onKeyDown = (e: KeyboardEvent) => {
+    const step = e.shiftKey ? NUDGE_LARGE : NUDGE;
+    const { x, y } = edits().offset;
+    const to = {
+      ArrowLeft: { x: x - step, y },
+      ArrowRight: { x: x + step, y },
+      ArrowUp: { x, y: y - step },
+      ArrowDown: { x, y: y + step },
+    }[e.key];
+    if (e.key === 'Home') {
+      e.preventDefault();
+      actions.resetOffset();
+    } else if (to) {
+      e.preventDefault();
+      actions.setOffset(to);
+    }
+  };
+
   const endDrag = () => {
     start = null;
     setDragging(false);
@@ -120,8 +144,13 @@ export function Stage() {
         class={`stage-frame stage-bg-${stageBackground()}`}
         classList={{ dragging: dragging() }}
         style={{ width: `${size().w}px`, height: `${size().h}px` }}
-        role="img"
+        role="application"
+        // biome-ignore lint/a11y/noNoninteractiveTabindex: a custom widget; arrow keys move the graphic.
+        tabIndex={0}
         aria-label={t('editor.stage.label')}
+        aria-describedby={hintId}
+        aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight Home"
+        onKeyDown={onKeyDown}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={endDrag}

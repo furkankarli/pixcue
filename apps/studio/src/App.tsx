@@ -82,8 +82,8 @@ export function App() {
 
         <section class="stage-column" aria-label={t('editor.stage.label')}>
           <StageToolbar />
-          <Stage />
-          <Transport />
+          <Stage hintId="stage-hint" />
+          <Transport hintId="stage-hint" />
         </section>
 
         <Timeline />

@@ -16,6 +16,7 @@ export function StatusBar() {
         <span class="status-dot" aria-hidden="true" />
         {t('editor.status.openSource')}
         <ExternalIcon size={12} />
+        <span class="visually-hidden">{t('editor.status.newTab')}</span>
       </a>
       <span class="status-note">{t('editor.status.local')}</span>
       <div class="status-end">
@@ -23,6 +24,7 @@ export function StatusBar() {
         <a class="status-link mono" href={AUTHOR_SITE} target="_blank" rel="noopener">
           furkankarli.com
           <ExternalIcon size={12} />
+          <span class="visually-hidden">{t('editor.status.newTab')}</span>
         </a>
       </div>
     </footer>

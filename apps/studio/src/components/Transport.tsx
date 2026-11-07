@@ -8,7 +8,7 @@ import { displayTime, playing, seek, togglePlay } from '../playback.ts';
 import { duration } from '../store.ts';
 import { PauseIcon, PlayIcon, SkipBackIcon } from '../ui/icons.tsx';
 
-export function Transport() {
+export function Transport(props: { hintId: string }) {
   const number = createMemo(
     () => new Intl.NumberFormat(locale(), { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
   );
@@ -42,7 +42,9 @@ export function Transport() {
           </Show>
         </button>
       </div>
-      <p class="transport-hint">{t('editor.stage.dragHint')}</p>
+      <p class="transport-hint" id={props.hintId}>
+        {t('editor.stage.dragHint')}
+      </p>
     </div>
   );
 }

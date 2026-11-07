@@ -16,7 +16,8 @@
   --bg-raised: #0a0a0b;
   --fg: #ededed;
   --fg-2: rgb(255 255 255 / 0.64);
-  --fg-3: rgb(255 255 255 / 0.44);
+  /* 0.54 keeps small text above 4.5:1 on the ground and on raised surfaces. */
+  --fg-3: rgb(255 255 255 / 0.54);
   --surface-1: rgb(255 255 255 / 0.03);
   --surface-2: rgb(255 255 255 / 0.06);
   --surface-3: rgb(255 255 255 / 0.1);
@@ -663,6 +664,10 @@ optgroup {
 
 .stage-frame.dragging {
   cursor: grabbing;
+}
+
+.stage-frame:focus-visible {
+  outline-offset: 3px;
 }
 
 .stage-bg-checker {
@@ -1963,8 +1968,14 @@ input[type="range"].hue-slider::-webkit-slider-thumb {
     padding-left: var(--space-3);
   }
 
+  /* Icon only on small screens; the label stays for screen readers. */
   .tool-label {
-    display: none;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
   }
 
   .stage-toolbar {

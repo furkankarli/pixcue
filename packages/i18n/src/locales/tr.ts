@@ -48,6 +48,7 @@ export default defineLocale({
       status: {
         openSource: 'GitHub’da açık kaynak',
         local: 'Tarayıcında çalışır, hiçbir şey yüklenmez.',
+        newTab: '(yeni sekmede açılır)',
       },
       timeline: {
         label: 'Zaman çizelgesi',
@@ -68,7 +69,7 @@ export default defineLocale({
           dark: 'Koyu',
           light: 'Açık',
         },
-        dragHint: 'Grafiği sürükleyerek taşı. Çift tıklayınca konumu sıfırlanır.',
+        dragHint: 'Grafiği sürükle ya da ok tuşlarıyla taşı. Çift tık veya Home konumu sıfırlar.',
         loading: 'Fontlar yükleniyor…',
       },
       style: {
