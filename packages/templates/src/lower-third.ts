@@ -84,9 +84,11 @@ const vector: VectorScene<LowerThirdFields, VectorBox> = {
   draw(c, t, { fields, theme, accent, locale, duration: dur, box }) {
     const { w, cardY: y0 } = box;
     const { enter, exit, pop } = theme.motion;
-    const bar = envelope(t, dur, 0, 0.42, 0.55, 0.15, pop, exit);
-    const card = envelope(t, dur, 0.12, 0.7, 0.75, 0.3, enter, exit);
-    const tagIn = envelope(t, dur, 0.8, 1.2, 0.55, 0.15, pop, exit);
+    // The outro runs in reverse: tag, subtitle and title leave first, then
+    // the card wipes away and the bar shrinks last.
+    const bar = envelope(t, dur, 0, 0.42, 0.42, 0.04, pop, exit);
+    const card = envelope(t, dur, 0.12, 0.7, 0.62, 0.12, enter, exit);
+    const tagIn = envelope(t, dur, 0.8, 1.2, 1.2, 0.88, pop, exit);
 
     // The card wipes in from the left.
     if (card > 0) {
@@ -113,15 +115,18 @@ const vector: VectorScene<LowerThirdFields, VectorBox> = {
       c.restore();
     }
 
-    // Title letters rise into place one by one, and drop out at the end.
+    // Title letters rise into place one by one, and drop out at the end,
+    // always inside the card.
     const title = themeCase(theme, fields.title, locale);
     const tf = themeFont(theme, 'display', 58);
     const letters = letterPositions(c, title, tf);
-    withClip(c, -10, y0 + 8, w + 20, 98, () => {
+    const outAt = dur - 1.0;
+    const stagger = Math.min(0.015, 0.22 / Math.max(1, letters.chars.length - 1));
+    withClip(c, -10, y0 + 8, Math.min(w + 20, (w + 60) * card - 30), 98, () => {
       letters.chars.forEach((ch, i) => {
         const p = (t - 0.36 - i * 0.026) / 0.42;
         if (p <= 0) return;
-        const out = t > dur - 0.62 ? exit((t - (dur - 0.62) - i * 0.01) / 0.3) : 0;
+        const out = t > outAt ? exit((t - outAt - i * stagger) / 0.4) : 0;
         const dy = (1 - pop(p)) * 96 + out * 100;
         fillTextAt(c, ch, 36 + (letters.xs[i] ?? 0), y0 + 82 + dy, tf, theme.colors.text);
       });
@@ -132,7 +137,7 @@ const vector: VectorScene<LowerThirdFields, VectorBox> = {
     const sw = textWidth(c, fields.subtitle, sf) + 10;
     theme.reveal(
       c,
-      envelope(t, dur, 0.72, 1.4, 0.72, 0.22, linear, linear),
+      envelope(t, dur, 0.72, 1.4, 1.15, 0.72, linear, exit),
       34,
       y0 + 101,
       sw,
