@@ -40,6 +40,9 @@ export default {
           feed: 'Feed',
         },
       },
+      content: {
+        reset: 'Reset {field} to default',
+      },
       tabs: {
         templates: 'Templates',
         content: 'Content',

@@ -36,6 +36,9 @@ export default defineLocale({
           feed: 'Akış',
         },
       },
+      content: {
+        reset: '{field} alanını varsayılana döndür',
+      },
       tabs: {
         templates: 'Şablonlar',
         content: 'İçerik',
