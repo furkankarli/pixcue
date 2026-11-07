@@ -1,4 +1,5 @@
-import { createEffect, Show } from 'solid-js';
+import { createEffect, createSignal, Show } from 'solid-js';
+import { ExportDialog } from './components/ExportDialog.tsx';
 import { FormatPicker } from './components/FormatPicker.tsx';
 import { Inspector } from './components/Inspector.tsx';
 import { LanguagePicker } from './components/LanguagePicker.tsx';
@@ -7,8 +8,10 @@ import { Stage } from './components/Stage.tsx';
 import { Transport } from './components/Transport.tsx';
 import { locale, t } from './i18n.ts';
 import { wide } from './media.ts';
+import { DownloadIcon } from './ui/icons.tsx';
 
 export function App() {
+  const [exporting, setExporting] = createSignal(false);
   createEffect(() => {
     document.documentElement.lang = locale();
   });
@@ -20,6 +23,10 @@ export function App() {
         <FormatPicker />
         <div class="topbar-actions">
           <LanguagePicker />
+          <button type="button" class="button primary" onClick={() => setExporting(true)}>
+            <DownloadIcon />
+            {t('editor.topbar.export')}
+          </button>
         </div>
       </header>
       <main class="workspace">
@@ -42,6 +49,7 @@ export function App() {
           />
         </aside>
       </main>
+      <ExportDialog open={exporting()} onClose={() => setExporting(false)} />
     </div>
   );
 }
