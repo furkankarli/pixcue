@@ -100,6 +100,30 @@ if (typeof document !== 'undefined') {
   });
 }
 
+/** Render state for any template (the library previews), with that template's own edits. */
+export function renderStateFor(
+  templateId: string,
+  outputFrame: Frame,
+): RenderState<unknown> | null {
+  const t = findTemplate(templateId);
+  if (!t) return null;
+  const e = editsFor(state, templateId);
+  const f = frame();
+  return {
+    frame: outputFrame,
+    theme: theme(),
+    scene: t.render as RenderState<unknown>['scene'],
+    fields: resolveFields(t, e.fields, {
+      t: createTranslator(locale()),
+      locale: locale(),
+      platform: f.platform,
+    }),
+    duration: e.duration ?? t.duration,
+    locale: locale(),
+    layout: { position: e.position ?? defaultPosition(t, f), offset: e.offset, scale: e.scale },
+  };
+}
+
 /** What the engine needs to draw the current graphic into `outputFrame`. */
 export function renderState(outputFrame: Frame = frame()): RenderState<unknown> {
   return {
