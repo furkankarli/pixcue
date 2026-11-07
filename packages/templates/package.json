@@ -10,6 +10,13 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "typecheck": "tsc -p tsconfig.json"
+    "typecheck": "tsc -p tsconfig.json && tsc -p test/tsconfig.json"
+  },
+  "dependencies": {
+    "@pixcue/engine": "workspace:^",
+    "@pixcue/i18n": "workspace:^"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.2"
   }
 }

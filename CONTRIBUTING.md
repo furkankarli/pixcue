@@ -40,10 +40,6 @@ pnpm install   # installs dependencies and the git hooks (lefthook)
 pnpm dev       # studio at http://localhost:3000
 ```
 
-pnpm refuses package versions published less than a day ago
-(`minimumReleaseAge` in `pnpm-workspace.yaml`). If an install fails on a brand-new
-release, pick the previous version.
-
 ### Scripts
 
 | Command                         | What it does                                                |
@@ -163,8 +159,10 @@ refactors need no changeset. See [.changeset/README.md](.changeset/README.md).
 - **Unit tests** live next to each package in `test/*.test.ts` and run with
   Vitest: `pnpm test`.
 - **Visual snapshot tests** (`test/*.visual.test.ts`) render chosen frames of
-  every template in every theme and format to PNG, then compare them with the
-  committed baselines in `__snapshots__/`.
+  every template in every theme and format to PNG, then compare them pixel by
+  pixel with the committed baselines in `test/__snapshots__/`. They run on a
+  Node.js canvas with the theme fonts bundled in
+  `packages/engine/testing/fonts/`, so no browser is needed.
 - **Format tests** (`test/*.format.test.ts`) export short clips and validate the
   codec, pixel format (including alpha) and frame count with ffprobe. They need
   ffmpeg installed.
@@ -183,6 +181,17 @@ baselines together with the change that caused them, and say in the PR that the
 snapshots changed on purpose. Never update baselines just to make a failing
 test pass.
 
+Good to know:
+
+- A test with no baseline yet writes one when you run it locally. In CI a
+  missing baseline is an error, so commit new baselines with your change.
+- When a frame differs, the test writes `__snapshots__/__actual__/` and
+  `__snapshots__/__diff__/` images next to the baseline (git-ignored). In CI
+  they are uploaded as the `visual-diffs` artifact of the failed run.
+- Baselines are rendered on Linux, as in CI. On macOS and Windows, text can
+  rasterize slightly differently; if only anti-aliased text edges differ, rely
+  on CI and do not commit baselines rendered on those systems.
+
 ## Before you open a PR
 
 Templates and anything that draws must:
@@ -199,12 +208,14 @@ its fields, and the editor builds the form from them. The full guide with a
 complete example is in [docs/templates.md](docs/templates.md). In short:
 
 1. Open a "New template" issue with a sketch or reference.
-2. Scaffold the file with `pnpm new-template` (available from v0.1).
-3. Declare the fields (text, number, color, select…) and a `render` function
-   that draws one frame at time `t`.
+2. Scaffold it: `pnpm new-template quote-card`. This creates a working
+   template, adds its strings to every locale and registers it.
+3. Declare the fields (text, number, color, select, list…) and draw one frame
+   at time `t`, once for the vector themes and once for the pixel theme.
 4. Use the frame size and safe area you are given, and lay out differently
    for vertical frames.
-5. Add visual snapshots, run the tests, add a changeset and open a PR.
+5. Run `pnpm test` and `pnpm test:visual` (the first run writes your
+   baselines), check the PNGs, add a changeset and open a PR.
 
 ## Adding a language
 

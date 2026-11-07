@@ -24,7 +24,7 @@ engine, i18n and export depend on no other Pixcue package.
 | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- |
 | `@pixcue/engine`    | Format presets, safe areas, layout, themes, animation and drawing helpers, the pixel engine and bitmap fonts, the `render` entry point | nothing                 |
 | `@pixcue/i18n`      | Locale files, language detection, typed translator                                                                                     | nothing                 |
-| `@pixcue/templates` | Built-in templates built with `defineTemplate`                                                                                         | engine, i18n            |
+| `@pixcue/templates` | The template API (`defineTemplate`, typed fields, `resolveFields`) and the built-in templates                                          | engine, i18n            |
 | `@pixcue/export`    | PNG sequence zip, MOV (PNG codec), MP4 (H.264), WebM (VP9 + alpha), the muxers and zip writer                                          | nothing                 |
 | `@pixcue/studio`    | The editor: form generation, preview, timeline, URL state, presets, export screen                                                      | everything above, Solid |
 
@@ -49,10 +49,10 @@ Rules that keep this healthy:
             ▼
  Frame { width, height, orientation, safeArea }   ← engine presets + safe-areas config
  Theme { fonts, colors, panel, button }           ← engine themes + user accent/font
- Copy  { subscribe | follow … }                   ← i18n, by locale and platform
+ Fields = defaults(locale, platform) + user edits ← templates: resolveFields (validated)
             │
             ▼
- template.render(ctx, t, state)                   ← deterministic: same input, same pixels
+ render(ctx, t, state) → template scene          ← deterministic: same input, same pixels
             │
             ├──► preview canvas (studio, requestAnimationFrame + scrubber)
             │
@@ -71,12 +71,50 @@ Rules that keep this healthy:
 
 ### Frames and safe areas
 
-Templates never assume 1920×1080. Every render receives the frame: width,
-height, orientation and a safe area. The presets are YouTube 1920×1080 and
-3840×2160, Shorts/TikTok/Reels 1080×1920, Instagram post 1080×1350 and square
-1080×1080. Vertical safe areas keep graphics away from platform UI (top tabs,
-the bottom caption area and the right-hand action buttons). The exact insets
-live in one config file in the engine so they can be tuned in one place.
+Templates never assume 1920×1080. They draw in **design units**, where the short
+side of every frame is 1080 units, and the engine scales to the output size: one
+design unit is one pixel at 1080p and two pixels at 4K. A template therefore
+looks the same in every resolution of the same shape.
+
+Every render receives a `Frame`: size in design units, orientation
+(`horizontal`, `vertical` or `square`), the safe area, the output size in pixels
+and the platform. The presets are:
+
+| Preset                      | Output               | Platform                               |
+| --------------------------- | -------------------- | -------------------------------------- |
+| `youtube`, `youtube-4k`     | 1920×1080, 3840×2160 | YouTube                                |
+| `shorts`, `tiktok`, `reels` | 1080×1920            | YouTube, TikTok, Instagram             |
+| `vertical`                  | 1080×1920            | any (strictest safe area of the three) |
+| `instagram-post`            | 1080×1350            | Instagram                              |
+| `square`                    | 1080×1080            | any                                    |
+
+Vertical safe areas keep graphics away from platform UI (top tabs, the bottom
+caption area and the right-hand action buttons). The exact insets live in one
+file, [`packages/engine/src/safe-areas.ts`](../packages/engine/src/safe-areas.ts),
+so they can be tuned in one place.
+
+The user picks one of nine anchor positions, a drag offset and a scale. The
+engine anchors the graphic inside the safe area and shrinks it if it would not
+fit.
+
+### Scenes and the two rendering paths
+
+A template's drawing code is a `Scene` with two parts, one per rendering path:
+
+- **Vector** (tech, pop, sade): `measure` returns the graphic's natural size in
+  design units, then `draw` paints one frame with Canvas 2D, taking fonts,
+  colors, panels, buttons and headings from the theme.
+- **Pixel**: `measure` returns a size in grid cells, then `draw` paints with a
+  `Painter` on a low-resolution grid that is scaled up without smoothing (6
+  output pixels per cell at 1080p). Sprites that "pop" are drawn afterwards at
+  full resolution in whole-number steps, which keeps them crisp.
+
+`render(ctx, t, state)` clears the canvas, paints an optional background (a solid
+color for green-screen exports, or an image for previews), picks the path from
+the theme, places the graphic and returns its bounds in output pixels.
+
+The engine creates its offscreen canvases through a factory: `OffscreenCanvas`
+in browsers, and a Node.js canvas in tests (`@pixcue/engine/testing`).
 
 ### Determinism
 
