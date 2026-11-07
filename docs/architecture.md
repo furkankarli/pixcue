@@ -180,8 +180,17 @@ they keep following the defaults for the user's language and the platform.
 
 The preview renders near its on-screen size with `scaleFrame`, but never
 below 720 pixels on the short side, so the pixel theme keeps enough grid
-cells for its pops to step smoothly; exports render at the full frame size. Fonts are
-self-hosted through Fontsource, and canvases redraw once they have loaded.
+cells for its pops to step smoothly; exports render at the full frame size.
+
+The editor keeps slow phones in mind:
+
+- On touch devices the preview draws 30 frames per second, the usual export
+  rate and the pixel theme's step.
+- Library thumbnails and the timeline's filmstrip redraw when the browser is
+  idle, and thumbnails render smaller on phones.
+- The export pipeline (frame loop, encoders, muxers) is a separate chunk that
+  loads when an export starts. Fonts are
+  self-hosted through Fontsource, and canvases redraw once they have loaded.
 
 ## Hosting
 

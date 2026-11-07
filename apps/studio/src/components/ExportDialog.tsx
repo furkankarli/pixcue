@@ -7,16 +7,15 @@ import {
   EDITORS,
   type EditorId,
   type ExportFormat,
-  ExportUnsupportedError,
   KEY_COLORS,
   type KeyColor,
   needsVideoEncoder,
   RENDER_SHARE,
 } from '@pixcue/export';
 import { createEffect, createMemo, createSignal, For, onCleanup, Show } from 'solid-js';
-import { keyConflict, runExport } from '../export-job.ts';
 import { canShareFile, download, shareFile } from '../files.ts';
 import { t } from '../i18n.ts';
+import { keyConflict } from '../key-conflict.ts';
 import { FRAME_RATES } from '../state/editor-state.ts';
 import { actions, duration, state } from '../store.ts';
 import { Segmented, Switch } from '../ui/controls.tsx';
@@ -91,6 +90,8 @@ export function ExportDialog(props: { open: boolean; onClose: () => void }) {
     controller = new AbortController();
     setStatus({ kind: 'running', progress: 0 });
     try {
+      // The pipeline (renderer loop, encoders, muxers) loads on first use.
+      const { runExport } = await import('../export-job.ts');
       const file = await runExport({
         format: format(),
         keyColor: keyColor(),
@@ -107,7 +108,9 @@ export function ExportDialog(props: { open: boolean; onClose: () => void }) {
       } else {
         console.error(error);
         const message =
-          error instanceof ExportUnsupportedError
+          // By name: importing the class would pull the encoders into the
+          // first download.
+          error instanceof Error && error.name === 'ExportUnsupportedError'
             ? t('editor.export.unsupported')
             : t('editor.export.failed');
         setStatus({ kind: 'error', message });

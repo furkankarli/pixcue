@@ -5,10 +5,14 @@
 import { type Bounds, render, scaleFrame } from '@pixcue/engine';
 import { createEffect, createMemo, createSignal, onCleanup, onMount, Show } from 'solid-js';
 import { t } from '../i18n.ts';
+import { touchDevice } from '../idle.ts';
 import { displayTime } from '../playback.ts';
 import { actions, edits, fontsVersion, frame, renderState } from '../store.ts';
 import { platformUi, safeArea, stageBackground } from '../view.ts';
 import { PlatformOverlay, SafeAreaOverlay } from './Overlays.tsx';
+
+/** Preview frame rate on touch devices. */
+const PREVIEW_FPS = 30;
 
 /** Smallest preview resolution, as the frame's short side in pixels. */
 const MIN_SHORT_SIDE = 720;
@@ -56,6 +60,12 @@ export function Stage(props: { hintId: string }) {
     return scaleFrame(f, Math.max(1, pixelWidth));
   });
 
+  // Touch devices draw the preview at 30 frames per second: the export's
+  // usual rate and the pixel theme's step, at half the work of 60.
+  const previewTime = createMemo(() =>
+    touchDevice ? Math.floor(displayTime() * PREVIEW_FPS) / PREVIEW_FPS : displayTime(),
+  );
+
   // Resize and draw in one effect: with two, the draw could run first, see
   // the old canvas size and skip, leaving the stage blank until the next
   // change (a format switch while paused).
@@ -69,7 +79,7 @@ export function Stage(props: { hintId: string }) {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     try {
-      setBounds(render(ctx, displayTime(), renderState(f)));
+      setBounds(render(ctx, previewTime(), renderState(f)));
     } catch (error) {
       // A broken template must not take the editor down.
       console.error(error);

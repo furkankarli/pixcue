@@ -7,6 +7,7 @@
 import { render, scaleFrame } from '@pixcue/engine';
 import { createEffect, createMemo, createSignal, For, onCleanup, onMount, Show } from 'solid-js';
 import { locale, t } from '../i18n.ts';
+import { whenIdle } from '../idle.ts';
 import { displayTime, seek } from '../playback.ts';
 import { MAX_DURATION } from '../state/editor-state.ts';
 import { actions, duration, fontsVersion, frame, renderState, template } from '../store.ts';
@@ -116,7 +117,11 @@ export function Timeline() {
   // moment after the last edit so typing stays smooth.
   const offscreen = document.createElement('canvas');
   let pending: ReturnType<typeof setTimeout> | undefined;
-  onCleanup(() => clearTimeout(pending));
+  let cancelIdle: (() => void) | undefined;
+  onCleanup(() => {
+    clearTimeout(pending);
+    cancelIdle?.();
+  });
   createEffect(() => {
     fontsVersion();
     const clipWidth = x(duration());
@@ -124,45 +129,50 @@ export function Timeline() {
     const rs = renderState(output);
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     clearTimeout(pending);
-    pending = setTimeout(() => {
-      const ctx = offscreen.getContext('2d');
-      const view = strip.getContext('2d');
-      if (!ctx || !view || clipWidth < 2) return;
-      offscreen.width = output.pixelWidth;
-      offscreen.height = output.pixelHeight;
-      strip.width = Math.round(clipWidth * dpr);
-      strip.height = Math.round(STRIP_H * dpr);
-      view.clearRect(0, 0, strip.width, strip.height);
-      try {
-        const crop = render(ctx, rs.duration / 2, rs);
-        const pad = Math.max(crop.width, crop.height) * 0.1;
-        const sx = Math.max(0, crop.x - pad);
-        const sy = Math.max(0, crop.y - pad);
-        const sw = Math.min(output.pixelWidth - sx, crop.width + pad * 2);
-        const sh = Math.min(output.pixelHeight - sy, crop.height + pad * 2);
-        const cellH = strip.height;
-        const cellW = Math.max(cellH, Math.min(cellH * 2.4, (sw / sh) * cellH));
-        const count = Math.max(1, Math.round(strip.width / cellW));
-        const w = strip.width / count;
-        for (let i = 0; i < count; i++) {
-          render(ctx, ((i + 0.5) / count) * rs.duration, rs);
-          const k = Math.min(w / sw, cellH / sh);
-          view.drawImage(
-            offscreen,
-            sx,
-            sy,
-            sw,
-            sh,
-            i * w + (w - sw * k) / 2,
-            (cellH - sh * k) / 2,
-            sw * k,
-            sh * k,
-          );
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    }, 140);
+    cancelIdle?.();
+    pending = setTimeout(
+      () =>
+        (cancelIdle = whenIdle(() => {
+          const ctx = offscreen.getContext('2d');
+          const view = strip.getContext('2d');
+          if (!ctx || !view || clipWidth < 2) return;
+          offscreen.width = output.pixelWidth;
+          offscreen.height = output.pixelHeight;
+          strip.width = Math.round(clipWidth * dpr);
+          strip.height = Math.round(STRIP_H * dpr);
+          view.clearRect(0, 0, strip.width, strip.height);
+          try {
+            const crop = render(ctx, rs.duration / 2, rs);
+            const pad = Math.max(crop.width, crop.height) * 0.1;
+            const sx = Math.max(0, crop.x - pad);
+            const sy = Math.max(0, crop.y - pad);
+            const sw = Math.min(output.pixelWidth - sx, crop.width + pad * 2);
+            const sh = Math.min(output.pixelHeight - sy, crop.height + pad * 2);
+            const cellH = strip.height;
+            const cellW = Math.max(cellH, Math.min(cellH * 2.4, (sw / sh) * cellH));
+            const count = Math.max(1, Math.round(strip.width / cellW));
+            const w = strip.width / count;
+            for (let i = 0; i < count; i++) {
+              render(ctx, ((i + 0.5) / count) * rs.duration, rs);
+              const k = Math.min(w / sw, cellH / sh);
+              view.drawImage(
+                offscreen,
+                sx,
+                sy,
+                sw,
+                sh,
+                i * w + (w - sw * k) / 2,
+                (cellH - sh * k) / 2,
+                sw * k,
+                sh * k,
+              );
+            }
+          } catch (error) {
+            console.error(error);
+          }
+        })),
+      140,
+    );
   });
 
   return (

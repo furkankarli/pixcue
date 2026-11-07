@@ -3,17 +3,18 @@
  * current format and theme. Thumbnails hold a mid-clip frame and play while
  * hovered or focused.
  */
-import { render, scaleFrame } from '@pixcue/engine';
+import { type Frame, type RenderState, render, scaleFrame } from '@pixcue/engine';
 import { TEMPLATES, type Template } from '@pixcue/templates';
 import { createEffect, createSignal, For, onCleanup } from 'solid-js';
 import { t } from '../i18n.ts';
+import { touchDevice, whenIdle } from '../idle.ts';
 import { actions, fontsVersion, frame, renderStateFor, state } from '../store.ts';
 
 /** Card preview size in CSS pixels (16:9). */
 const CARD_W = 208;
 const CARD_H = 117;
-/** Offscreen render width: enough detail for the zoomed-in crop. */
-const RENDER_WIDTH = 960;
+/** Offscreen render width: enough detail for the zoomed-in crop (less on phones). */
+const RENDER_WIDTH = touchDevice ? 640 : 960;
 
 function Thumbnail(props: { template: Template; active: boolean }) {
   let canvas!: HTMLCanvasElement;
@@ -41,10 +42,20 @@ function Thumbnail(props: { template: Template; active: boolean }) {
   // cards stay legible. The crop comes from the mid-clip frame and stays put
   // while the card animates.
   const offscreen = document.createElement('canvas');
+  let cancel: (() => void) | undefined;
+  onCleanup(() => cancel?.());
   createEffect(() => {
     fontsVersion();
     const output = scaleFrame(frame(), RENDER_WIDTH);
     const rs = renderStateFor(props.template.id, output);
+    const now = time();
+    // Still cards redraw when the browser is idle; a playing card at once.
+    cancel?.();
+    if (now === null) cancel = whenIdle(() => draw(output, rs, null));
+    else draw(output, rs, now);
+  });
+
+  function draw(output: Frame, rs: RenderState<unknown> | null, now: number | null) {
     const ctx = offscreen.getContext('2d');
     const view = canvas.getContext('2d');
     if (!rs || !ctx || !view) return;
@@ -52,7 +63,6 @@ function Thumbnail(props: { template: Template; active: boolean }) {
     offscreen.height = output.pixelHeight;
     try {
       const crop = render(ctx, rs.duration / 2, rs);
-      const now = time();
       if (now !== null) render(ctx, now, rs);
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       canvas.width = Math.round(CARD_W * dpr);
@@ -81,7 +91,7 @@ function Thumbnail(props: { template: Template; active: boolean }) {
     } catch (error) {
       console.error(error);
     }
-  });
+  }
 
   return (
     <button
