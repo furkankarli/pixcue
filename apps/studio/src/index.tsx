@@ -1,3 +1,9 @@
+// Theme fonts (and the UI font, Manrope), self-hosted.
+import '@fontsource/manrope/500.css';
+import '@fontsource/manrope/700.css';
+import '@fontsource/manrope/800.css';
+import '@fontsource/chakra-petch/700.css';
+import '@fontsource/anton/400.css';
 import { render } from 'solid-js/web';
 import { App } from './App.tsx';
 import './styles.css';
