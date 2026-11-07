@@ -11,5 +11,21 @@ export default defineLocale({
     settings: {
       language: 'Dil',
     },
+    templates: {
+      lowerThird: {
+        name: 'Alt bant',
+        fields: {
+          tag: 'Etiket',
+          tagHelp: 'Boş bırakırsan görünmez.',
+          title: 'Başlık',
+          subtitle: 'Alt yazı',
+        },
+        sample: {
+          tag: 'İnceleme',
+          title: 'Kablosuz Kulaklık',
+          subtitle: 'Ses, pil ömrü ve bağlantı testleri',
+        },
+      },
+    },
   },
 });

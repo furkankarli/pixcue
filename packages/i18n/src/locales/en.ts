@@ -15,5 +15,21 @@ export default {
     settings: {
       language: 'Language',
     },
+    templates: {
+      lowerThird: {
+        name: 'Lower third',
+        fields: {
+          tag: 'Tag',
+          tagHelp: 'Leave empty to hide it.',
+          title: 'Title',
+          subtitle: 'Subtitle',
+        },
+        sample: {
+          tag: 'Review',
+          title: 'Wireless Headphones',
+          subtitle: 'Sound, battery life and connection tests',
+        },
+      },
+    },
   },
 } satisfies { code: string; name: string; messages: MessageTree };

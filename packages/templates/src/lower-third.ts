@@ -1,9 +1,6 @@
 /**
  * Lower third: a name or product title with a subtitle and an optional tag,
- * anchored bottom-left by default.
- *
- * Phase 1 sample of the scene contract; phase 2 wraps it in `defineTemplate`
- * with field definitions.
+ * anchored bottom-left.
  */
 import {
   blockReveal,
@@ -25,7 +22,6 @@ import {
   pixelTextStyles,
   popScale,
   roundRectPath,
-  type Scene,
   textWidth,
   themeCase,
   themeFont,
@@ -35,19 +31,28 @@ import {
   type VectorScene,
   withClip,
 } from '@pixcue/engine';
+import { defineTemplate, type FieldValues, field } from './api.ts';
 
-export interface LowerThirdFields {
-  /** Small label above the panel; hidden when empty. */
-  readonly tag: string;
-  readonly title: string;
-  readonly subtitle: string;
-}
-
-export const lowerThirdDefaults: LowerThirdFields = {
-  tag: 'İnceleme',
-  title: 'Kablosuz Kulaklık',
-  subtitle: 'Ses, pil ömrü ve bağlantı testleri',
+const fields = {
+  tag: field.text({
+    label: 'templates.lowerThird.fields.tag',
+    help: 'templates.lowerThird.fields.tagHelp',
+    maxLength: 30,
+    default: ({ t }) => t('templates.lowerThird.sample.tag'),
+  }),
+  title: field.text({
+    label: 'templates.lowerThird.fields.title',
+    maxLength: 60,
+    default: ({ t }) => t('templates.lowerThird.sample.title'),
+  }),
+  subtitle: field.text({
+    label: 'templates.lowerThird.fields.subtitle',
+    maxLength: 90,
+    default: ({ t }) => t('templates.lowerThird.sample.subtitle'),
+  }),
 };
+
+export type LowerThirdFields = FieldValues<typeof fields>;
 
 /** Panel top inside the graphic; the tag sits above it. */
 const Y0 = 46;
@@ -212,4 +217,12 @@ const pixel: PixelScene<LowerThirdFields, PixelBox> = {
   },
 };
 
-export const lowerThird: Scene<LowerThirdFields> = { vector, pixel };
+export const lowerThird = defineTemplate({
+  id: 'lower-third',
+  name: 'templates.lowerThird.name',
+  duration: 5,
+  minDuration: 3,
+  position: 'bl',
+  fields,
+  render: { vector, pixel },
+});
