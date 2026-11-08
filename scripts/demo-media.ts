@@ -1,8 +1,8 @@
 /**
- * Renders the README's demo animations into docs/media: a lower third in a
- * horizontal frame and a subscribe button in a vertical one, over a stand-in
- * for video footage. Needs ffmpeg on PATH. Run `pnpm demo-media` after a
- * visible change to these templates or themes, and commit the GIFs.
+ * Renders the README's demo animations into docs/media: templates in every
+ * theme, in horizontal and vertical frames, over a stand-in for video
+ * footage. Needs ffmpeg on PATH. Run `pnpm demo-media` after a visible change
+ * to these templates or themes, and commit the GIFs.
  */
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
@@ -113,5 +113,13 @@ function demo(
   console.log(`docs/media/${name}.gif`);
 }
 
-demo('horizontal', 'lower-third', 'tech', 'youtube', 640);
-demo('vertical', 'subscribe', 'pop', 'shorts', 360);
+// Horizontal frames, two per row in the README. At these widths a pixel-theme
+// cell is exactly 2 pixels, so the pixel theme stays crisp.
+demo('lower-third-tech', 'lower-third', 'tech', 'youtube', 640);
+demo('chapter-title-sade', 'chapter-title', 'sade', 'youtube', 640);
+demo('callout-pop', 'callout', 'pop', 'youtube', 640);
+demo('score-card-pixel', 'score-card', 'pixel', 'youtube', 640);
+// Vertical frames, three per row.
+demo('subscribe-pop', 'subscribe', 'pop', 'shorts', 360);
+demo('pros-cons-tech', 'pros-cons', 'tech', 'shorts', 360);
+demo('spec-card-pixel', 'spec-card', 'pixel', 'shorts', 360);
