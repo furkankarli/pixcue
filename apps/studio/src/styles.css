@@ -136,7 +136,6 @@ a {
 
   .input,
   .select,
-  .format-picker select,
   .language-picker select {
     font-size: 16px;
   }
@@ -437,7 +436,6 @@ a {
 }
 
 /* ---------- Native selects ---------- */
-.format-picker select,
 .language-picker select,
 .select {
   height: var(--control-h);
@@ -454,7 +452,6 @@ a {
   transition: background-color var(--quick);
 }
 
-.format-picker select:hover,
 .language-picker select:hover,
 .select:hover:not(:disabled) {
   background-color: var(--surface-3);
@@ -631,6 +628,9 @@ optgroup {
 }
 
 .transport-end {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
   justify-self: end;
 }
 
@@ -1962,6 +1962,97 @@ input[type="range"].hue-slider::-webkit-slider-thumb {
   line-height: 16px;
 }
 
+/* ---------- Format list ---------- */
+.format-button {
+  max-width: 220px;
+}
+
+.format-button > span:not(.format-shape) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.format-shape {
+  flex: none;
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1.5px currentColor;
+}
+
+.format-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 240px;
+}
+
+.format-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-inline-size: 0;
+}
+
+.format-group-title {
+  padding: 4px 10px;
+  color: var(--fg-3);
+  font-size: 12px;
+}
+
+.format-choice {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  padding: 0 10px;
+  border-radius: var(--radius-1);
+  color: var(--fg-2);
+  cursor: pointer;
+  transition:
+    background-color var(--quick),
+    color var(--quick);
+}
+
+.format-choice:hover {
+  background: var(--surface-2);
+  color: var(--fg);
+}
+
+.format-choice input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.format-choice:has(input:checked) {
+  background: var(--surface-3);
+  color: var(--fg);
+}
+
+.format-choice:has(input:checked)::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  margin-left: auto;
+  border-radius: 1px;
+  background: var(--ink);
+}
+
+.format-choice:has(input:focus-visible) {
+  outline: 1px solid var(--fg);
+  outline-offset: -1px;
+}
+
+.format-choice-shape {
+  display: grid;
+  place-items: center;
+  width: 20px;
+}
+
 /* ---------- Phones: tools and their sheet ---------- */
 .sheet {
   display: flex;
@@ -2014,8 +2105,8 @@ input[type="range"].hue-slider::-webkit-slider-thumb {
 .toolbar {
   display: grid;
   flex: none;
-  grid-template-columns: repeat(4, 1fr);
-  padding: var(--space-1) var(--space-2) calc(var(--space-1) + env(safe-area-inset-bottom, 0px));
+  grid-template-columns: repeat(5, 1fr);
+  padding: var(--space-1) var(--space-1) calc(var(--space-1) + env(safe-area-inset-bottom, 0px));
   background: var(--bg);
   box-shadow: inset 0 1px var(--line);
 }
@@ -2064,10 +2155,6 @@ input[type="range"].hue-slider::-webkit-slider-thumb {
   .wordmark svg {
     width: auto;
     height: 27px;
-  }
-
-  .format-picker select {
-    max-width: 128px;
   }
 
   .topbar .button-label,

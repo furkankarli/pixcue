@@ -1,13 +1,12 @@
 /**
- * The top bar: the video format on the left, the name in the middle, and on
- * the right a menu for everything occasional (link, saved setups, language,
- * where Pixcue comes from) beside the one primary action, Export.
+ * The top bar: a menu for everything occasional (link, saved setups,
+ * language, where Pixcue comes from) on the left, the name in the middle,
+ * and the one primary action, Export, on the right.
  */
 import { t } from '../i18n.ts';
 import { BookmarkIcon, DownloadIcon, ExternalIcon, LinkIcon, MoreIcon } from '../ui/icons.tsx';
 import { Menu, useCloseMenu } from '../ui/Menu.tsx';
 import { PixelWordmark } from '../ui/PixelWordmark.tsx';
-import { FormatPicker } from './FormatPicker.tsx';
 import { LanguagePicker } from './LanguagePicker.tsx';
 import { shareLink } from './ShareButton.tsx';
 
@@ -66,20 +65,14 @@ export function TopBar(props: { onExport: () => void; onPresets: () => void }) {
   return (
     <header class="topbar">
       <div class="topbar-start">
-        <FormatPicker />
+        <Menu label={t('editor.topbar.menu')} class="icon-button ghost" trigger={<MoreIcon />}>
+          <MoreItems onPresets={props.onPresets} />
+        </Menu>
       </div>
       <h1 class="brand">
         <PixelWordmark />
       </h1>
       <div class="topbar-end">
-        <Menu
-          label={t('editor.topbar.menu')}
-          class="icon-button ghost"
-          align="end"
-          trigger={<MoreIcon />}
-        >
-          <MoreItems onPresets={props.onPresets} />
-        </Menu>
         <button type="button" class="button primary" onClick={props.onExport}>
           <DownloadIcon />
           <span class="button-label">{t('editor.topbar.export')}</span>

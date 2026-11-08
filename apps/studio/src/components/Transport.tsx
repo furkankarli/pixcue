@@ -1,6 +1,6 @@
 /**
- * The transport bar under the stage. Wide screens: the time, play controls
- * and the view menu. Phones: play, a scrubber, the time and the view menu,
+ * The transport bar under the stage. Wide screens: the time, play controls,
+ * and the format and view menus. Phones: play, a scrubber, the time and the view menu,
  * like a video player, since the full timeline does not fit.
  */
 import { createMemo, Show } from 'solid-js';
@@ -9,6 +9,7 @@ import { wide } from '../media.ts';
 import { displayTime, playing, seek, togglePlay } from '../playback.ts';
 import { duration } from '../store.ts';
 import { PauseIcon, PlayIcon, SkipBackIcon } from '../ui/icons.tsx';
+import { FormatMenu } from './FormatPicker.tsx';
 import { ViewMenu } from './ViewMenu.tsx';
 
 export function Transport(props: { hintId: string }) {
@@ -78,6 +79,7 @@ export function Transport(props: { hintId: string }) {
           {play()}
         </div>
         <div class="transport-end">
+          <FormatMenu up />
           <ViewMenu up />
         </div>
       </Show>

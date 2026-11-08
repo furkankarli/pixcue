@@ -50,7 +50,9 @@ export function Menu(props: {
         aria-controls={id}
         aria-label={props.label}
         title={props.label}
-        onClick={() => panel.togglePopover()}
+        // The browser toggles the panel. A click handler would reopen it: the
+        // press outside closes it first, then the click toggles it back.
+        popovertarget={id}
       >
         {props.trigger}
       </button>
