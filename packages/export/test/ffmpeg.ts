@@ -15,6 +15,10 @@ export function ffmpeg(args: string[]): Buffer {
 
 export interface ProbeStream {
   codec_name: string;
+  codec_type?: string;
+  sample_rate?: string;
+  channels?: number;
+  duration?: string;
   pix_fmt?: string;
   width: number;
   height: number;
@@ -61,8 +65,9 @@ export function decodeRgba(file: string, decoder: string[] = []): Buffer {
 }
 
 /** MD5 of every decoded frame, in order. */
+/** One hash per decoded video frame (sound tracks are left out). */
 export function frameHashes(file: string): string[] {
-  return ffmpeg(['-i', file, '-f', 'framemd5', 'pipe:1'])
+  return ffmpeg(['-i', file, '-map', '0:v', '-f', 'framemd5', 'pipe:1'])
     .toString()
     .split('\n')
     .filter((l) => l && !l.startsWith('#'))

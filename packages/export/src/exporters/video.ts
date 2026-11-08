@@ -10,6 +10,7 @@ import {
 import { ensureAvcC } from '../mux/avc.ts';
 import { muxMp4 } from '../mux/mp4.ts';
 import { muxWebm, type WebmSample } from '../mux/webm.ts';
+import { type AudioCodecsApi, encodeAac, type SoundInput } from '../sound.ts';
 
 /** The WebCodecs classes the exporter uses; injectable for tests. */
 export interface WebCodecsApi {
@@ -33,6 +34,9 @@ export class ExportUnsupportedError extends Error {
 }
 
 export interface VideoExportOptions extends ExportOptions {
+  /** Sound for the file; MP4 gets it as AAC where the browser can encode that. */
+  readonly sound?: SoundInput | undefined;
+  readonly audioCodecs?: AudioCodecsApi | undefined;
   /** Paint frames onto a solid color, e.g. a green screen; `hardEdges` is chroma-key mode. */
   readonly background?: { readonly color: string; readonly hardEdges: boolean } | undefined;
   readonly webcodecs?: WebCodecsApi | undefined;
@@ -191,7 +195,8 @@ async function encodeFrames(
 
 /**
  * H.264 MP4. Without a background the frames are flattened onto black, since
- * MP4 has no alpha; pass a key color for green-screen exports.
+ * MP4 has no alpha; pass a key color for green-screen exports. Sound is added
+ * as AAC where the browser can encode it (see `canEncodeAac`).
  */
 export async function exportMp4(
   source: FrameSource,
@@ -212,7 +217,8 @@ export async function exportMp4(
   const { samples, description } = await encodeFrames(source, options, codecs, config, false);
   if (!description) throw new Error('The H.264 encoder did not provide its configuration (avcC).');
   const avcC = ensureAvcC(description, samples.find((s) => s.key)?.data);
-  const mp4 = muxMp4(samples, { width, height, fps, avcC });
+  const audio = options.sound ? await encodeAac(options.sound, options.audioCodecs) : null;
+  const mp4 = muxMp4(samples, { width, height, fps, avcC, audio: audio ?? undefined });
   options.onProgress?.(1);
   return mp4;
 }

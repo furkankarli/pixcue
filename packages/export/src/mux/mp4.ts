@@ -1,5 +1,5 @@
 import { ascii, u32 } from '../bytes.ts';
-import { box, movieHeader, TICKS_PER_FRAME, visualSampleEntry } from './isobmff.ts';
+import { aacSampleEntry, box, movieHeader, TICKS_PER_FRAME, visualSampleEntry } from './isobmff.ts';
 
 /** An encoded video frame in decode order, as WebCodecs emits it. */
 export interface EncodedSample {
@@ -17,12 +17,27 @@ export interface Mp4Options {
   readonly fps: number;
   /** The `avcC` decoder configuration (WebCodecs `decoderConfig.description`). */
   readonly avcC: Uint8Array;
+  /** An AAC sound track. */
+  readonly audio?: Mp4Audio | undefined;
+}
+
+/** AAC frames (raw, no ADTS headers) as WebCodecs' AudioEncoder emits them. */
+export interface Mp4Audio {
+  readonly frames: readonly Uint8Array[];
+  readonly sampleRate: number;
+  readonly channels: number;
+  /** The AudioSpecificConfig (`decoderConfig.description`). */
+  readonly config: Uint8Array;
+  readonly bitrate: number;
+  /** Encoder delay in samples, hidden with an edit list. */
+  readonly priming: number;
 }
 
 /**
  * Muxes H.264 samples (AVC format, length-prefixed NAL units) into an MP4.
  * Handles B-frames: presentation times that differ from decode order become
  * composition offsets, and an edit list hides the resulting start delay.
+ * An optional AAC track follows the video in the same file.
  */
 export function muxMp4(samples: readonly EncodedSample[], o: Mp4Options): Blob {
   const ticksPerSecond = o.fps * TICKS_PER_FRAME;
@@ -64,8 +79,21 @@ export function muxMp4(samples: readonly EncodedSample[], o: Mp4Options): Blob {
     compositionOffsets: hasComposition ? composition : null,
     editMediaTime: samples.length && earliest > 0 ? earliest : 0,
     quicktime: false,
+    audio: o.audio && {
+      sampleEntry: aacSampleEntry(
+        o.audio.sampleRate,
+        o.audio.channels,
+        o.audio.config,
+        o.audio.bitrate,
+      ),
+      sampleRate: o.audio.sampleRate,
+      sampleDelta: 1024, // an AAC frame holds 1024 samples per channel
+      sampleSizes: o.audio.frames.map((f) => f.length),
+      editMediaTime: o.audio.priming,
+    },
   });
-  return new Blob([header, ...samples.map((s) => s.data as Uint8Array<ArrayBuffer>)], {
+  const audio = (o.audio?.frames ?? []) as Uint8Array<ArrayBuffer>[];
+  return new Blob([header, ...samples.map((s) => s.data as Uint8Array<ArrayBuffer>), ...audio], {
     type: 'video/mp4',
   });
 }
