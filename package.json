@@ -30,7 +30,8 @@
     "test:formats": "vitest run --project formats",
     "changeset": "changeset",
     "new-template": "node scripts/new-template.ts",
-    "brand": "node scripts/brand-assets.ts"
+    "brand": "node scripts/brand-assets.ts",
+    "demo-media": "node scripts/demo-media.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.6.6",
