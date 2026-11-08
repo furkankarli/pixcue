@@ -14,7 +14,7 @@ import { StylePanel } from './StylePanel.tsx';
 
 export type InspectorTab = 'templates' | 'content' | 'style' | 'layout';
 
-function ContentPanel() {
+export function ContentPanel() {
   return (
     <div class="panel-stack">
       <For each={Object.entries(template().fields) as [string, Field][]}>

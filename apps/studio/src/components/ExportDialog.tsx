@@ -15,11 +15,12 @@ import {
 import { createEffect, createMemo, createSignal, For, onCleanup, Show } from 'solid-js';
 import { canShareFile, download, shareFile } from '../files.ts';
 import { t } from '../i18n.ts';
+import { touchDevice } from '../idle.ts';
 import { keyConflict } from '../key-conflict.ts';
 import { FRAME_RATES } from '../state/editor-state.ts';
 import { actions, duration, state } from '../store.ts';
 import { Segmented, Switch } from '../ui/controls.tsx';
-import { CloseIcon, DownloadIcon } from '../ui/icons.tsx';
+import { CloseIcon, DownloadIcon, ShareIcon } from '../ui/icons.tsx';
 
 const EDITOR_KEY = 'pixcue.editor.v1';
 const hasVideoEncoder = typeof window !== 'undefined' && 'VideoEncoder' in window;
@@ -35,8 +36,7 @@ function savedEditor(): EditorId {
     // Use the default below.
   }
   // On a phone the file is for a phone editor.
-  const touch = typeof matchMedia !== 'undefined' && matchMedia('(pointer: coarse)').matches;
-  return touch ? 'capcut-mobile' : 'davinci';
+  return touchDevice ? 'capcut-mobile' : 'davinci';
 }
 
 type Status =
@@ -100,8 +100,9 @@ export function ExportDialog(props: { open: boolean; onClose: () => void }) {
         onProgress: (progress) => setStatus({ kind: 'running', progress }),
       });
       setStatus({ kind: 'done', file });
-      // Desktop: save right away. Phones: the share sheet needs a tap, see below.
-      if (!(mobile() && canShareFile(file))) download(file, file.name);
+      // Desktop: save right away. Phones and tablets: the share sheet (with
+      // "Save Video" for the gallery) needs a tap, see below.
+      if (!(touchDevice && canShareFile(file))) download(file, file.name);
     } catch (error) {
       if (error instanceof DOMException && error.name === 'AbortError') {
         setStatus({ kind: 'error', message: t('editor.export.cancelled') });
@@ -263,7 +264,15 @@ export function ExportDialog(props: { open: boolean; onClose: () => void }) {
             <span>{progressText()}</span>
           </Show>
           <Show when={status().kind === 'done' && (status() as { file: File }).file}>
-            {(file) => <span>{t('editor.export.done', { file: file().name })}</span>}
+            {(file) => (
+              <span>
+                {t('editor.export.done', { file: file().name })}
+                <Show when={touchDevice && canShareFile(file())}>
+                  {' '}
+                  {t('editor.export.shareHint')}
+                </Show>
+              </span>
+            )}
           </Show>
           <Show when={status().kind === 'error'}>
             <span class="error">{(status() as { message: string }).message}</span>
@@ -289,7 +298,7 @@ export function ExportDialog(props: { open: boolean; onClose: () => void }) {
               >
                 {(file) => (
                   <>
-                    <Show when={mobile() && canShareFile(file())}>
+                    <Show when={touchDevice && canShareFile(file())}>
                       <button
                         type="button"
                         class="button primary"
@@ -297,6 +306,7 @@ export function ExportDialog(props: { open: boolean; onClose: () => void }) {
                           if (!(await shareFile(file()))) download(file(), file().name);
                         }}
                       >
+                        <ShareIcon />
                         {t('editor.export.share')}
                       </button>
                     </Show>
@@ -306,7 +316,7 @@ export function ExportDialog(props: { open: boolean; onClose: () => void }) {
                       onClick={() => download(file(), file().name)}
                     >
                       <DownloadIcon />
-                      {t('editor.export.download')}
+                      {touchDevice ? t('editor.export.saveToFiles') : t('editor.export.download')}
                     </button>
                   </>
                 )}

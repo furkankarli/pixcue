@@ -1,5 +1,5 @@
-import { createFrame, type FramePresetId, isFramePresetId } from '@pixcue/engine';
-import { createEffect, createUniqueId, For } from 'solid-js';
+import { type FramePresetId, isFramePresetId } from '@pixcue/engine';
+import { For } from 'solid-js';
 import { t } from '../i18n.ts';
 import { actions, state } from '../store.ts';
 
@@ -32,48 +32,5 @@ export function FormatPicker() {
         </For>
       </select>
     </label>
-  );
-}
-
-/**
- * Video format as a row of chips, for phones: every platform is one tap away
- * and the row scrolls sideways. Each chip shows the frame's shape.
- */
-export function FormatChips() {
-  const name = createUniqueId();
-  let row!: HTMLFieldSetElement;
-  // Bring the chosen chip into view, including after a link sets the format.
-  createEffect(() => {
-    state.preset;
-    row.querySelector('input:checked')?.closest('label')?.scrollIntoView({
-      block: 'nearest',
-      inline: 'center',
-    });
-  });
-  return (
-    <fieldset class="format-chips" ref={row}>
-      <legend class="visually-hidden">{t('editor.topbar.format')}</legend>
-      <For each={GROUPS.flatMap((g) => g.presets)}>
-        {(p) => {
-          const f = createFrame(p);
-          const long = 14;
-          const ratio = f.width / f.height;
-          const w = ratio >= 1 ? long : Math.round(long * ratio);
-          const h = ratio >= 1 ? Math.round(long / ratio) : long;
-          return (
-            <label class="format-chip">
-              <input
-                type="radio"
-                name={name}
-                checked={state.preset === p}
-                onChange={() => actions.setPreset(p)}
-              />
-              <span class="format-shape" style={{ width: `${w}px`, height: `${h}px` }} />
-              {t(`editor.formats.${p}`)}
-            </label>
-          );
-        }}
-      </For>
-    </fieldset>
   );
 }

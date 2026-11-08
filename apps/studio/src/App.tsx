@@ -1,31 +1,31 @@
 /**
- * The editor shell: a top bar, the template library, the stage with its
- * toolbar, the inspector, the timeline, and a status bar along the bottom. On narrow
- * screens the panels stack and the library becomes an inspector tab.
+ * The editor shell. Wide screens: the template library, the stage and the
+ * inspector side by side, with the timeline below. Phones: the stage fills
+ * the screen and a bar of tools along the bottom opens one panel at a time.
+ * Both share the top bar: format, name, menu and Export.
  */
 import { createEffect, createSignal, onCleanup, Show } from 'solid-js';
 import { ExportDialog } from './components/ExportDialog.tsx';
 import { Inspector } from './components/Inspector.tsx';
 import { Library } from './components/Library.tsx';
+import { MobileTools } from './components/MobileTools.tsx';
 import { PresetsDialog } from './components/PresetsDialog.tsx';
-import { ShareButton } from './components/ShareButton.tsx';
 import { Stage } from './components/Stage.tsx';
-import { StageToolbar } from './components/StageToolbar.tsx';
-import { StatusBar } from './components/StatusBar.tsx';
 import { Timeline } from './components/Timeline.tsx';
+import { TopBar } from './components/TopBar.tsx';
 import { Transport } from './components/Transport.tsx';
 import { locale, t } from './i18n.ts';
 import { wide } from './media.ts';
 import { togglePlay } from './playback.ts';
-import { BookmarkIcon, DownloadIcon } from './ui/icons.tsx';
-import { PixelWordmark } from './ui/PixelWordmark.tsx';
+import { Toast } from './ui/toast.tsx';
 
 /** Whether a key press belongs to a control that uses the key itself. */
 const ownsKeys = (target: EventTarget | null) =>
   target instanceof HTMLElement &&
   (target.isContentEditable ||
-    target.closest('input, textarea, select, button, [role="slider"], [role="tab"], dialog') !==
-      null);
+    target.closest(
+      'input, textarea, select, button, [role="slider"], [role="tab"], [role="application"], dialog, [popover]',
+    ) !== null);
 
 export function App() {
   const [exporting, setExporting] = createSignal(false);
@@ -44,32 +44,27 @@ export function App() {
   document.addEventListener('keydown', onKey);
   onCleanup(() => document.removeEventListener('keydown', onKey));
 
-  return (
-    <div class="app">
-      <header class="topbar">
-        <h1 class="brand">
-          <PixelWordmark />
-        </h1>
-        <div class="topbar-actions">
-          <ShareButton />
-          <button
-            type="button"
-            class="button ghost responsive"
-            onClick={() => setPresetsOpen(true)}
-            aria-label={t('editor.topbar.presets')}
-          >
-            <BookmarkIcon />
-            <span class="button-label">{t('editor.topbar.presets')}</span>
-          </button>
-          <button type="button" class="button primary" onClick={() => setExporting(true)}>
-            <DownloadIcon />
-            {t('editor.topbar.export')}
-          </button>
-        </div>
-      </header>
+  const stage = (
+    <section class="stage-column" aria-label={t('editor.stage.label')}>
+      <Stage hintId="stage-hint" />
+      <Transport hintId="stage-hint" />
+    </section>
+  );
 
-      <main class="workspace">
-        <Show when={wide()}>
+  return (
+    <div class="app" classList={{ phone: !wide() }}>
+      <TopBar onExport={() => setExporting(true)} onPresets={() => setPresetsOpen(true)} />
+
+      <Show
+        when={wide()}
+        fallback={
+          <main class="workspace phone">
+            {stage}
+            <MobileTools />
+          </main>
+        }
+      >
+        <main class="workspace">
           <aside class="panel library-panel" aria-labelledby="library-title">
             <h2 class="panel-title" id="library-title">
               {t('editor.tabs.templates')}
@@ -78,35 +73,15 @@ export function App() {
               <Library />
             </div>
           </aside>
-        </Show>
+          {stage}
+          <Timeline />
+          <aside class="panel inspector-panel">
+            <Inspector tabs={['content', 'style', 'layout']} />
+          </aside>
+        </main>
+      </Show>
 
-        {/* Phones: the format chips sit above the stage and scroll away. */}
-        <Show when={!wide()}>
-          <StageToolbar />
-        </Show>
-
-        <section class="stage-column" aria-label={t('editor.stage.label')}>
-          <Show when={wide()}>
-            <StageToolbar />
-          </Show>
-          <div class="monitor">
-            <Stage hintId="stage-hint" />
-            <Transport hintId="stage-hint" />
-          </div>
-        </section>
-
-        <Timeline />
-
-        <aside class="panel inspector-panel">
-          <Inspector
-            tabs={
-              wide() ? ['content', 'style', 'layout'] : ['templates', 'content', 'style', 'layout']
-            }
-          />
-        </aside>
-      </main>
-
-      <StatusBar />
+      <Toast />
       <ExportDialog open={exporting()} onClose={() => setExporting(false)} />
       <PresetsDialog open={presetsOpen()} onClose={() => setPresetsOpen(false)} />
     </div>

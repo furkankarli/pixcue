@@ -20,6 +20,7 @@ export default defineLocale({
         presets: 'Kayıtlı',
         export: 'Dışa aktar',
         menu: 'Menü',
+        view: 'Görünüm',
       },
       formats: {
         youtube: 'YouTube',
@@ -49,6 +50,11 @@ export default defineLocale({
         openSource: 'GitHub’da açık kaynak',
         local: 'Tarayıcında çalışır, hiçbir şey yüklenmez.',
         newTab: '(yeni sekmede açılır)',
+        madeBy: 'Yapan',
+      },
+      sheet: {
+        tools: 'Araçlar',
+        close: 'Paneli kapat',
       },
       timeline: {
         label: 'Zaman çizelgesi',
@@ -202,7 +208,9 @@ export default defineLocale({
         packaging: 'Dosya paketleniyor…',
         done: 'Hazır: {file}',
         download: 'Tekrar indir',
-        share: 'Telefona kaydet veya paylaş',
+        share: 'Galeriye kaydet veya paylaş',
+        saveToFiles: 'Dosyalar’a kaydet',
+        shareHint: 'iPhone’da Fotoğraflar’a eklemek için Videoyu Kaydet’i seç.',
         unsupported:
           "Bu tarayıcı bu formatı kodlayamıyor. Şeffaf MOV'u veya PNG sekansını seç ya da Chrome veya Edge ile dene.",
         failed: 'Dışa aktarım başarısız oldu. Tekrar dene veya başka bir format seç.',

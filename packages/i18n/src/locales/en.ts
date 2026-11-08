@@ -24,6 +24,7 @@ export default {
         presets: 'Saved',
         export: 'Export',
         menu: 'Menu',
+        view: 'View',
       },
       formats: {
         youtube: 'YouTube',
@@ -53,6 +54,11 @@ export default {
         openSource: 'Open source on GitHub',
         local: 'Runs in your browser. Nothing is uploaded.',
         newTab: '(opens in a new tab)',
+        madeBy: 'Made by',
+      },
+      sheet: {
+        tools: 'Tools',
+        close: 'Close panel',
       },
       timeline: {
         label: 'Timeline',
@@ -205,7 +211,9 @@ export default {
         packaging: 'Packaging the file…',
         done: 'Ready: {file}',
         download: 'Download again',
-        share: 'Save to phone or share',
+        share: 'Save to gallery or share',
+        saveToFiles: 'Save to Files',
+        shareHint: 'On iPhone, choose Save Video to put it in Photos.',
         unsupported:
           'This browser cannot encode this format. Choose the transparent MOV or the PNG sequence, or try Chrome or Edge.',
         failed: 'The export failed. Try again or choose another format.',
