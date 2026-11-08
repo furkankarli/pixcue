@@ -296,4 +296,22 @@ export const prosCons = defineTemplate({
   position: 'mc',
   fields,
   render: { vector, pixel },
+  sounds: ({ fields, duration: dur, pixel }) => {
+    // Both panels arrive, then each item pops in, pros higher than cons.
+    const columns = [fields.pros, fields.cons];
+    const items = columns.flatMap((items, ci) =>
+      items.map((_, i) => ({
+        t: ci * 0.12 + (pixel ? 0.65 : 0.6) + i * (pixel ? 0.28 : 0.15),
+        kind: 'pop' as const,
+        gain: 0.45,
+        pitch: ci === 0 ? 4 : -3,
+      })),
+    );
+    return [
+      { t: 0, kind: 'whoosh' },
+      { t: 0.15, kind: 'whoosh', gain: 0.6 },
+      ...items,
+      { t: dur - 0.6, kind: 'swoosh' },
+    ];
+  },
 });

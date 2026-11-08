@@ -29,6 +29,7 @@ import {
   popScale,
   rasterizeText,
   roundRectPath,
+  type SoundCue,
   SPRITES,
   type Sprite,
   seededRandom,
@@ -568,4 +569,29 @@ export const subscribe = defineTemplate({
   position: 'bc',
   fields,
   render: { vector, pixel },
+  sounds: ({ fields, duration: dur, frame }) => {
+    // Each press makes the pointer's sound (a click, or a tap on phones),
+    // then the button answers: a confirmation, a pop, the bell ringing.
+    const press = pointerKind(fields.pointer, frame) === 'tap' ? 'tap' : 'click';
+    const at = (a: number) => a - 0.03;
+    const cues: SoundCue[] = [
+      { t: 0.03, kind: 'pop', gain: 0.6 },
+      { t: at(A1), kind: press },
+      { t: A1 + 0.02, kind: 'chime', gain: 0.7 },
+    ];
+    if (fields.like)
+      cues.push(
+        { t: 0.13, kind: 'pop', gain: 0.4 },
+        { t: at(A2), kind: press },
+        { t: A2 + 0.02, kind: 'pop' },
+      );
+    if (fields.bell)
+      cues.push(
+        { t: 0.26, kind: 'pop', gain: 0.4 },
+        { t: at(A3), kind: press },
+        { t: A3 + 0.02, kind: 'bell' },
+      );
+    cues.push({ t: dur - 0.95, kind: 'swoosh', gain: 0.8 });
+    return cues;
+  },
 });

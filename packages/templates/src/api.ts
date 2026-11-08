@@ -2,7 +2,7 @@
  * The template API: a template declares its fields (the editor builds its form
  * from them), its timing, its default position and its drawing code.
  */
-import type { Frame, Platform, Position, Scene } from '@pixcue/engine';
+import type { Frame, Platform, Position, Scene, SoundCue } from '@pixcue/engine';
 import type { LocaleCode, MessageKey, Translate } from '@pixcue/i18n';
 
 /** What dynamic defaults can depend on. */
@@ -177,6 +177,18 @@ export interface TemplateDefinition<S extends FieldSchema> {
   readonly position: Position | ((frame: Frame) => Position);
   readonly fields: S;
   readonly render: Scene<FieldValues<S>>;
+  /** Sound effects in time with the animation (played only when sound is on). */
+  // Method syntax, like `render`, so a template still fits `Template` with its own fields.
+  sounds?(args: SoundArgs<FieldValues<S>>): readonly SoundCue[];
+}
+
+/** What a template's sound cues may depend on. */
+export interface SoundArgs<F> {
+  readonly fields: F;
+  readonly duration: number;
+  readonly frame: Frame;
+  /** The pixel theme types its text in; the others reveal it. */
+  readonly pixel: boolean;
 }
 
 export type Template<S extends FieldSchema = FieldSchema> = TemplateDefinition<S>;

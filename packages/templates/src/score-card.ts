@@ -333,4 +333,26 @@ export const scoreCard = defineTemplate({
   position: 'mc',
   fields,
   render: { vector, pixel },
+  sounds: ({ fields, duration: dur, pixel }) => {
+    // The card arrives, the score counts up in rising ticks and lands with a
+    // chime, then each category bar fills with a blip.
+    const ticks = Array.from({ length: 10 }, (_, i) => ({
+      t: 0.55 + i * 0.12,
+      kind: 'blip' as const,
+      gain: 0.3,
+      pitch: i,
+    }));
+    return [
+      { t: 0, kind: pixel ? 'pop' : 'whoosh' },
+      ...ticks,
+      { t: pixel ? 1.75 : 1.85, kind: 'chime' },
+      ...fields.categories.map((_, i) => ({
+        t: (pixel ? 1.2 + i * 0.2 : 1.1 + i * 0.15) + 0.05,
+        kind: 'blip' as const,
+        gain: 0.35,
+        pitch: 7 + i * 2,
+      })),
+      { t: dur - (pixel ? 0.55 : 0.62), kind: 'swoosh' },
+    ];
+  },
 });
