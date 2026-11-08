@@ -55,6 +55,7 @@ export default {
         local: 'Runs in your browser. Nothing is uploaded.',
         newTab: '(opens in a new tab)',
         madeBy: 'Made by',
+        sponsor: 'Sponsor on GitHub',
       },
       sheet: {
         tools: 'Tools',

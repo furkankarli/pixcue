@@ -4,7 +4,14 @@
  * and the one primary action, Export, on the right.
  */
 import { t } from '../i18n.ts';
-import { BookmarkIcon, DownloadIcon, ExternalIcon, LinkIcon, MoreIcon } from '../ui/icons.tsx';
+import {
+  BookmarkIcon,
+  DownloadIcon,
+  ExternalIcon,
+  HeartIcon,
+  LinkIcon,
+  MoreIcon,
+} from '../ui/icons.tsx';
 import { Menu, useCloseMenu } from '../ui/Menu.tsx';
 import { PixelWordmark } from '../ui/PixelWordmark.tsx';
 import { LanguagePicker } from './LanguagePicker.tsx';
@@ -12,6 +19,7 @@ import { shareLink } from './ShareButton.tsx';
 
 export const REPOSITORY = 'https://github.com/furkankarli/pixcue';
 export const AUTHOR_SITE = 'https://furkankarli.com';
+export const SPONSOR = 'https://github.com/sponsors/furkankarli';
 
 function MoreItems(props: { onPresets: () => void }) {
   const close = useCloseMenu();
@@ -47,6 +55,12 @@ function MoreItems(props: { onPresets: () => void }) {
       <a class="menu-item" href={REPOSITORY} target="_blank" rel="noopener">
         <span class="status-dot" aria-hidden="true" />
         {t('editor.status.openSource')}
+        <ExternalIcon size={12} />
+        <span class="visually-hidden">{t('editor.status.newTab')}</span>
+      </a>
+      <a class="menu-item sponsor" href={SPONSOR} target="_blank" rel="noopener">
+        <HeartIcon />
+        {t('editor.status.sponsor')}
         <ExternalIcon size={12} />
         <span class="visually-hidden">{t('editor.status.newTab')}</span>
       </a>

@@ -51,6 +51,7 @@ export default defineLocale({
         local: 'Tarayıcında çalışır, hiçbir şey yüklenmez.',
         newTab: '(yeni sekmede açılır)',
         madeBy: 'Yapan',
+        sponsor: 'GitHub’da sponsor ol',
       },
       sheet: {
         tools: 'Araçlar',
