@@ -12,9 +12,11 @@ const reducedMotion =
   typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const [time, setTime] = createSignal(0);
+/** Counts restarts of the loop, so the sound can start again with it. */
+const [loops, setLoops] = createSignal(0);
 const [playing, setPlaying] = createSignal(!reducedMotion);
 
-export { playing, time };
+export { loops, playing, time };
 
 let last = 0;
 let frameRequest = 0;
@@ -23,7 +25,10 @@ function tick(now: number) {
   const dt = Math.min(0.1, (now - last) / 1000);
   last = now;
   const total = duration();
-  setTime((t) => (t + dt > total + LOOP_PAUSE ? 0 : t + dt));
+  if (time() + dt > total + LOOP_PAUSE) {
+    setTime(0);
+    setLoops((n) => n + 1);
+  } else setTime((t) => t + dt);
   frameRequest = requestAnimationFrame(tick);
 }
 

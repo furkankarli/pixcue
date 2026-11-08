@@ -44,6 +44,8 @@ export function serialize(state: EditorState): Record<string, unknown> {
   if (edits.offset.x || edits.offset.y) out.o = [edits.offset.x, edits.offset.y];
   if (edits.scale !== EMPTY_EDITS.scale) out.s = edits.scale;
   if (edits.duration !== null) out.du = edits.duration;
+  // Sound only when it is on: its volume.
+  if (state.sound.on) out.sn = state.sound.volume;
   return out;
 }
 
@@ -64,6 +66,7 @@ export function deserialize(data: unknown): EditorState {
       typeof d.t === 'string'
         ? { [d.t]: { fields: d.d, position: d.pos, offset, scale: d.s, duration: d.du } }
         : {},
+    sound: typeof d.sn === 'number' ? { on: true, volume: d.sn } : undefined,
   });
 }
 

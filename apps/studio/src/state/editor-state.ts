@@ -42,7 +42,16 @@ export interface EditorState {
   readonly fps: FrameRate;
   /** Edits per template, so switching templates keeps what was typed. */
   readonly edits: Readonly<Record<string, TemplateEdits>>;
+  /** Sound effects: off by default; `volume` from 0 to 1. */
+  readonly sound: SoundSettings;
 }
+
+export interface SoundSettings {
+  readonly on: boolean;
+  readonly volume: number;
+}
+
+export const DEFAULT_SOUND: SoundSettings = { on: false, volume: 0.8 };
 
 export const EMPTY_EDITS: TemplateEdits = {
   fields: {},
@@ -66,6 +75,7 @@ export function initialState(): EditorState {
     font: null,
     fps: 30,
     edits: {},
+    sound: DEFAULT_SOUND,
   };
 }
 
@@ -118,6 +128,16 @@ export function cleanEdits(template: Template, raw: unknown): TemplateEdits {
   };
 }
 
+/** Validates sound settings from untrusted input. */
+export function cleanSound(raw: unknown): SoundSettings {
+  if (typeof raw !== 'object' || raw === null) return DEFAULT_SOUND;
+  const r = raw as Record<string, unknown>;
+  return {
+    on: r.on === true,
+    volume: finite(r.volume) ? clampTo(r.volume, 0, 1) : DEFAULT_SOUND.volume,
+  };
+}
+
 /** Builds a valid state from untrusted input; anything invalid falls back to the defaults. */
 export function cleanState(raw: unknown): EditorState {
   const base = initialState();
@@ -145,6 +165,7 @@ export function cleanState(raw: unknown): EditorState {
     font: typeof r.font === 'string' && findFont(r.font) ? r.font : null,
     fps: (FRAME_RATES as readonly unknown[]).includes(r.fps) ? (r.fps as FrameRate) : base.fps,
     edits,
+    sound: cleanSound(r.sound),
   };
 }
 

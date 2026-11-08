@@ -18,6 +18,8 @@ import { locale, t } from './i18n.ts';
 import { wide } from './media.ts';
 import { togglePlay } from './playback.ts';
 import { Toast } from './ui/toast.tsx';
+// Preview sound: starts on the first click or key press.
+import './audio.ts';
 
 /** Whether a key press belongs to a control that uses the key itself. */
 const ownsKeys = (target: EventTarget | null) =>

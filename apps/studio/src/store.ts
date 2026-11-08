@@ -10,7 +10,10 @@ import {
   type Point,
   type Position,
   type RenderState,
+  renderSoundtrack,
   resolveTheme,
+  SOUND_STYLES,
+  type Soundtrack,
   type ThemeId,
 } from '@pixcue/engine';
 import { createTranslator } from '@pixcue/i18n';
@@ -90,6 +93,28 @@ const derived = createRoot(() => {
 });
 
 export const { frame, template, edits, font, theme, fields, duration, position } = derived;
+
+/**
+ * The current graphic's sound effects, mixed, or null while sound is off. The
+ * preview plays these samples and exports carry the same ones.
+ */
+export const soundtrack = createRoot(() =>
+  createMemo((): Soundtrack | null => {
+    if (!state.sound.on) return null;
+    const cues =
+      template().sounds?.({
+        fields: fields() as never,
+        duration: duration(),
+        frame: frame(),
+        pixel: theme().kind === 'pixel',
+      }) ?? [];
+    return renderSoundtrack(cues, {
+      duration: duration(),
+      style: SOUND_STYLES[state.theme],
+      volume: state.sound.volume,
+    });
+  }),
+);
 
 if (typeof document !== 'undefined') {
   void themeFontsReady().then(() => bumpFonts((v) => v + 1));
@@ -186,6 +211,12 @@ export const actions = {
       ...e,
       scale: Math.min(SCALE_RANGE.max, Math.max(SCALE_RANGE.min, scale)),
     }));
+  },
+  setSound(on: boolean) {
+    setState('sound', 'on', on);
+  },
+  setSoundVolume(volume: number) {
+    setState('sound', 'volume', Math.min(1, Math.max(0, volume)));
   },
   setDuration(seconds: number) {
     const min = template().minDuration;

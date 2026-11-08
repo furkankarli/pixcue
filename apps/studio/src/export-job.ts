@@ -13,10 +13,9 @@ import {
   KEY_COLORS,
   type KeyColor,
 } from '@pixcue/export';
-import { fileName } from './files.ts';
+import { exportName } from './export-name.ts';
 import { loadFont, themeFontsReady } from './fonts.ts';
-import { t } from './i18n.ts';
-import { duration, fields, font, frame, renderState, state, template } from './store.ts';
+import { duration, font, frame, renderState, soundtrack, state } from './store.ts';
 
 export interface ExportRequest {
   readonly format: ExportFormat;
@@ -24,22 +23,6 @@ export interface ExportRequest {
   readonly chromaKey: boolean;
   readonly onProgress: (progress: number) => void;
   readonly signal: AbortSignal;
-}
-
-const EXTENSIONS: Record<ExportFormat, string> = {
-  mov: 'mov',
-  'mp4-key': 'mp4',
-  webm: 'webm',
-  'png-sequence': 'zip',
-};
-
-/** A readable name: template, its first text and the format, e.g. alt-bant-kablosuz-kulaklik-youtube. */
-export function exportName(format: ExportFormat): string {
-  // Prefer the title; otherwise the first text the template has.
-  const values = fields() as Record<string, unknown>;
-  const isText = (v: unknown): v is string => typeof v === 'string' && v.trim() !== '';
-  const text = isText(values.title) ? values.title : Object.values(values).find(isText);
-  return fileName([t(template().name), text ?? '', state.preset], EXTENSIONS[format]);
 }
 
 export async function runExport(request: ExportRequest): Promise<File> {
@@ -65,7 +48,9 @@ export async function runExport(request: ExportRequest): Promise<File> {
   };
 
   const name = exportName(request.format);
-  const options = { onProgress: request.onProgress, signal: request.signal };
+  // The same samples the preview plays; WebM is exported without sound.
+  const sound = soundtrack() ?? undefined;
+  const options = { onProgress: request.onProgress, signal: request.signal, sound };
   const blob = await {
     mov: () => exportMov(source, options),
     'png-sequence': () =>
@@ -75,7 +60,7 @@ export async function runExport(request: ExportRequest): Promise<File> {
         ...options,
         background: { color: KEY_COLORS[request.keyColor], hardEdges: request.chromaKey },
       }),
-    webm: () => exportWebm(source, options),
+    webm: () => exportWebm(source, { ...options, sound: undefined }),
   }[request.format]();
   return new File([blob], name, { type: blob.type });
 }
