@@ -10,7 +10,7 @@
 > Pixcue is under active development and v0.1 has not been released yet. The
 > features below describe what v0.1 will ship.
 
-**Live:** _coming soon_ <!-- TODO: replace with the production URL -->
+**Live:** [pixcue.furkankarli.com](https://pixcue.furkankarli.com)
 
 <!-- TODO: replace the placeholders with real recordings -->
 | Horizontal (YouTube)   | Vertical (Shorts, TikTok, Reels) |
