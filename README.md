@@ -114,8 +114,8 @@ then follow the steps for your editor.
 - **Keying leaves holes in the graphic:** pick another key color. Pixcue warns
   you when the graphic uses the one you chose.
 - **The graphic sits under platform buttons in a vertical video:** turn on
-  **Safe area** and **App buttons** in the preview, then move the graphic with
-  the mouse, the arrow keys or the **Layout** tab.
+  **Safe area** and **App buttons** in the **View** menu under the preview,
+  then move the graphic with the mouse, the arrow keys or the **Layout** tool.
 
 ## Quick start for creators
 
@@ -126,8 +126,8 @@ then follow the steps for your editor.
 5. Put the file on a track above your video in your editor. The steps for
    each editor are under [Using the file in your editor](#using-the-file-in-your-editor).
 
-On a phone, Pixcue offers to share the video straight to your gallery or to
-CapCut.
+On a phone, the finished video opens the share sheet: choose **Save Video**
+on iPhone to put it in Photos, or send it straight to CapCut.
 
 ## Quick start for contributors
 
