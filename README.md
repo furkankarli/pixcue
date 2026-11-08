@@ -196,6 +196,9 @@ To set it up once:
 
 3. Enable **builds for non-production branches** so every other branch gets a
    preview URL.
+4. Under the Worker's **Settings → Domains & Routes**, add the custom domain
+   `pixcue.furkankarli.com` (its zone must be on the same Cloudflare account).
+   The social preview tags point there, so link previews need it.
 
 Workers Builds reads the Node.js version from `.nvmrc` and the pnpm version from
 the `packageManager` field in `package.json`, so no extra build variables are
