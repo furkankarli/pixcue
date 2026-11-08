@@ -5,48 +5,12 @@
  * reduced motion is requested).
  */
 import { createSignal, For } from 'solid-js';
+import { WORDMARK } from '../brand/wordmark.ts';
 
-/** 5×7 letters (I is 3 wide), one clear column apart. */
-const LETTERS: readonly (readonly string[])[] = [
-  ['####.', '#...#', '#...#', '####.', '#....', '#....', '#....'],
-  ['###', '.#.', '.#.', '.#.', '.#.', '.#.', '###'],
-  ['#...#', '#...#', '.#.#.', '..#..', '.#.#.', '#...#', '#...#'],
-  ['.####', '#....', '#....', '#....', '#....', '#....', '.####'],
-  ['#...#', '#...#', '#...#', '#...#', '#...#', '#...#', '.###.'],
-  ['#####', '#....', '#....', '####.', '#....', '#....', '#####'],
-];
-
-/** Unlit border around the letters, in cells. */
-const PAD = 1;
 /** One cell in CSS pixels: a 3 px LED and a 1 px gap, so it stays crisp. */
 const PITCH = 4;
 const LED = 3;
-const ROWS = 7 + PAD * 2;
-
-interface Cell {
-  readonly x: number;
-  readonly y: number;
-  readonly lit: boolean;
-}
-
-const { cells, cols } = (() => {
-  const lit = new Set<string>();
-  let x = PAD;
-  for (const letter of LETTERS) {
-    letter.forEach((row, y) => {
-      [...row].forEach((c, dx) => {
-        if (c === '#') lit.add(`${x + dx},${y + PAD}`);
-      });
-    });
-    x += (letter[0]?.length ?? 0) + 1;
-  }
-  const cols = x - 1 + PAD;
-  const cells: Cell[] = [];
-  for (let cy = 0; cy < ROWS; cy++) {
-    for (let cx = 0; cx < cols; cx++) cells.push({ x: cx, y: cy, lit: lit.has(`${cx},${cy}`) });
-  }
-  return { cells, cols };
-})();
+const { cells, cols, rows: ROWS } = WORDMARK;
 
 export function PixelWordmark() {
   // Restart the glint on every hover by toggling the class off and on.
