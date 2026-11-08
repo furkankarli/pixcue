@@ -1,3 +1,5 @@
+import { createGlComposer, type GlComposer } from './gl-compose.ts';
+
 /** A canvas the exporter can read pixels from and hand to encoders. */
 export interface FrameCanvas {
   readonly width: number;
@@ -25,6 +27,11 @@ export interface FrameSource {
 export interface ExportPlatform {
   createCanvas(width: number, height: number): FrameImage;
   encodePng(canvas: FrameImage): Promise<Uint8Array>;
+  /**
+   * A fast way to put frames of this size on a solid color (the GPU in
+   * browsers), or null to use the JavaScript compositor.
+   */
+  colorComposer?(width: number, height: number): GlComposer | null;
 }
 
 export const browserPlatform: ExportPlatform = {
@@ -35,6 +42,7 @@ export const browserPlatform: ExportPlatform = {
     canvas.height = height;
     return canvas;
   },
+  colorComposer: (width, height) => createGlComposer(width, height),
   async encodePng(canvas) {
     const blob =
       'convertToBlob' in canvas
