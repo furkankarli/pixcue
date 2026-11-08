@@ -22,6 +22,7 @@ import {
   type VectorScene,
 } from '@pixcue/engine';
 import { defineTemplate, type FieldValues, field } from './api.ts';
+import { typedUntil, typing } from './sounds.ts';
 
 const fields = {
   title: field.text({
@@ -250,4 +251,24 @@ export const callout = defineTemplate({
   position: 'mc',
   fields,
   render: { vector, pixel },
+  sounds: ({ fields, duration: dur, pixel }) => {
+    // The anchor pops, the leader line draws, the text appears.
+    if (pixel) {
+      const s2 = typedUntil(0.78, fields.title) + 0.08;
+      return [
+        { t: 0.03, kind: 'pop' },
+        { t: 0.2, kind: 'whoosh', gain: 0.6 },
+        ...typing(0.78, fields.title),
+        ...typing(s2, fields.subtitle),
+        { t: dur - 0.5, kind: 'swoosh', gain: 0.8 },
+      ];
+    }
+    return [
+      { t: 0.02, kind: 'pop' },
+      { t: 0.18, kind: 'whoosh', gain: 0.7 },
+      { t: 0.62, kind: 'blip', gain: 0.5 },
+      { t: 1.0, kind: 'blip', gain: 0.35, pitch: 5 },
+      { t: dur - 0.55, kind: 'swoosh', gain: 0.8 },
+    ];
+  },
 });

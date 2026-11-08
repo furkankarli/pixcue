@@ -13,6 +13,7 @@ export * from './exporters/sequence.ts';
 export * from './exporters/video.ts';
 export * from './frames.ts';
 export { type MovOptions, muxMovPng } from './mux/mov.ts';
-export { type EncodedSample, type Mp4Options, muxMp4 } from './mux/mp4.ts';
+export { type EncodedSample, type Mp4Audio, type Mp4Options, muxMp4 } from './mux/mp4.ts';
 export { muxWebm, type WebmOptions, type WebmSample } from './mux/webm.ts';
+export * from './sound.ts';
 export { createZip, type ZipEntry } from './zip.ts';

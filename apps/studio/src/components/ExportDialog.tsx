@@ -3,6 +3,7 @@
  * cleanly there, explains in two lines how to use it, then renders the file.
  */
 import {
+  canEncodeAac,
   EDITOR_IDS,
   EDITORS,
   type EditorId,
@@ -11,14 +12,24 @@ import {
   type KeyColor,
   needsVideoEncoder,
   RENDER_SHARE,
+  wavFile,
 } from '@pixcue/export';
-import { createEffect, createMemo, createSignal, For, onCleanup, Show } from 'solid-js';
+import {
+  createEffect,
+  createMemo,
+  createResource,
+  createSignal,
+  For,
+  onCleanup,
+  Show,
+} from 'solid-js';
+import { exportName } from '../export-name.ts';
 import { canShareFile, download, shareFile } from '../files.ts';
 import { t } from '../i18n.ts';
 import { touchDevice } from '../idle.ts';
 import { keyConflict } from '../key-conflict.ts';
 import { FRAME_RATES } from '../state/editor-state.ts';
-import { actions, duration, state } from '../store.ts';
+import { actions, duration, soundtrack, state } from '../store.ts';
 import { Segmented, Switch } from '../ui/controls.tsx';
 import { CloseIcon, DownloadIcon, ShareIcon } from '../ui/icons.tsx';
 
@@ -74,6 +85,18 @@ export function ExportDialog(props: { open: boolean; onClose: () => void }) {
   };
 
   const available = (f: ExportFormat) => hasVideoEncoder || !needsVideoEncoder(f);
+  // Whether this browser can put the sound into an MP4 (AAC).
+  const [aac] = createResource(
+    () => (props.open && soundtrack()) || null,
+    (track) => canEncodeAac(track),
+  );
+  const soundNote = () => {
+    const f = format();
+    if (f === 'webm') return t('editor.export.soundMissingWebm');
+    if (f === 'mp4-key' && aac() === false) return t('editor.export.soundMissingMp4');
+    return t('editor.export.soundIncluded');
+  };
+  const exportBaseName = () => exportName(format());
   const frames = () => Math.max(1, Math.round(duration() * state.fps));
   const running = () => status().kind === 'running';
   const mobile = () => EDITORS[editor()].mobile;
@@ -213,6 +236,27 @@ export function ExportDialog(props: { open: boolean; onClose: () => void }) {
             <p class="field-help">{t('editor.export.phoneHint')}</p>
           </Show>
         </fieldset>
+
+        <Show when={soundtrack()}>
+          {(track) => (
+            <div class="group sound-note">
+              <p class="field-help">{soundNote()}</p>
+              <button
+                type="button"
+                class="button"
+                onClick={() =>
+                  download(
+                    new Blob([wavFile(track()) as Uint8Array<ArrayBuffer>], { type: 'audio/wav' }),
+                    exportBaseName().replace(/\.[a-z0-9]+$/, '.wav'),
+                  )
+                }
+              >
+                <DownloadIcon />
+                {t('editor.export.soundWav')}
+              </button>
+            </div>
+          )}
+        </Show>
 
         <Show when={format() === 'mp4-key'}>
           <div class="group">

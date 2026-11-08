@@ -181,6 +181,9 @@ importers:
       '@commitlint/types':
         specifier: ^21.2.3
         version: 21.2.3
+      '@napi-rs/canvas':
+        specifier: 1.1.0
+        version: 1.1.0
       '@types/node':
         specifier: ^24
         version: 24.19.2

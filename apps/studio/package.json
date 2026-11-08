@@ -1,6 +1,6 @@
 {
   "name": "@pixcue/studio",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "description": "Pixcue editor: pick a template, fill in the text, export a file for your video editor.",
   "license": "MIT",

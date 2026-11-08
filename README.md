@@ -1,20 +1,51 @@
-# Pixcue
+<h1 align="center">
+  <a href="https://pixcue.furkankarli.com">
+    <img src="apps/studio/public/og.png" alt="Pixcue" width="720">
+  </a>
+</h1>
 
-**Free, open-source motion graphics for video creators: pick a template, type your text, drop the file into your editor.**
+<p align="center">
+  <strong>Free, open-source motion graphics for video creators: pick a template, type your text, drop the file into your editor.</strong>
+</p>
 
-[![CI](https://github.com/furkankarli/pixcue/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/furkankarli/pixcue/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+<p align="center">
+  <a href="https://pixcue.furkankarli.com"><strong>Open Pixcue</strong></a>
+  ·
+  <a href="https://github.com/sponsors/furkankarli">Sponsor</a>
+  ·
+  <a href="https://furkankarli.com">furkankarli.com</a>
+</p>
 
-> [!NOTE]
-> Pixcue is under active development and v0.1 has not been released yet. The
-> features below describe what v0.1 will ship.
+<p align="center">
+  <a href="https://github.com/furkankarli/pixcue/actions/workflows/ci.yml"><img src="https://github.com/furkankarli/pixcue/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI"></a>
+  <a href="https://github.com/furkankarli/pixcue/releases"><img src="https://img.shields.io/github/v/release/furkankarli/pixcue" alt="Release"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a>
+  <a href="https://github.com/sponsors/furkankarli"><img src="https://img.shields.io/badge/sponsor-%E2%99%A5-ea4aaa.svg" alt="Sponsor"></a>
+</p>
 
-**Live:** _coming soon_ <!-- TODO: replace with the production URL -->
+## Demos
 
-<!-- TODO: replace the placeholders with real recordings -->
-| Horizontal (YouTube)   | Vertical (Shorts, TikTok, Reels) |
-| ---------------------- | -------------------------------- |
-| _demo GIF placeholder_ | _demo GIF placeholder_           |
+Every template works in four themes (tech, pop, sade and pixel) and in
+horizontal and vertical frames. A few of them, over stand-in footage:
+
+<table>
+  <tr>
+    <td align="center"><img src="docs/media/lower-third-tech.gif" alt="A lower third typing in, in the tech theme" width="400"><br><sub>Lower third · tech</sub></td>
+    <td align="center"><img src="docs/media/chapter-title-sade.gif" alt="A chapter title in the sade theme" width="400"><br><sub>Chapter title · sade</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/media/callout-pop.gif" alt="A callout pointing at a detail, in the pop theme" width="400"><br><sub>Callout · pop</sub></td>
+    <td align="center"><img src="docs/media/score-card-pixel.gif" alt="A review score card counting up, in the pixel theme" width="400"><br><sub>Score card · pixel</sub></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td align="center"><img src="docs/media/subscribe-pop.gif" alt="A subscribe, like and bell button being clicked, in the pop theme" width="260"><br><sub>Subscribe · pop</sub></td>
+    <td align="center"><img src="docs/media/pros-cons-tech.gif" alt="A pros and cons list in the tech theme" width="260"><br><sub>Pros and cons · tech</sub></td>
+    <td align="center"><img src="docs/media/spec-card-pixel.gif" alt="A spec card in the pixel theme" width="260"><br><sub>Spec card · pixel</sub></td>
+  </tr>
+</table>
 
 ## Features
 
@@ -29,6 +60,9 @@
   WebM or a PNG sequence. Pixcue asks which editor you use and picks the format.
 - **Platform-aware copy:** "Subscribe" on YouTube, "Follow" on TikTok and
   Instagram, in English and Turkish.
+- **Sound effects:** optional clicks, pops, whooshes and chimes in time with
+  the animation, in a style that matches each theme. They play in the preview
+  and go into the exported file.
 - **Share a setup as a link:** the whole editor state lives in the URL.
 - **Private by design:** everything runs in your browser. No uploads, no
   accounts, no server.
@@ -46,7 +80,9 @@
 | Anything else      | WebM (VP9 + alpha) or PNG sequence (zip) | Alpha channel |
 
 Every editor can also get the MP4. It is the one file phones and messaging
-apps open, so choose it whenever the graphic travels to a phone. Pixcue picks
+apps open, so choose it whenever the graphic travels to a phone. With sound
+effects on, the MOV and the PNG sequence always carry the sound; the MP4 does
+where the browser can encode AAC, and the sound is also offered as a WAV. Pixcue picks
 a key color (green, blue or magenta) that the graphic does not use, and a
 chroma-key mode removes soft shadows and see-through edges so keying stays
 clean.
@@ -191,6 +227,9 @@ To set it up once:
 
 3. Enable **builds for non-production branches** so every other branch gets a
    preview URL.
+4. Under the Worker's **Settings → Domains & Routes**, add the custom domain
+   `pixcue.furkankarli.com` (its zone must be on the same Cloudflare account).
+   The social preview tags point there, so link previews need it.
 
 Workers Builds reads the Node.js version from `.nvmrc` and the pnpm version from
 the `packageManager` field in `package.json`, so no extra build variables are
@@ -209,7 +248,6 @@ npx wrangler deploy --config apps/studio/wrangler.jsonc --dry-run
 Not part of v0.1, planned for later:
 
 - OBS mode (browser source for live streams)
-- Sound effects
 - Pixel effects (pixelfx)
 - Visual template builder
 - Publishing the engine and exporters as npm packages
@@ -219,6 +257,12 @@ Not part of v0.1, planned for later:
 Ideas and votes are welcome in
 [Discussions](https://github.com/furkankarli/pixcue/discussions).
 
+## Support Pixcue
+
+Pixcue is free and stays free, with no accounts and no ads. If it saves you
+time, you can support its development through
+[GitHub Sponsors](https://github.com/sponsors/furkankarli).
+
 ## License
 
-[MIT](LICENSE) © Furkan Karlı and Pixcue contributors
+[MIT](LICENSE) © [Furkan Karlı](https://furkankarli.com) and Pixcue contributors

@@ -1,9 +1,10 @@
 import { THEME_IDS, THEMES, type ThemeId } from '@pixcue/engine';
-import { createSignal, createUniqueId, For, Show } from 'solid-js';
+import { createMemo, createSignal, createUniqueId, For, Show } from 'solid-js';
 import { FONTS } from '../fonts.ts';
-import { t } from '../i18n.ts';
+import { locale, t } from '../i18n.ts';
 import { actions, state, theme } from '../store.ts';
 import { ColorPicker } from '../ui/ColorPicker.tsx';
+import { Slider, Switch } from '../ui/controls.tsx';
 
 /** Quick accent choices; any color can be picked too. */
 const SWATCHES = [
@@ -19,6 +20,7 @@ const SWATCHES = [
 
 export function StylePanel() {
   const fontId = createUniqueId();
+  const percent = createMemo(() => new Intl.NumberFormat(locale(), { style: 'percent' }));
   const pickerId = createUniqueId();
   const [pickerOpen, setPickerOpen] = createSignal(false);
   const accentOverride = () => state.accents[state.theme];
@@ -118,6 +120,26 @@ export function StylePanel() {
         <Show when={state.theme === 'pixel'}>
           <p class="field-help">{t('editor.style.pixelFontNote')}</p>
         </Show>
+      </div>
+
+      <div class="group">
+        <Switch
+          label={t('editor.sound.effects')}
+          checked={state.sound.on}
+          onChange={actions.setSound}
+        />
+        <Show when={state.sound.on}>
+          <Slider
+            label={t('editor.sound.volume')}
+            min={0}
+            max={1}
+            step={0.05}
+            value={state.sound.volume}
+            display={percent().format(state.sound.volume)}
+            onInput={actions.setSoundVolume}
+          />
+        </Show>
+        <p class="field-help">{t('editor.sound.help')}</p>
       </div>
     </div>
   );

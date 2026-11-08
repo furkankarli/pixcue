@@ -55,6 +55,12 @@ export default {
         local: 'Runs in your browser. Nothing is uploaded.',
         newTab: '(opens in a new tab)',
         madeBy: 'Made by',
+        sponsor: 'Sponsor on GitHub',
+      },
+      sound: {
+        effects: 'Sound effects',
+        volume: 'Volume',
+        help: 'Plays in the preview and goes into the exported file.',
       },
       sheet: {
         tools: 'Tools',
@@ -132,6 +138,12 @@ export default {
         editorQuestion: 'Which editor do you use?',
         format: 'Format',
         recommended: 'Recommended',
+        soundIncluded: 'The sound effects are in the file.',
+        soundMissingMp4:
+          'This browser cannot add sound to an MP4. Download the sound and add it in your editor.',
+        soundMissingWebm:
+          'WebM files are exported without sound. Download the sound and add it in your editor.',
+        soundWav: 'Download sound (WAV)',
         phoneHint:
           'Sending it to a phone or through a messaging app? Choose the MP4: phones cannot open transparent MOV, WebM or PNG files.',
         editors: {

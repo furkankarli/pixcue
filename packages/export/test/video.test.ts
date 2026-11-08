@@ -9,6 +9,7 @@ import {
   type WebCodecsApi,
 } from '../src/exporters/video.ts';
 import type { FrameImage } from '../src/frames.ts';
+import type { AudioCodecsApi } from '../src/sound.ts';
 import { find, parseBoxes } from './boxes.ts';
 import { nodePlatform, syntheticSource } from './node-platform.ts';
 import { H, W } from './synthetic.ts';
@@ -102,6 +103,48 @@ describe('codec choice', () => {
 });
 
 describe('exportMp4', () => {
+  it('adds the sound as AAC when the browser can encode it, and leaves it out otherwise', async () => {
+    const tone = { sampleRate: 48000, channels: [new Float32Array(4800), new Float32Array(4800)] };
+    const audioCodecs = (supported: boolean) =>
+      ({
+        AudioEncoder: class {
+          static async isConfigSupported(config: AudioEncoderConfig) {
+            return { supported, config };
+          }
+          state: CodecState = 'unconfigured';
+          constructor(private readonly init: AudioEncoderInit) {}
+          configure() {}
+          encode() {
+            this.init.output(
+              {
+                byteLength: 1,
+                copyTo: (d: Uint8Array) => d.set([5]),
+              } as unknown as EncodedAudioChunk,
+              undefined,
+            );
+          }
+          async flush() {}
+          close() {
+            this.state = 'closed';
+          }
+        },
+        AudioData: class {
+          close() {}
+        },
+      }) as unknown as AudioCodecsApi;
+    for (const supported of [true, false]) {
+      const mp4 = await bytes(
+        await exportMp4(syntheticSource(3), {
+          webcodecs: fakeWebCodecs().api,
+          platform: nodePlatform,
+          sound: tone,
+          audioCodecs: audioCodecs(supported),
+        }),
+      );
+      expect(mp4.includes('mp4a'), String(supported)).toBe(supported);
+    }
+  });
+
   it('encodes every frame with a keyframe every two seconds and muxes an MP4', async () => {
     const fake = fakeWebCodecs();
     const progress: number[] = [];

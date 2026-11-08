@@ -6,6 +6,7 @@ import {
   type Layout,
   render,
   resolveTheme,
+  scaleFrame,
   type ThemeId,
 } from '@pixcue/engine';
 import { createTestCanvas } from '@pixcue/engine/testing';
@@ -21,11 +22,14 @@ export interface RenderCase {
   readonly locale?: LocaleCode;
   readonly overrides?: Readonly<Record<string, unknown>>;
   readonly layout?: Partial<Layout>;
+  /** Output width in pixels, smaller than the preset's as in the preview. */
+  readonly width?: number;
 }
 
 /** Renders one frame of a template with its defaults onto a fresh Node.js canvas. */
 export function renderFrame(c: RenderCase) {
-  const frame = createFrame(c.preset);
+  const preset = createFrame(c.preset);
+  const frame = c.width ? scaleFrame(preset, c.width) : preset;
   const locale = c.locale ?? 'tr';
   const fields = resolveFields(c.template, c.overrides ?? {}, {
     t: createTranslator(locale),
@@ -41,7 +45,7 @@ export function renderFrame(c: RenderCase) {
     duration: c.template.duration,
     locale,
     layout: {
-      position: defaultPosition(c.template, frame),
+      position: defaultPosition(c.template, preset),
       offset: { x: 0, y: 0 },
       scale: 1,
       ...c.layout,

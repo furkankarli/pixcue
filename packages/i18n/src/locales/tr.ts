@@ -51,6 +51,12 @@ export default defineLocale({
         local: 'Tarayıcında çalışır, hiçbir şey yüklenmez.',
         newTab: '(yeni sekmede açılır)',
         madeBy: 'Yapan',
+        sponsor: 'GitHub’da sponsor ol',
+      },
+      sound: {
+        effects: 'Ses efektleri',
+        volume: 'Ses seviyesi',
+        help: 'Önizlemede çalar ve dışa aktarılan dosyaya eklenir.',
       },
       sheet: {
         tools: 'Araçlar',
@@ -128,6 +134,10 @@ export default defineLocale({
         editorQuestion: 'Hangi editörü kullanıyorsun?',
         format: 'Format',
         recommended: 'Önerilen',
+        soundIncluded: 'Ses efektleri dosyanın içinde.',
+        soundMissingMp4: 'Bu tarayıcı MP4’e ses ekleyemiyor. Sesi indirip editöründe ekle.',
+        soundMissingWebm: 'WebM dosyaları sessiz dışa aktarılır. Sesi indirip editöründe ekle.',
+        soundWav: 'Sesi indir (WAV)',
         phoneHint:
           'Telefona ya da mesajlaşma uygulamasıyla mı göndereceksin? MP4’ü seç: telefonlar saydam MOV, WebM ve PNG dosyalarını açamaz.',
         editors: {

@@ -10,6 +10,7 @@ const edited: EditorState = {
   accents: { pop: '#FF4FA3', tech: '#00E5FF' },
   font: 'bebas-neue',
   fps: 60,
+  sound: { on: true, volume: 0.5 },
   edits: {
     subscribe: {
       fields: { button: 'Katıl', bell: true },
@@ -42,6 +43,13 @@ describe('share links', () => {
   it('keeps links short by leaving out defaults', () => {
     expect(serialize(initialState())).toEqual({ v: 1, t: initialState().template });
     expect(encodeHash(initialState()).length).toBeLessThan(40);
+  });
+
+  it('carries sound only when it is on, with its volume', () => {
+    expect(serialize({ ...initialState(), sound: { on: false, volume: 0.3 } }).sn).toBeUndefined();
+    expect(serialize({ ...initialState(), sound: { on: true, volume: 0.3 } }).sn).toBe(0.3);
+    expect(deserialize({ v: 1, t: 'callout', sn: 7 }).sound).toEqual({ on: true, volume: 1 });
+    expect(deserialize({ v: 1, t: 'callout', sn: 'loud' }).sound.on).toBe(false);
   });
 
   it('keeps Turkish text intact', () => {

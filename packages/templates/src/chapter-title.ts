@@ -219,4 +219,17 @@ export const chapterTitle = defineTemplate({
   position: 'mc',
   fields,
   render: { vector, pixel },
+  sounds: ({ fields, duration: dur, pixel }) => {
+    // The line sweeps out, the last letter lands, the label pops in.
+    const letters = Array.from(fields.title).length;
+    const landed = pixel ? 0.16 + (letters - 1) * 0.05 + 0.3 : 0.2 + (letters - 1) * 0.035 + 0.4;
+    return [
+      { t: 0.02, kind: 'whoosh' },
+      { t: landed, kind: 'pop' },
+      ...(fields.kicker
+        ? [{ t: pixel ? 0.42 + letters * 0.05 : 0.6, kind: 'blip', gain: 0.6 } as const]
+        : []),
+      { t: dur - 0.85, kind: 'swoosh' },
+    ];
+  },
 });

@@ -7,7 +7,7 @@ import type { PixelText, Sprite } from './raster.ts';
  * resolution by `flush`, after the grid has been scaled up.
  */
 export interface Painter {
-  /** Size of one grid pixel in output pixels. */
+  /** Size of one grid pixel in design units (output pixels at 1080p). */
   readonly px: number;
   /** Where the graphic's origin sits on the grid, in cells. */
   readonly origin: { readonly x: number; readonly y: number };
@@ -29,7 +29,7 @@ export interface Painter {
     start: number,
     blinkUntil: number,
   ): void;
-  /** Queues a sprite scaled `k` times (centered) for `flush`; 0 hides it. */
+  /** Queues a sprite scaled `k` design units per pixel (centered) for `flush`; 0 hides it. */
   pop(s: Sprite, x: number, y: number, k: number): void;
   clip(x: number, y: number, w: number, h: number): void;
   unclip(): void;
@@ -55,6 +55,8 @@ export function createPainter(
   px: number,
   gridWidth = 0,
   gridHeight = 0,
+  /** Output pixels per design unit. */
+  unit = 1,
 ): Painter {
   const pops: [Sprite, number, number, number][] = [];
   const P: Painter = {
@@ -93,7 +95,8 @@ export function createPainter(
       }
     },
     pop(s, x, y, k) {
-      if (k > 0) pops.push([s, (ox + x + s.w / 2) * px, (oy + y + s.h / 2) * px, k]);
+      if (k > 0)
+        pops.push([s, (ox + x + s.w / 2) * px * unit, (oy + y + s.h / 2) * px * unit, k * unit]);
     },
     clip(x, y, w, h) {
       c.save();

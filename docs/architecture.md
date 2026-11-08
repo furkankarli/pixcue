@@ -159,6 +159,17 @@ Instagram Edits). Every muxer is validated against ffprobe and ffmpeg in the
 `pnpm test:formats` suite: codec, pixel format including alpha, frame count,
 and decoded frames compared with the source.
 
+### Sound
+
+Sound effects are synthesized in plain JavaScript (`packages/engine/src/sound.ts`):
+no audio files and no Web Audio graph, so a soundtrack is deterministic like
+the frames. A template returns cues from `sounds()`, a kind of sound at a time
+in seconds; the theme picks the style (digital, cartoon, soft or 8-bit); and
+`renderSoundtrack` mixes them into stereo PCM. The studio plays those samples
+in the preview and hands the same ones to the exporters, which take plain
+PCM: the MOV gets a 16-bit PCM track, the PNG sequence a WAV, and the MP4 an
+AAC track where WebCodecs can encode one.
+
 ### State and sharing
 
 The studio's state (`apps/studio/src/state/`) is plain data: format preset,

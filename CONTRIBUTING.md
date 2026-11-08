@@ -54,6 +54,8 @@ pnpm dev       # studio at http://localhost:3000
 | `pnpm test:visual:update`       | Rewrite visual baselines (see below)                        |
 | `pnpm test:formats`             | Export a short clip per format and validate it with ffprobe |
 | `pnpm changeset`                | Add release notes for your change                           |
+| `pnpm brand`                    | Regenerate the favicon, app icons and social preview        |
+| `pnpm demo-media`               | Regenerate the README's demo GIFs (needs ffmpeg)            |
 
 ## Project structure
 

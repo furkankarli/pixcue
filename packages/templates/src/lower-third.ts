@@ -28,6 +28,7 @@ import {
   withClip,
 } from '@pixcue/engine';
 import { defineTemplate, type FieldValues, field } from './api.ts';
+import { typedUntil, typing } from './sounds.ts';
 
 const fields = {
   tag: field.text({
@@ -222,4 +223,23 @@ export const lowerThird = defineTemplate({
   position: 'bl',
   fields,
   render: { vector, pixel },
+  sounds: ({ fields, duration: dur, pixel }) => {
+    if (pixel) {
+      // The panel unrolls, the title and subtitle type themselves in.
+      const s2 = typedUntil(0.55, fields.title) + 0.12;
+      return [
+        { t: 0.1, kind: 'whoosh', gain: 0.7 },
+        ...typing(0.55, fields.title),
+        ...typing(s2, fields.subtitle),
+        ...(fields.tag ? [{ t: 0.9, kind: 'pop', gain: 0.6 } as const] : []),
+        { t: dur - 0.5, kind: 'swoosh' },
+      ];
+    }
+    return [
+      { t: 0.1, kind: 'whoosh' },
+      { t: 0.72, kind: 'blip', gain: 0.4 },
+      ...(fields.tag ? [{ t: 0.8, kind: 'pop', gain: 0.6 } as const] : []),
+      { t: dur - 0.62, kind: 'swoosh' },
+    ];
+  },
 });

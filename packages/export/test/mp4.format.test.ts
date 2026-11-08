@@ -132,4 +132,44 @@ describe('H.264 MP4', () => {
     expect(log).toBe('');
     expect(frameHashes(file)).toEqual(frameHashes(source));
   });
+
+  it('carries an AAC sound track that decodes cleanly', async () => {
+    // Real AAC frames: ffmpeg encodes one second of a tone; we read its
+    // packets and AudioSpecificConfig as WebCodecs' AudioEncoder gives them.
+    const aac = tmp.file('tone.m4a');
+    ffmpeg([
+      ...['-f', 'lavfi', '-i', 'sine=frequency=440:duration=1:sample_rate=48000'],
+      ...['-ac', '2', '-c:a', 'aac', '-b:a', '160k', aac],
+    ]);
+    const probe = ffprobe(aac, ['-show_packets', '-show_data']);
+    const bytes = readFileSync(aac);
+    const frames = (probe.packets ?? []).map((p) => {
+      const pos = Number(p.pos);
+      return new Uint8Array(bytes.subarray(pos, pos + Number(p.size)));
+    });
+    const config = hexdumpBytes(probe.streams[0]?.extradata ?? '');
+    const blob = muxMp4(samples, {
+      width: 320,
+      height: 180,
+      fps: 30,
+      avcC,
+      audio: { frames, sampleRate: 48000, channels: 2, config, bitrate: 160_000, priming: 1024 },
+    });
+    const file = tmp.file('sound.mp4', new Uint8Array(await blob.arrayBuffer()));
+    const info = ffprobe(file);
+    expect(info.streams).toHaveLength(2);
+    expect(info.streams[1]).toMatchObject({
+      codec_type: 'audio',
+      codec_name: 'aac',
+      sample_rate: '48000',
+      channels: 2,
+    });
+    const log = ffmpeg(['-v', 'warning', '-i', file, '-map', '0:a', '-f', 'null', '-']).toString();
+    expect(log).toBe('');
+    const pcm = ffmpeg(['-i', file, '-map', '0:a', '-f', 's16le', '-ac', '1', 'pipe:1']);
+    // About one second of samples, with the encoder delay trimmed.
+    expect(pcm.length / 2).toBeGreaterThan(47000);
+    expect(pcm.length / 2).toBeLessThan(49100);
+    expect(frameHashes(file)).toEqual(frameHashes(source));
+  });
 });

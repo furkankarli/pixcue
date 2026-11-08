@@ -264,6 +264,28 @@ the text.
 - `args.frame.platform` (`youtube`, `tiktok`, `instagram` or `any`) can change
   details, like the heart instead of the thumbs-up outside YouTube.
 
+## Sound effects
+
+Sound is optional and off by default; when a creator turns it on, the
+editor plays and exports the cues your template returns from `sounds`. Each
+cue is a kind of sound at a time in seconds. The theme decides how it sounds
+(digital, cartoon, soft or 8-bit), so templates only say what happens when.
+
+```ts
+sounds: ({ fields, duration, frame, pixel }) => [
+  { t: 0.1, kind: 'whoosh' }, // the card arrives
+  ...(pixel ? typing(0.55, fields.title) : []), // keystrokes as the text types in
+  { t: duration - 0.6, kind: 'swoosh' }, // it leaves
+],
+```
+
+Kinds: `whoosh`, `swoosh`, `pop`, `click`, `tap`, `type`, `bell`, `chime` and
+`blip`, each with an optional `gain` and `pitch` (in semitones). Keep cues in
+time with the animation, inside the clip at every duration from
+`minDuration` up, and sparse: one sound per thing the viewer notices.
+`typing` (from `src/sounds.ts`) gives keystrokes for text the pixel theme
+types in.
+
 ## Translations
 
 Template strings live in `packages/i18n/src/locales/<language>.ts` under

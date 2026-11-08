@@ -29,6 +29,7 @@ import {
   withClip,
 } from '@pixcue/engine';
 import { defineTemplate, type FieldValues, field } from './api.ts';
+import { typing } from './sounds.ts';
 
 const fields = {
   header: field.text({
@@ -216,4 +217,16 @@ export const specCard = defineTemplate({
   position: (frame) => (frame.orientation === 'horizontal' ? 'mr' : 'mc'),
   fields,
   render: { vector, pixel },
+  sounds: ({ fields, duration: dur, pixel }) => [
+    // The card slides in, then each row arrives with a tick.
+    { t: 0, kind: 'whoosh' },
+    ...(pixel ? typing(0.4, fields.header) : []),
+    ...fields.rows.map((_, i) => ({
+      t: (pixel ? 0.6 + i * 0.22 : 0.55 + i * 0.14) + 0.02,
+      kind: 'blip' as const,
+      gain: 0.45,
+      pitch: i * 2,
+    })),
+    { t: dur - (pixel ? 0.6 : 0.95), kind: 'swoosh' },
+  ],
 });
