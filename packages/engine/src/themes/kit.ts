@@ -1,5 +1,11 @@
 /** Drawing helpers shared by the theme implementations. */
-import type { Ctx2D } from '../canvas.ts';
+import {
+  type Ctx2D,
+  context2d,
+  createSurface,
+  type DrawableSurface,
+  onCanvasConfigured,
+} from '../canvas.ts';
 import { clamp } from '../math.ts';
 
 export interface Point {
@@ -39,6 +45,70 @@ export function fillTracked(
     c.fillText(ch, cursor, y);
     cursor += c.measureText(ch).width + tracking;
   }
+  return width;
+}
+
+interface GlowSprite {
+  readonly surface: DrawableSurface;
+  /** Where the text origin sits inside the sprite, in sprite pixels. */
+  readonly ox: number;
+  readonly oy: number;
+}
+
+const glowCache = new Map<string, GlowSprite>();
+const GLOW_CACHE_SIZE = 64;
+onCanvasConfigured(() => glowCache.clear());
+
+/**
+ * Tracked text with a glow, like `fillTracked` under `shadowBlur`, but drawn
+ * once into a sprite and reused on later frames. Blurring small glyphs is
+ * very slow in some browsers (Firefox spends milliseconds per glyph on some
+ * fonts), and a label repeats on every frame of an export.
+ */
+export function fillTrackedGlow(
+  c: Ctx2D,
+  text: string,
+  x: number,
+  y: number,
+  font: string,
+  color: string,
+  tracking: number,
+  blur: number,
+): number {
+  const m = c.getTransform();
+  // Device pixels per unit: the sprite is drawn at the size it lands at.
+  const scale = Math.hypot(m.a, m.b) || 1;
+  const width = trackedWidth(c, text, font, tracking);
+  const key = [text, font, color, tracking, blur, scale.toFixed(4)].join('|');
+  let sprite = glowCache.get(key);
+  if (!sprite) {
+    c.font = font;
+    const metrics = c.measureText(text);
+    const ascent = Math.ceil(metrics.actualBoundingBoxAscent) + 2;
+    const descent = Math.ceil(metrics.actualBoundingBoxDescent) + 2;
+    // shadowBlur works in device pixels; leave room for it on every side.
+    const pad = blur * 2 + 2;
+    const surface = createSurface(
+      Math.ceil(width * scale + pad * 2),
+      Math.ceil((ascent + descent) * scale + pad * 2),
+    );
+    const g = context2d(surface);
+    g.translate(pad, pad + ascent * scale);
+    g.scale(scale, scale);
+    g.shadowColor = color;
+    g.shadowBlur = blur;
+    fillTracked(g, text, 0, 0, font, color, tracking);
+    sprite = { surface, ox: pad, oy: pad + ascent * scale };
+    if (glowCache.size >= GLOW_CACHE_SIZE) glowCache.clear();
+    glowCache.set(key, sprite);
+  }
+  c.drawImage(
+    sprite.surface,
+    x - sprite.ox / scale,
+    y - sprite.oy / scale,
+    sprite.surface.width / scale,
+    sprite.surface.height / scale,
+  );
   return width;
 }
 

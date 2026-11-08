@@ -6,7 +6,13 @@
 import { clamp, easeIn, easeOutExpo } from '../math.ts';
 import type { VectorTheme } from '../theme.ts';
 import { roundRectPath } from '../vector/draw.ts';
-import { chamferPath, cornerBrackets, fillTracked, partialPolyline, trackedWidth } from './kit.ts';
+import {
+  chamferPath,
+  cornerBrackets,
+  fillTrackedGlow,
+  partialPolyline,
+  trackedWidth,
+} from './kit.ts';
 import { SEMANTIC_COLORS } from './semantic.ts';
 
 const GLASS = 'rgba(8,12,18,.86)';
@@ -104,11 +110,7 @@ export const tech: VectorTheme = {
     c.strokeStyle = accent;
     c.lineWidth = 1.5;
     c.stroke();
-    c.save();
-    c.shadowColor = accent;
-    c.shadowBlur = 8;
-    fillTracked(c, label, x + size * 0.6, y + h * 0.68, font, accent, tracking);
-    c.restore();
+    fillTrackedGlow(c, label, x + size * 0.6, y + h * 0.68, font, accent, tracking, 8);
     return { w, h };
   },
 
@@ -143,43 +145,55 @@ export const tech: VectorTheme = {
     const gap = 4;
     const seg = (w - gap * (count - 1)) / count;
     const filled = clamp(value) * count;
+    c.fillStyle = 'rgba(255,255,255,.1)';
+    for (let i = 0; i < count; i++) c.fillRect(x + i * (seg + gap), y, seg, h);
+    // Every lit segment in one path, so the glow is blurred once, not per segment.
+    c.beginPath();
     for (let i = 0; i < count; i++) {
-      const sx = x + i * (seg + gap);
-      c.fillStyle = 'rgba(255,255,255,.1)';
-      c.fillRect(sx, y, seg, h);
       const part = clamp(filled - i);
-      if (part <= 0) continue;
-      c.save();
-      c.shadowColor = color;
-      c.shadowBlur = 10;
-      c.fillStyle = color;
-      c.fillRect(sx, y, seg * part, h);
-      c.restore();
+      if (part > 0) c.rect(x + i * (seg + gap), y, seg * part, h);
     }
+    c.save();
+    c.shadowColor = color;
+    c.shadowBlur = 10;
+    c.fillStyle = color;
+    c.fill();
+    c.restore();
   },
 
   ring(c, cx, cy, r, value, color) {
     const count = 40;
     const filled = clamp(value) * count;
     c.lineWidth = 14;
-    for (let i = 0; i < count; i++) {
+    const arc = (i: number) => {
       const a0 = -Math.PI / 2 + (i / count) * Math.PI * 2 + 0.03;
       const a1 = -Math.PI / 2 + ((i + 1) / count) * Math.PI * 2 - 0.03;
-      c.beginPath();
+      c.moveTo(cx + Math.cos(a0) * r, cy + Math.sin(a0) * r);
       c.arc(cx, cy, r, a0, a1);
-      if (i < filled) {
-        c.save();
-        c.strokeStyle = color;
-        c.shadowColor = color;
-        c.shadowBlur = 12;
-        c.globalAlpha *= i + 1 <= filled ? 1 : filled - i;
-        c.stroke();
-        c.restore();
-      } else {
-        c.strokeStyle = 'rgba(255,255,255,.1)';
-        c.stroke();
-      }
+    };
+    const whole = Math.floor(filled);
+    // Unlit segments, then the lit ones as one path (one blur, not forty),
+    // then the segment that is still filling, fading in.
+    c.beginPath();
+    for (let i = Math.ceil(filled); i < count; i++) arc(i);
+    c.strokeStyle = 'rgba(255,255,255,.1)';
+    c.stroke();
+    c.save();
+    c.strokeStyle = color;
+    c.shadowColor = color;
+    c.shadowBlur = 12;
+    if (whole > 0) {
+      c.beginPath();
+      for (let i = 0; i < whole; i++) arc(i);
+      c.stroke();
     }
+    if (filled > whole) {
+      c.globalAlpha *= filled - whole;
+      c.beginPath();
+      arc(whole);
+      c.stroke();
+    }
+    c.restore();
     // Outer scale with four ticks.
     c.strokeStyle = 'rgba(255,255,255,.22)';
     c.lineWidth = 1.5;
