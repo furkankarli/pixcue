@@ -4,6 +4,7 @@
 
 [![CI](https://github.com/furkankarli/pixcue/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/furkankarli/pixcue/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Sponsor](https://img.shields.io/badge/sponsor-%E2%99%A5-ea4aaa.svg)](https://github.com/sponsors/furkankarli)
 
 > [!NOTE]
 > Pixcue is under active development and v0.1 has not been released yet. The
@@ -218,6 +219,12 @@ Not part of v0.1, planned for later:
 
 Ideas and votes are welcome in
 [Discussions](https://github.com/furkankarli/pixcue/discussions).
+
+## Support Pixcue
+
+Pixcue is free and stays free, with no accounts and no ads. If it saves you
+time, you can support its development through
+[GitHub Sponsors](https://github.com/sponsors/furkankarli).
 
 ## License
 
