@@ -11,12 +11,13 @@ export interface EditorProfile {
 
 /**
  * Which format to export for each video editor. MOV keeps a real alpha
- * channel; apps without reliable alpha import get a chroma-key MP4.
+ * channel; apps without reliable alpha import get a chroma-key MP4. Every
+ * editor also offers the MP4, the one file phones and messaging apps open.
  */
 export const EDITORS = {
-  davinci: { formats: ['mov', 'png-sequence'], mobile: false },
-  premiere: { formats: ['mov', 'png-sequence'], mobile: false },
-  'final-cut': { formats: ['mov', 'png-sequence'], mobile: false },
+  davinci: { formats: ['mov', 'png-sequence', 'mp4-key'], mobile: false },
+  premiere: { formats: ['mov', 'png-sequence', 'mp4-key'], mobile: false },
+  'final-cut': { formats: ['mov', 'png-sequence', 'mp4-key'], mobile: false },
   'capcut-desktop': { formats: ['mp4-key', 'mov'], mobile: false },
   'capcut-mobile': { formats: ['mp4-key'], mobile: true },
   edits: { formats: ['mp4-key'], mobile: true },

@@ -20,6 +20,7 @@ export default defineLocale({
         presets: 'Kayıtlı',
         export: 'Dışa aktar',
         menu: 'Menü',
+        view: 'Görünüm',
       },
       formats: {
         youtube: 'YouTube',
@@ -45,6 +46,21 @@ export default defineLocale({
         style: 'Stil',
         layout: 'Yerleşim',
       },
+      status: {
+        openSource: 'GitHub’da açık kaynak',
+        local: 'Tarayıcında çalışır, hiçbir şey yüklenmez.',
+        newTab: '(yeni sekmede açılır)',
+        madeBy: 'Yapan',
+      },
+      sheet: {
+        tools: 'Araçlar',
+        close: 'Paneli kapat',
+      },
+      timeline: {
+        label: 'Zaman çizelgesi',
+        toStart: 'Başa dön',
+        playhead: 'Oynatma kafası',
+      },
       stage: {
         label: 'Önizleme',
         play: 'Oynat',
@@ -59,7 +75,7 @@ export default defineLocale({
           dark: 'Koyu',
           light: 'Açık',
         },
-        dragHint: 'Grafiği sürükleyerek taşı. Çift tıklayınca konumu sıfırlanır.',
+        dragHint: 'Sürükle ya da ok tuşlarıyla taşı. Home sıfırlar.',
         loading: 'Fontlar yükleniyor…',
       },
       style: {
@@ -72,6 +88,9 @@ export default defineLocale({
         },
         accent: 'Vurgu rengi',
         customColor: 'Özel renk',
+        colorArea: 'Doygunluk ve parlaklık',
+        colorHue: 'Renk tonu',
+        colorHex: 'Hex renk kodu',
         resetColor: 'Temanın rengine dön',
         font: 'Başlık fontu',
         themeFont: 'Temanın fontu',
@@ -109,6 +128,8 @@ export default defineLocale({
         editorQuestion: 'Hangi editörü kullanıyorsun?',
         format: 'Format',
         recommended: 'Önerilen',
+        phoneHint:
+          'Telefona ya da mesajlaşma uygulamasıyla mı göndereceksin? MP4’ü seç: telefonlar saydam MOV, WebM ve PNG dosyalarını açamaz.',
         editors: {
           davinci: 'DaVinci Resolve',
           premiere: 'Premiere Pro',
@@ -187,7 +208,9 @@ export default defineLocale({
         packaging: 'Dosya paketleniyor…',
         done: 'Hazır: {file}',
         download: 'Tekrar indir',
-        share: 'Telefona kaydet veya paylaş',
+        share: 'Galeriye kaydet veya paylaş',
+        saveToFiles: 'Dosyalar’a kaydet',
+        shareHint: 'iPhone’da Fotoğraflar’a eklemek için Videoyu Kaydet’i seç.',
         unsupported:
           "Bu tarayıcı bu formatı kodlayamıyor. Şeffaf MOV'u veya PNG sekansını seç ya da Chrome veya Edge ile dene.",
         failed: 'Dışa aktarım başarısız oldu. Tekrar dene veya başka bir format seç.',
@@ -271,7 +294,13 @@ export default defineLocale({
           done: 'Tıklandıktan sonraki yazı',
           like: 'Beğeni butonu',
           bell: 'Bildirim zili',
-          cursor: 'Fare imleci',
+          pointer: 'İşaretçi',
+          pointerHelp:
+            'Otomatik: telefonda izlenen dikey ve kare formatlarda parmakla dokunma, yatay videoda fare imleci gösterir.',
+          pointerAuto: 'Otomatik',
+          pointerCursor: 'Fare',
+          pointerTap: 'Dokunma',
+          pointerNone: 'Yok',
         },
         sample: {
           subscribe: 'Abone ol',
@@ -308,6 +337,12 @@ export default defineLocale({
           consTitle: 'Eksiler başlığı',
           cons: 'Eksiler',
           item: 'Madde',
+          arrangement: 'Dizilim',
+          arrangementHelp:
+            'Otomatik: sığdığında paneller yan yana durur, dikey ve kare videoda üst üste dizilir.',
+          arrangementAuto: 'Otomatik',
+          arrangementSide: 'Yan yana',
+          arrangementStacked: 'Üst üste',
         },
         sample: {
           prosTitle: 'Artılar',

@@ -91,9 +91,8 @@ const vector: VectorScene<${n.pascal}Fields> = {
     const show = envelope(t, duration, 0, 0.5, 0.4, 0);
     if (show <= 0) return;
     withAlpha(c, show, () => {
-      theme.panel(c, 0, 0, box.w, box.h);
-      c.fillStyle = accent;
-      c.fillRect(0, box.h - 8, box.w * show, 8);
+      theme.card(c, 0, 0, box.w, box.h, accent);
+      theme.rule(c, 0, box.h - 8, box.w * show, 8, accent);
       const font = themeFont(theme, 'display', 64);
       const title = themeCase(theme, fields.title, locale);
       theme.heading(c, title, box.w / 2, 104 + (1 - show) * 20, font, 'center', theme.colors.text, accent);
@@ -117,7 +116,7 @@ const pixel: PixelScene<${n.pascal}Fields, PixelBox> = {
 
   draw(P, t, { accent, duration, box }) {
     // Pop in from the second frame (so the first stays empty), pop out at the end.
-    const k = popScale(t, 1 / 30, duration - 0.3, P.px);
+    const k = popScale(t, 1 / 30, duration - 0.55, P.px);
     if (k === 0) return;
     const panel = pixelPanel(box.w, box.h - 3, PIXEL_PANEL_FILL);
     if (k !== P.px) {
@@ -126,7 +125,7 @@ const pixel: PixelScene<${n.pascal}Fields, PixelBox> = {
     }
     P.img(panel, 0, 0);
     P.rect(4, 4, 2, box.h - 11, accent);
-    P.text(box.title, 8, 3, typedVisible(t, 0.3, box.title.length, duration - 0.6));
+    P.text(box.title, 8, 3, typedVisible(t, 0.3, box.title.length, duration - 1.1));
   },
 };
 

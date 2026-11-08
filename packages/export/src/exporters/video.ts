@@ -82,17 +82,31 @@ export function videoBitrate(width: number, height: number, fps: number, base = 
   return Math.round(Math.min(120e6, Math.max(8e6, base * scale)));
 }
 
+/**
+ * The first supported configuration. A hardware encoder comes first (phones
+ * have one and it is many times faster); without one, the software encoder
+ * runs in its faster realtime mode, which at these bitrates loses nothing
+ * visible on flat graphics.
+ */
 async function pickConfig(
   codecs: WebCodecsApi,
   candidates: readonly string[],
   base: Omit<VideoEncoderConfig, 'codec'>,
 ): Promise<VideoEncoderConfig | null> {
-  for (const codec of candidates) {
-    try {
-      const result = await codecs.VideoEncoder.isConfigSupported({ ...base, codec });
-      if (result.supported) return result.config ?? { ...base, codec };
-    } catch {
-      // Malformed or unknown codec string: try the next one.
+  const modes: Partial<VideoEncoderConfig>[] = [
+    { hardwareAcceleration: 'prefer-hardware', latencyMode: 'quality' },
+    { latencyMode: 'realtime' },
+    {},
+  ];
+  for (const mode of modes) {
+    for (const codec of candidates) {
+      const config = { ...base, ...mode, codec };
+      try {
+        const result = await codecs.VideoEncoder.isConfigSupported(config);
+        if (result.supported) return result.config ?? config;
+      } catch {
+        // Malformed or unknown codec string: try the next one.
+      }
     }
   }
   return null;
@@ -145,17 +159,17 @@ async function encodeFrames(
   try {
     encoder.configure(config);
     let composed: FrameImage | undefined;
+    const gpu = options.background
+      ? (platform.colorComposer?.(source.width, source.height) ?? null)
+      : null;
     await forEachFrame(source, options, async (canvas, i) => {
       if (failure) throw failure;
       let image = canvas;
       if (options.background) {
-        composed = frameOnColor(
-          canvas,
-          options.background.color,
-          options.background.hardEdges,
-          platform,
-          composed,
-        );
+        const { color, hardEdges } = options.background;
+        composed = gpu
+          ? gpu.compose(canvas, color, hardEdges)
+          : frameOnColor(canvas, color, hardEdges, platform, composed);
         image = composed;
       }
       const frame = new codecs.VideoFrame(image, {
@@ -191,7 +205,6 @@ export async function exportMp4(
         height,
         framerate: fps,
         bitrate: videoBitrate(width, height, fps, options.background ? 20e6 : 24e6),
-        latencyMode: 'quality',
         avc: { format: 'avc' },
       })
     : null;
@@ -218,7 +231,6 @@ export async function exportWebm(
         height,
         framerate: fps,
         bitrate: videoBitrate(width, height, fps, options.background ? 20e6 : 24e6),
-        latencyMode: 'quality',
         alpha: transparent ? 'keep' : 'discard',
       })
     : null;

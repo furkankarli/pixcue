@@ -12,4 +12,23 @@ describe('pros and cons', () => {
       expect(tall.height).toBeGreaterThan(tall.width);
     },
   );
+
+  it.each(['tech', 'pixel'] as const)('follows a chosen arrangement (%s)', (theme) => {
+    const side = renderFrame({
+      template: prosCons,
+      theme,
+      preset: 'vertical',
+      t: 3,
+      overrides: { arrangement: 'side' },
+    }).bounds;
+    const stacked = renderFrame({
+      template: prosCons,
+      theme,
+      preset: 'youtube',
+      t: 3,
+      overrides: { arrangement: 'stacked' },
+    }).bounds;
+    expect(side.width).toBeGreaterThan(side.height);
+    expect(stacked.height).toBeGreaterThan(stacked.width);
+  });
 });

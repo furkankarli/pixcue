@@ -1,8 +1,9 @@
 import { THEME_IDS, THEMES, type ThemeId } from '@pixcue/engine';
-import { createUniqueId, For, Show } from 'solid-js';
+import { createSignal, createUniqueId, For, Show } from 'solid-js';
 import { FONTS } from '../fonts.ts';
 import { t } from '../i18n.ts';
 import { actions, state, theme } from '../store.ts';
+import { ColorPicker } from '../ui/ColorPicker.tsx';
 
 /** Quick accent choices; any color can be picked too. */
 const SWATCHES = [
@@ -18,6 +19,8 @@ const SWATCHES = [
 
 export function StylePanel() {
   const fontId = createUniqueId();
+  const pickerId = createUniqueId();
+  const [pickerOpen, setPickerOpen] = createSignal(false);
   const accentOverride = () => state.accents[state.theme];
   return (
     <div class="panel-stack">
@@ -61,15 +64,30 @@ export function StylePanel() {
               </label>
             )}
           </For>
-          <label class="swatch custom" title={t('editor.style.customColor')}>
-            <input
-              type="color"
-              value={theme().accent.toLowerCase()}
-              onInput={(e) => actions.setAccent(e.currentTarget.value)}
-            />
-            <span class="visually-hidden">{t('editor.style.customColor')}</span>
-          </label>
+          <button
+            type="button"
+            class="swatch custom"
+            classList={{ open: pickerOpen() }}
+            title={t('editor.style.customColor')}
+            aria-label={t('editor.style.customColor')}
+            aria-expanded={pickerOpen()}
+            aria-controls={pickerId}
+            onClick={() => setPickerOpen((o) => !o)}
+          />
         </div>
+        <Show when={pickerOpen()}>
+          <div id={pickerId}>
+            <ColorPicker
+              value={theme().accent}
+              onChange={(hex) => actions.setAccent(hex)}
+              labels={{
+                area: t('editor.style.colorArea'),
+                hue: t('editor.style.colorHue'),
+                hex: t('editor.style.colorHex'),
+              }}
+            />
+          </div>
+        </Show>
         <Show when={accentOverride()}>
           <button type="button" class="link-button" onClick={() => actions.setAccent(null)}>
             {t('editor.style.resetColor')}

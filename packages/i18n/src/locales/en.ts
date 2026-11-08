@@ -24,6 +24,7 @@ export default {
         presets: 'Saved',
         export: 'Export',
         menu: 'Menu',
+        view: 'View',
       },
       formats: {
         youtube: 'YouTube',
@@ -49,6 +50,21 @@ export default {
         style: 'Style',
         layout: 'Layout',
       },
+      status: {
+        openSource: 'Open source on GitHub',
+        local: 'Runs in your browser. Nothing is uploaded.',
+        newTab: '(opens in a new tab)',
+        madeBy: 'Made by',
+      },
+      sheet: {
+        tools: 'Tools',
+        close: 'Close panel',
+      },
+      timeline: {
+        label: 'Timeline',
+        toStart: 'Go to start',
+        playhead: 'Playhead',
+      },
       stage: {
         label: 'Preview',
         play: 'Play',
@@ -63,7 +79,7 @@ export default {
           dark: 'Dark',
           light: 'Light',
         },
-        dragHint: 'Drag the graphic to move it. Double-click resets the position.',
+        dragHint: 'Drag or use the arrow keys to move it. Home resets.',
         loading: 'Loading fonts…',
       },
       style: {
@@ -76,6 +92,9 @@ export default {
         },
         accent: 'Accent color',
         customColor: 'Custom color',
+        colorArea: 'Saturation and brightness',
+        colorHue: 'Hue',
+        colorHex: 'Hex color',
         resetColor: 'Use theme color',
         font: 'Title font',
         themeFont: 'Theme font',
@@ -113,6 +132,8 @@ export default {
         editorQuestion: 'Which editor do you use?',
         format: 'Format',
         recommended: 'Recommended',
+        phoneHint:
+          'Sending it to a phone or through a messaging app? Choose the MP4: phones cannot open transparent MOV, WebM or PNG files.',
         editors: {
           davinci: 'DaVinci Resolve',
           premiere: 'Premiere Pro',
@@ -190,7 +211,9 @@ export default {
         packaging: 'Packaging the file…',
         done: 'Ready: {file}',
         download: 'Download again',
-        share: 'Save to phone or share',
+        share: 'Save to gallery or share',
+        saveToFiles: 'Save to Files',
+        shareHint: 'On iPhone, choose Save Video to put it in Photos.',
         unsupported:
           'This browser cannot encode this format. Choose the transparent MOV or the PNG sequence, or try Chrome or Edge.',
         failed: 'The export failed. Try again or choose another format.',
@@ -274,7 +297,13 @@ export default {
           done: 'Text after the click',
           like: 'Like button',
           bell: 'Notification bell',
-          cursor: 'Mouse pointer',
+          pointer: 'Pointer',
+          pointerHelp:
+            'Automatic shows a finger tap in vertical and square formats, which are watched on phones, and a mouse pointer in horizontal video.',
+          pointerAuto: 'Automatic',
+          pointerCursor: 'Mouse',
+          pointerTap: 'Tap',
+          pointerNone: 'None',
         },
         sample: {
           subscribe: 'Subscribe',
@@ -311,6 +340,12 @@ export default {
           consTitle: 'Cons title',
           cons: 'Cons',
           item: 'Item',
+          arrangement: 'Arrangement',
+          arrangementHelp:
+            'Automatic puts the panels side by side when they fit and stacks them in vertical and square video.',
+          arrangementAuto: 'Automatic',
+          arrangementSide: 'Side by side',
+          arrangementStacked: 'Stacked',
         },
         sample: {
           prosTitle: 'Pros',

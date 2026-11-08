@@ -10,8 +10,8 @@ build/
 .wrangler/
 coverage/
 .vitest-attachments/
-**/__snapshots__/__diff__/
-**/__snapshots__/__actual__/
+**/__snapshots__/**/__diff__/
+**/__snapshots__/**/__actual__/
 
 # Local environment and secrets
 .env

@@ -1,16 +1,31 @@
-import { createEffect, createSignal, Show } from 'solid-js';
+/**
+ * The editor shell. Wide screens: the template library, the stage and the
+ * inspector side by side, with the timeline below. Phones: the stage fills
+ * the screen and a bar of tools along the bottom opens one panel at a time.
+ * Both share the top bar: format, name, menu and Export.
+ */
+import { createEffect, createSignal, onCleanup, Show } from 'solid-js';
 import { ExportDialog } from './components/ExportDialog.tsx';
-import { FormatPicker } from './components/FormatPicker.tsx';
 import { Inspector } from './components/Inspector.tsx';
-import { LanguagePicker } from './components/LanguagePicker.tsx';
 import { Library } from './components/Library.tsx';
+import { MobileTools } from './components/MobileTools.tsx';
 import { PresetsDialog } from './components/PresetsDialog.tsx';
-import { ShareButton } from './components/ShareButton.tsx';
 import { Stage } from './components/Stage.tsx';
+import { Timeline } from './components/Timeline.tsx';
+import { TopBar } from './components/TopBar.tsx';
 import { Transport } from './components/Transport.tsx';
 import { locale, t } from './i18n.ts';
 import { wide } from './media.ts';
-import { BookmarkIcon, DownloadIcon } from './ui/icons.tsx';
+import { togglePlay } from './playback.ts';
+import { Toast } from './ui/toast.tsx';
+
+/** Whether a key press belongs to a control that uses the key itself. */
+const ownsKeys = (target: EventTarget | null) =>
+  target instanceof HTMLElement &&
+  (target.isContentEditable ||
+    target.closest(
+      'input, textarea, select, button, [role="slider"], [role="tab"], [role="application"], dialog, [popover]',
+    ) !== null);
 
 export function App() {
   const [exporting, setExporting] = createSignal(false);
@@ -19,54 +34,54 @@ export function App() {
     document.documentElement.lang = locale();
   });
 
+  // Space plays and pauses, as in every video editor.
+  const onKey = (e: KeyboardEvent) => {
+    if (e.code !== 'Space' || e.repeat || ownsKeys(e.target)) return;
+    if (exporting() || presetsOpen()) return;
+    e.preventDefault();
+    togglePlay();
+  };
+  document.addEventListener('keydown', onKey);
+  onCleanup(() => document.removeEventListener('keydown', onKey));
+
+  const stage = (
+    <section class="stage-column" aria-label={t('editor.stage.label')}>
+      <Stage hintId="stage-hint" />
+      <Transport hintId="stage-hint" />
+    </section>
+  );
+
   return (
-    <div class="app">
-      <header class="topbar">
-        <span class="brand">Pixcue</span>
-        <FormatPicker />
-        <div class="topbar-actions">
-          <ShareButton />
-          <button
-            type="button"
-            class="button responsive"
-            onClick={() => setPresetsOpen(true)}
-            aria-label={t('editor.topbar.presets')}
-          >
-            <BookmarkIcon />
-            <span class="button-label">{t('editor.topbar.presets')}</span>
-          </button>
-          <span class="wide-only">
-            <LanguagePicker />
-          </span>
-          <button type="button" class="button primary" onClick={() => setExporting(true)}>
-            <DownloadIcon />
-            {t('editor.topbar.export')}
-          </button>
-        </div>
-      </header>
-      <main class="workspace">
-        <Show when={wide()}>
-          <aside class="side-panel library-panel" aria-label={t('editor.tabs.templates')}>
-            <h2 class="panel-title">{t('editor.tabs.templates')}</h2>
-            <Library />
+    <div class="app" classList={{ phone: !wide() }}>
+      <TopBar onExport={() => setExporting(true)} onPresets={() => setPresetsOpen(true)} />
+
+      <Show
+        when={wide()}
+        fallback={
+          <main class="workspace phone">
+            {stage}
+            <MobileTools />
+          </main>
+        }
+      >
+        <main class="workspace">
+          <aside class="panel library-panel" aria-labelledby="library-title">
+            <h2 class="panel-title" id="library-title">
+              {t('editor.tabs.templates')}
+            </h2>
+            <div class="panel-scroll">
+              <Library />
+            </div>
           </aside>
-        </Show>
-        <section class="stage-column" aria-label={t('editor.stage.label')}>
-          <Stage />
-          <Transport />
-          <p class="hint">{t('editor.stage.dragHint')}</p>
-        </section>
-        <aside class="side-panel inspector-panel">
-          <Inspector
-            tabs={
-              wide() ? ['content', 'style', 'layout'] : ['templates', 'content', 'style', 'layout']
-            }
-          />
-        </aside>
-      </main>
-      <footer class="app-footer narrow-only">
-        <LanguagePicker />
-      </footer>
+          {stage}
+          <Timeline />
+          <aside class="panel inspector-panel">
+            <Inspector tabs={['content', 'style', 'layout']} />
+          </aside>
+        </main>
+      </Show>
+
+      <Toast />
       <ExportDialog open={exporting()} onClose={() => setExporting(false)} />
       <PresetsDialog open={presetsOpen()} onClose={() => setPresetsOpen(false)} />
     </div>

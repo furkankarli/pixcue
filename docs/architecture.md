@@ -48,7 +48,7 @@ Rules that keep this healthy:
             │
             ▼
  Frame { width, height, orientation, safeArea }   ← engine presets + safe-areas config
- Theme { fonts, colors, panel, button }           ← engine themes + user accent/font
+ Theme { fonts, colors, motion, card, chip, … }   ← engine themes + user accent/font
  Fields = defaults(locale, platform) + user edits ← templates: resolveFields (validated)
             │
             ▼
@@ -103,7 +103,8 @@ A template's drawing code is a `Scene` with two parts, one per rendering path:
 
 - **Vector** (tech, pop, sade): `measure` returns the graphic's natural size in
   design units, then `draw` paints one frame with Canvas 2D, taking fonts,
-  colors, panels, buttons and headings from the theme.
+  colors, motion and every surface (cards, chips, meters, reveals…) from the
+  theme's kit, described in [themes.md](themes.md).
 - **Pixel**: `measure` returns a size in grid cells, then `draw` paints with a
   `Painter` on a low-resolution grid that is scaled up without smoothing (6
   output pixels per cell at 1080p). Sprites that "pop" are drawn afterwards at
@@ -177,9 +178,19 @@ they keep following the defaults for the user's language and the platform.
 - **Preview-only settings** (safe area, app UI mock, stage background) are
   separate browser preferences and are not shared.
 
-The preview renders at its on-screen size with `scaleFrame`, which keeps
-playback smooth on phones; exports render at the full frame size. Fonts are
-self-hosted through Fontsource, and canvases redraw once they have loaded.
+The preview renders near its on-screen size with `scaleFrame`, but never
+below 720 pixels on the short side, so the pixel theme keeps enough grid
+cells for its pops to step smoothly; exports render at the full frame size.
+
+The editor keeps slow phones in mind:
+
+- On touch devices the preview draws 30 frames per second, the usual export
+  rate and the pixel theme's step.
+- Library thumbnails and the timeline's filmstrip redraw when the browser is
+  idle, and thumbnails render smaller on phones.
+- The export pipeline (frame loop, encoders, muxers) is a separate chunk that
+  loads when an export starts. Fonts are
+  self-hosted through Fontsource, and canvases redraw once they have loaded.
 
 ## Hosting
 

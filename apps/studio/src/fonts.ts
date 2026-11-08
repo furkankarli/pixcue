@@ -82,6 +82,7 @@ const THEME_FACES = [
   '500 40px Manrope',
   '700 40px Manrope',
   '800 40px Manrope',
+  '700 40px "JetBrains Mono"',
 ];
 
 /** Resolves when the theme fonts are ready to draw on a canvas. */

@@ -25,7 +25,7 @@
   (1080×1080). Vertical layouts stay clear of platform buttons and captions.
 - **Themes:** tech, pop, sade and pixel (with hand-made bitmap fonts). Change
   the accent color and pick from fonts with full Turkish support.
-- **Exports for your editor:** transparent MOV, green-screen MP4, transparent
+- **Exports for your editor:** transparent MOV, chroma-key MP4, transparent
   WebM or a PNG sequence. Pixcue asks which editor you use and picks the format.
 - **Platform-aware copy:** "Subscribe" on YouTube, "Follow" on TikTok and
   Instagram, in English and Turkish.
@@ -35,19 +35,87 @@
 
 ## Supported editors
 
-| Editor             | Format Pixcue exports                    | Transparency  |
+| Editor             | Format Pixcue recommends                 | Transparency  |
 | ------------------ | ---------------------------------------- | ------------- |
 | DaVinci Resolve    | MOV (PNG codec)                          | Alpha channel |
 | Adobe Premiere Pro | MOV (PNG codec)                          | Alpha channel |
 | Final Cut Pro      | MOV (PNG codec)                          | Alpha channel |
-| CapCut (desktop)   | MP4 (H.264) on a green screen            | Chroma key    |
-| CapCut (mobile)    | MP4 (H.264) on a green screen            | Chroma key    |
-| Instagram Edits    | MP4 (H.264) on a green screen            | Chroma key    |
+| CapCut (desktop)   | MP4 (H.264) on a key color               | Chroma key    |
+| CapCut (phone)     | MP4 (H.264) on a key color               | Chroma key    |
+| Instagram Edits    | MP4 (H.264) on a key color               | Chroma key    |
 | Anything else      | WebM (VP9 + alpha) or PNG sequence (zip) | Alpha channel |
 
-The green screen color (green, blue or magenta) is selectable, and a
-chroma-key mode removes soft shadows and semi-transparent edges so keying stays
+Every editor can also get the MP4. It is the one file phones and messaging
+apps open, so choose it whenever the graphic travels to a phone. Pixcue picks
+a key color (green, blue or magenta) that the graphic does not use, and a
+chroma-key mode removes soft shadows and see-through edges so keying stays
 clean.
+
+## Using the file in your editor
+
+Export at the frame rate of your project (30 fps unless you know otherwise),
+then follow the steps for your editor.
+
+### DaVinci Resolve
+
+1. Import the MOV into the Media Pool and drag it onto a video track above
+   your footage.
+2. The background is already transparent; no keying is needed.
+3. If you see a black box instead, right-click the clip in the Media Pool,
+   open **Clip Attributes** and set **Alpha Mode** to **Straight**.
+
+### Adobe Premiere Pro
+
+1. Import the MOV and place it on a track above your clip (for example V2).
+2. Premiere reads the alpha channel on its own.
+3. If the background shows, right-click the clip in the Project panel and
+   check the alpha settings under **Modify → Interpret Footage**.
+
+### Final Cut Pro
+
+1. Import the MOV and connect it above your clip in the timeline.
+2. It keeps its transparency.
+
+### CapCut (desktop)
+
+1. Import the MP4 and drag it onto a track above your video.
+2. In the clip's video settings, turn on **Chroma key**, pick the background
+   color with the color picker and raise the strength until it disappears.
+3. Keep Pixcue's chroma-key mode on for the cleanest edges.
+
+### CapCut (phone)
+
+1. Export on your phone and tap **Share** to save the video, or send the MP4
+   from your computer. A MOV or WebM will not open on a phone.
+2. In CapCut, add the video with **Overlay**, then open its background
+   removal options, choose **Chroma key**, pick the background color and
+   adjust the strength.
+
+### Instagram Edits
+
+1. Save the MP4 to your phone, as for CapCut.
+2. Add it as an overlay and remove the background color with the chroma key
+   tool.
+
+### Other editors
+
+1. Choose the transparent WebM if your editor reads VP9 with alpha; it gives
+   small files.
+2. Otherwise choose the PNG sequence, unzip it and import the frames as one
+   image sequence clip at your project's frame rate.
+
+### When something looks wrong
+
+- **The file will not download on a phone, or a messaging app rejects it:**
+  export the MP4. Phones cannot open transparent MOV, WebM or PNG files.
+- **Playback stutters in a media player:** a transparent MOV is meant for
+  editors, not players; at 60 fps and 1080p it is too heavy for most players.
+  Check it in your editor instead.
+- **Keying leaves holes in the graphic:** pick another key color. Pixcue warns
+  you when the graphic uses the one you chose.
+- **The graphic sits under platform buttons in a vertical video:** turn on
+  **Safe area** and **App buttons** in the **View** menu under the preview,
+  then move the graphic with the mouse, the arrow keys or the **Layout** tool.
 
 ## Quick start for creators
 
@@ -55,10 +123,11 @@ clean.
 2. Choose your video format, for example YouTube or Shorts.
 3. Pick a template and a theme, then fill in the text.
 4. Press **Export**, choose your editor and download the file.
-5. Put the file on a track above your video in your editor.
+5. Put the file on a track above your video in your editor. The steps for
+   each editor are under [Using the file in your editor](#using-the-file-in-your-editor).
 
-On a phone, Pixcue offers to share the video straight to your gallery or to
-CapCut.
+On a phone, the finished video opens the share sheet: choose **Save Video**
+on iPhone to put it in Photos, or send it straight to CapCut.
 
 ## Quick start for contributors
 

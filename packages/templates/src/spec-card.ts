@@ -3,14 +3,15 @@
  * right. Right-aligned in horizontal video, centered otherwise.
  */
 import {
-  accentTextColor,
-  blockReveal,
   clamp,
+  drawLabel,
   easeIn,
   easeInOut,
   easeOut,
   envelope,
   fillTextAt,
+  labelColor,
+  labelWidth,
   linear,
   PIXEL_PANEL_FILL,
   type PixelScene,
@@ -65,6 +66,8 @@ export type SpecCardFields = FieldValues<typeof fields>;
 const ROW_H = 104;
 const ROWS_Y = 118;
 
+const LABEL_SIZE = 19;
+
 const vector: VectorScene<SpecCardFields> = {
   measure(c, { fields, theme, locale }) {
     let m = textWidth(c, themeCase(theme, fields.header, locale), themeFont(theme, 'display', 34));
@@ -72,7 +75,7 @@ const vector: VectorScene<SpecCardFields> = {
       m = Math.max(
         m,
         textWidth(c, row.value, themeFont(theme, 'body', 36, 800)) + 20,
-        textWidth(c, upper(row.label, locale), themeFont(theme, 'body', 20, 800)),
+        labelWidth(c, theme, row.label, LABEL_SIZE, locale),
       );
     }
     return { w: Math.max(560, m + 100), h: ROWS_Y + fields.rows.length * ROW_H + 18 };
@@ -80,34 +83,17 @@ const vector: VectorScene<SpecCardFields> = {
 
   draw(c, t, { fields, theme, accent, locale, duration: dur, box }) {
     const { w, h } = box;
+    const { enter, exit } = theme.motion;
     const rows = fields.rows;
-    const pan = envelope(t, dur, 0, 0.6, 0.95, 0.4);
-    const head = envelope(t, dur, 0.35, 0.8, 0.75, 0.5);
-    const clipX = w - (w + 40) * pan;
+    const pan = envelope(t, dur, 0, 0.6, 0.95, 0.4, enter, exit);
+    const head = envelope(t, dur, 0.35, 0.8, 0.75, 0.5, enter, exit);
 
-    // The panel wipes in from the right edge. The extra 40 units uncover the
-    // panel's shadow, so skip drawing entirely while the panel is hidden.
+    // The card wipes in from the right edge. The extra 40 units uncover its
+    // shadow and outline, so skip drawing entirely while it is hidden.
     if (pan <= 0) return;
-    withClip(c, clipX, -30, (w + 40) * pan + 40, h + 70, () => {
-      theme.panel(c, 0, 0, w, h);
-      c.fillStyle = accent;
-      c.fillRect(w - 7, 22, 7, (h - 44) * pan);
-
-      const sp = (t - 0.6) / 0.7;
-      if (sp > 0 && sp < 1) {
-        c.save();
-        c.beginPath();
-        c.rect(0, 0, w, h);
-        c.clip();
-        const gy = -80 + (h + 160) * easeInOut(sp);
-        const g = c.createLinearGradient(0, gy - 90, 0, gy + 90);
-        g.addColorStop(0, 'rgba(255,255,255,0)');
-        g.addColorStop(0.5, theme.colors.sweep);
-        g.addColorStop(1, 'rgba(255,255,255,0)');
-        c.fillStyle = g;
-        c.fillRect(0, gy - 90, w, 180);
-        c.restore();
-      }
+    withClip(c, w - (w + 40) * pan, -40, (w + 40) * pan + 50, h + 80, () => {
+      theme.card(c, 0, 0, w, h, accent);
+      theme.rule(c, w - 8, 24, 8, (h - 48) * pan, accent);
 
       withAlpha(c, head, () =>
         fillTextAt(
@@ -119,32 +105,30 @@ const vector: VectorScene<SpecCardFields> = {
           theme.colors.text,
         ),
       );
-      c.fillStyle = accent;
-      c.fillRect(40, 88, 64 * head, 6);
+      if (head > 0) theme.rule(c, 40, 86, 64 * head, 6, accent);
 
       // Rows enter one after another and leave in reverse order.
       rows.forEach((row, i) => {
         const a = 0.55 + i * 0.14;
         const oa = 0.66 - (rows.length - 1 - i) * 0.05;
-        const v = envelope(t, dur, a, a + 0.4, oa, oa - 0.24);
+        const v = envelope(t, dur, a, a + 0.4, oa, oa - 0.24, enter, exit);
         const ry = ROWS_Y + i * ROW_H;
-        if (i > 0) {
-          c.fillStyle = theme.colors.line;
-          c.fillRect(40, ry, (w - 80) * v, 2);
-        }
+        if (i > 0) theme.divider(c, 40, ry, w - 80, v);
         withAlpha(c, v, () =>
-          fillTextAt(
+          drawLabel(
             c,
-            upper(row.label, locale),
+            theme,
+            row.label,
             40 + (1 - v) * 40,
             ry + 38,
-            themeFont(theme, 'body', 20, 800),
-            accentTextColor(theme, accent),
+            LABEL_SIZE,
+            labelColor(theme, accent),
+            { locale },
           ),
         );
         const vf = themeFont(theme, 'body', 36, 800);
         const vw = textWidth(c, row.value, vf) + 12;
-        blockReveal(
+        theme.reveal(
           c,
           envelope(t, dur, a + 0.08, a + 0.68, oa + 0.05, oa - 0.3, linear, linear),
           38,
@@ -190,16 +174,16 @@ const pixel: PixelScene<SpecCardFields, PixelBox> = {
     // Slide from beyond the right edge of the frame.
     const distance = Math.max(b.pw + 40, P.grid.width - P.origin.x);
     const slideIn = 1 - easeOut(t / 0.45);
-    const slideOut = t > dur - 0.45 ? easeIn((t - (dur - 0.45)) / 0.4) : 0;
+    const slideOut = t > dur - 0.6 ? easeIn((t - (dur - 0.6)) / 0.52) : 0;
     const off = Math.round((slideIn + slideOut) * distance);
     P.img(panel, off, 0);
 
-    const hn = typedVisible(t, 0.4, b.header.length, dur - 0.7);
+    const hn = typedVisible(t, 0.4, b.header.length, dur - 1.2);
     P.text(b.header, 8 + off, 4, hn);
     P.rect(
       8 + off,
       4 + b.header.h,
-      Math.round(14 * clamp((t - 0.55) / 0.2) * (t > dur - 0.7 ? 0 : 1)),
+      Math.round(14 * clamp((t - 0.55) / 0.2) * (1 - easeInOut((t - (dur - 1.25)) / 0.3))),
       2,
       accent,
     );
@@ -208,7 +192,7 @@ const pixel: PixelScene<SpecCardFields, PixelBox> = {
     b.rows.forEach(([label, value], i) => {
       const ry = 6 + b.header.h + 6 + i * 22;
       const st = 0.6 + i * 0.22;
-      const vanish = dur - 0.95 + (n - 1 - i) * 0.08;
+      const vanish = dur - 1.5 + (n - 1 - i) * 0.1;
       if (t > vanish) {
         // A one-frame white flash as each row disappears.
         if (t < vanish + 0.07) P.rect(off + 4, ry - 2, b.pw - 8, 21, '#FFFFFF');

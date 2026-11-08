@@ -18,6 +18,7 @@ export * from './pixel/raster.ts';
 export * from './pixel/timing.ts';
 export * from './render.ts';
 export * from './safe-areas.ts';
+export * from './tap.ts';
 export * from './text.ts';
 export * from './theme.ts';
 export * from './vector/draw.ts';

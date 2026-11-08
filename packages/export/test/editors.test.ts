@@ -18,6 +18,10 @@ describe('editor profiles', () => {
       expect(recommendedFormat(id)).toBe('mp4-key');
   });
 
+  it('offers every editor the MP4 that phones and messaging apps open', () => {
+    for (const id of EDITOR_IDS) expect(EDITORS[id].formats).toContain('mp4-key');
+  });
+
   it('marks phone apps for the share sheet', () => {
     expect(EDITOR_IDS.filter((id) => EDITORS[id].mobile)).toEqual(['capcut-mobile', 'edits']);
   });

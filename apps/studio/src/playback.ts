@@ -2,7 +2,7 @@
  * The preview clock: plays the clip in a loop with a short pause at the end,
  * or holds a time chosen on the timeline.
  */
-import { createEffect, createRoot, createSignal } from 'solid-js';
+import { createEffect, createRoot, createSignal, onCleanup } from 'solid-js';
 import { duration } from './store.ts';
 
 /** Pause after the clip ends before looping, in seconds. */
@@ -28,11 +28,13 @@ function tick(now: number) {
 }
 
 createRoot(() => {
+  // Solid ignores an effect's return value, so the loop is stopped with
+  // onCleanup: it runs before the effect re-runs, which is when play stops.
   createEffect(() => {
     if (!playing() || typeof requestAnimationFrame === 'undefined') return;
     last = performance.now();
     frameRequest = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frameRequest);
+    onCleanup(() => cancelAnimationFrame(frameRequest));
   });
   // Keep the playhead inside a clip that got shorter.
   createEffect(() => {

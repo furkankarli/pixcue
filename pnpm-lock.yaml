@@ -199,6 +199,12 @@ importers:
 
   apps/studio:
     dependencies:
+      '@fontsource-variable/geist':
+        specifier: 5.3.0
+        version: 5.3.0
+      '@fontsource-variable/geist-mono':
+        specifier: 5.3.0
+        version: 5.3.0
       '@fontsource/anton':
         specifier: ^5.3.0
         version: 5.3.0
@@ -218,6 +224,9 @@ importers:
         specifier: ^5.3.0
         version: 5.3.0
       '@fontsource/inter':
+        specifier: ^5.3.0
+        version: 5.3.0
+      '@fontsource/jetbrains-mono':
         specifier: ^5.3.0
         version: 5.3.0
       '@fontsource/manrope':
@@ -256,6 +265,9 @@ importers:
       '@pixcue/templates':
         specifier: workspace:^
         version: link:../../packages/templates
+      lucide-solid:
+        specifier: 1.70.0
+        version: 1.70.0(solid-js@1.9.18)
       solid-js:
         specifier: ^1.9.18
         version: 1.9.18
@@ -894,6 +906,12 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@fontsource-variable/geist-mono@5.3.0':
+    resolution: {integrity: sha512-vBbuwDEo9AkrqADMXOrlAR3DFcJi4/JxeuU43FoiQERnNwsfXNnvxvReZG02cQKmyk4DZkZdBZX3oTDvy2zBAw==}
+
+  '@fontsource-variable/geist@5.3.0':
+    resolution: {integrity: sha512-j0m+vLQuG5XAYoHtGCVu0spvlGreR3EzpECUVzkFmI1mTVnAO38l/NEPDCFgZ177JxzYJCLSmTQibIiYPilGrA==}
+
   '@fontsource/anton@5.3.0':
     resolution: {integrity: sha512-OR1D5n124n2XRs66SbX7IjcOSptljEJE8FcDNnlni2y1/M6KpTx7cU2PIWzTSsBj4WFkHPw24On8qw3qkQZuTw==}
 
@@ -914,6 +932,9 @@ packages:
 
   '@fontsource/inter@5.3.0':
     resolution: {integrity: sha512-RofMylZmjlJEfELXeNHFWBRcSs75rGU/6bV2S2jfnvv/3rPXPGe0LgUJTklcHZ9lM4OZmAVFhcJPnACfb91A3g==}
+
+  '@fontsource/jetbrains-mono@5.3.0':
+    resolution: {integrity: sha512-fqDfB5I9f1p1TV486aUgB9t8zP84P0O1FtQR5Ol9vjwPy+S+EIGlVYm1cvj2W5shcZMTg2nZFdVMoH5wFu8a1A==}
 
   '@fontsource/manrope@5.3.0':
     resolution: {integrity: sha512-obJ1Dv3+uCA6HlHgW8u4BGYxJR9In2HW7gjJhlflEvkrj1X1iSEwu0fToL+JYGC/FEKFfIz1sBuPduvcL2gIAA==}
@@ -2058,6 +2079,11 @@ packages:
   lru-cache@5.1.1:
     resolution: {integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==}
 
+  lucide-solid@1.70.0:
+    resolution: {integrity: sha512-BMCAjXRTa+XB4UjU0HnsTcFKhNGtjkw3Pt/LtuQz3as2GIljPet+6GOEV9Pr0iWF032bna2Qp3iPxY3QgRJtMg==}
+    peerDependencies:
+      solid-js: ^1.4.7
+
   magic-string@1.4.5:
     resolution: {integrity: sha512-oLLC2+YvQUfAa+vxoufE/yc1icb87M9iXIRqAoR/2EhE/8cb3SF/+Gi0c2By1B+5Vz2e2vQtUvHiu1+63Znh+w==}
 
@@ -3019,6 +3045,10 @@ snapshots:
   '@esbuild/win32-x64@0.28.2':
     optional: true
 
+  '@fontsource-variable/geist-mono@5.3.0': {}
+
+  '@fontsource-variable/geist@5.3.0': {}
+
   '@fontsource/anton@5.3.0': {}
 
   '@fontsource/archivo-black@5.3.0': {}
@@ -3032,6 +3062,8 @@ snapshots:
   '@fontsource/dm-serif-display@5.3.0': {}
 
   '@fontsource/inter@5.3.0': {}
+
+  '@fontsource/jetbrains-mono@5.3.0': {}
 
   '@fontsource/manrope@5.3.0': {}
 
@@ -3892,6 +3924,10 @@ snapshots:
   lru-cache@5.1.1:
     dependencies:
       yallist: 3.1.1
+
+  lucide-solid@1.70.0(solid-js@1.9.18):
+    dependencies:
+      solid-js: 1.9.18
 
   magic-string@1.4.5:
     dependencies:

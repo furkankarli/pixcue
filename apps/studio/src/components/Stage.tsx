@@ -1,19 +1,31 @@
 /**
- * The live preview. The canvas is rendered at its on-screen size (not the
- * export size), which keeps playback smooth on phones; layout is identical.
+ * The live preview. The canvas is rendered near its on-screen size, not the
+ * export size, which keeps playback smooth on phones; layout is identical.
  */
 import { type Bounds, render, scaleFrame } from '@pixcue/engine';
 import { createEffect, createMemo, createSignal, onCleanup, onMount, Show } from 'solid-js';
 import { t } from '../i18n.ts';
+import { touchDevice } from '../idle.ts';
 import { displayTime } from '../playback.ts';
 import { actions, edits, fontsVersion, frame, renderState } from '../store.ts';
 import { platformUi, safeArea, stageBackground } from '../view.ts';
 import { PlatformOverlay, SafeAreaOverlay } from './Overlays.tsx';
 
+/** Preview frame rate on touch devices. */
+const PREVIEW_FPS = 30;
+
+/** Smallest preview resolution, as the frame's short side in pixels. */
+const MIN_SHORT_SIDE = 720;
+
+/** Arrow-key nudge, in design units (with Shift: the large one). */
+const NUDGE = 10;
+const NUDGE_LARGE = 50;
+
 /** Extra hit area around the graphic for dragging, in CSS pixels. */
 const GRAB_MARGIN = 16;
 
-export function Stage() {
+export function Stage(props: { hintId: string }) {
+  const hintId = props.hintId;
   let box!: HTMLDivElement;
   let canvas!: HTMLCanvasElement;
   const [space, setSpace] = createSignal({ w: 0, h: 0 });
@@ -36,25 +48,38 @@ export function Stage() {
     return { w: width, h: width / aspect };
   });
 
+  // Draw at least MIN_SHORT_SIDE pixels on the short side and let the browser
+  // scale down: a phone-sized preview would otherwise put the pixel theme on
+  // its coarsest grid, where pops jump in one or two steps instead of easing.
   const output = createMemo(() => {
+    const f = frame();
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const pixelWidth = Math.max(1, Math.min(frame().pixelWidth, Math.round(size().w * dpr)));
-    return scaleFrame(frame(), pixelWidth);
+    const floor =
+      f.pixelWidth * Math.min(1, MIN_SHORT_SIDE / Math.min(f.pixelWidth, f.pixelHeight));
+    const pixelWidth = Math.round(Math.min(f.pixelWidth, Math.max(size().w * dpr, floor)));
+    return scaleFrame(f, Math.max(1, pixelWidth));
   });
 
-  createEffect(() => {
-    const f = output();
-    canvas.width = f.pixelWidth;
-    canvas.height = f.pixelHeight;
-  });
+  // Touch devices draw the preview at 30 frames per second: the export's
+  // usual rate and the pixel theme's step, at half the work of 60.
+  const previewTime = createMemo(() =>
+    touchDevice ? Math.floor(displayTime() * PREVIEW_FPS) / PREVIEW_FPS : displayTime(),
+  );
 
+  // Resize and draw in one effect: with two, the draw could run first, see
+  // the old canvas size and skip, leaving the stage blank until the next
+  // change (a format switch while paused).
   createEffect(() => {
     fontsVersion();
     const f = output();
+    if (canvas.width !== f.pixelWidth || canvas.height !== f.pixelHeight) {
+      canvas.width = f.pixelWidth;
+      canvas.height = f.pixelHeight;
+    }
     const ctx = canvas.getContext('2d');
-    if (!ctx || canvas.width !== f.pixelWidth) return;
+    if (!ctx) return;
     try {
-      setBounds(render(ctx, displayTime(), renderState(f)));
+      setBounds(render(ctx, previewTime(), renderState(f)));
     } catch (error) {
       // A broken template must not take the editor down.
       console.error(error);
@@ -96,6 +121,25 @@ export function Stage() {
       y: start.offset.y + (e.clientY - start.y) * k,
     });
   };
+  // Keyboard: arrows nudge the graphic (Shift for bigger steps), Home resets.
+  const onKeyDown = (e: KeyboardEvent) => {
+    const step = e.shiftKey ? NUDGE_LARGE : NUDGE;
+    const { x, y } = edits().offset;
+    const to = {
+      ArrowLeft: { x: x - step, y },
+      ArrowRight: { x: x + step, y },
+      ArrowUp: { x, y: y - step },
+      ArrowDown: { x, y: y + step },
+    }[e.key];
+    if (e.key === 'Home') {
+      e.preventDefault();
+      actions.resetOffset();
+    } else if (to) {
+      e.preventDefault();
+      actions.setOffset(to);
+    }
+  };
+
   const endDrag = () => {
     start = null;
     setDragging(false);
@@ -110,8 +154,13 @@ export function Stage() {
         class={`stage-frame stage-bg-${stageBackground()}`}
         classList={{ dragging: dragging() }}
         style={{ width: `${size().w}px`, height: `${size().h}px` }}
-        role="img"
+        role="application"
+        // biome-ignore lint/a11y/noNoninteractiveTabindex: a custom widget; arrow keys move the graphic.
+        tabIndex={0}
         aria-label={t('editor.stage.label')}
+        aria-describedby={hintId}
+        aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight Home"
+        onKeyDown={onKeyDown}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={endDrag}
