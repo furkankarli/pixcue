@@ -1,6 +1,6 @@
 {
   "name": "@pixcue/export",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "description": "Framework-free exporters: PNG sequence zip, transparent MOV, MP4 and WebM via WebCodecs.",
   "license": "MIT",
