@@ -71,4 +71,17 @@ describe.each(TEMPLATES.map((t) => [t.id, t] as const))('%s', (_, template) => {
     expect(bounds.x + bounds.width).toBeLessThanOrEqual(frame.pixelWidth);
     expect(bounds.y + bounds.height).toBeLessThanOrEqual(frame.pixelHeight);
   });
+
+  it.each(['youtube', 'vertical'] as const)(
+    'keeps its pixel-theme size in a small %s preview',
+    (preset) => {
+      const t = template.duration / 2;
+      const full = renderFrame({ template, theme: 'pixel', preset, t }).bounds;
+      const small = renderFrame({ template, theme: 'pixel', preset, t, width: 480 });
+      const k = small.frame.unit;
+      // Within one grid cell (6 output pixels at 1080p) of the export, scaled down.
+      for (const key of ['x', 'y', 'width', 'height'] as const)
+        expect(Math.abs(small.bounds[key] / k - full[key]), key).toBeLessThanOrEqual(6);
+    },
+  );
 });

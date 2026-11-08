@@ -83,12 +83,17 @@ export interface Bounds {
   readonly height: number;
 }
 
-/** Output pixels per pixel-grid cell at 1080p and scale 1 (so 1 cell = 6 design units). */
+/** Design units per pixel-grid cell at scale 1 (6 output pixels at 1080p). */
 export const PIXEL_BASE = 6;
 
-/** Size of one pixel-theme grid cell in output pixels for a user scale. */
-export function pixelSize(scale: number, frame: Frame): number {
-  return clamp(Math.round(PIXEL_BASE * scale * frame.unit), 2, Math.round(14 * frame.unit));
+/**
+ * Size of one pixel-theme grid cell in design units for a user scale. It is
+ * a whole number, so a 1080p export (one output pixel per design unit) and a
+ * 4K one (two) stay pixel-sharp. Smaller outputs, such as the preview, scale
+ * the same grid down, so the graphic keeps the size it has in the export.
+ */
+export function pixelSize(scale: number): number {
+  return clamp(Math.round(PIXEL_BASE * scale), 2, 14);
 }
 
 let measureCtx: Ctx2D | undefined;
@@ -180,26 +185,27 @@ function renderPixel<F>(
 ): Bounds {
   const box = scene.pixel.measure(args);
   const { unit, safeArea } = frame;
-  let px = pixelSize(layout.scale, frame);
-  while (px > 2 && (box.w * px > safeArea.width * unit || box.h * px > safeArea.height * unit))
-    px--;
+  // Cell size in design units; `cell` is the same in output pixels.
+  let px = pixelSize(layout.scale);
+  while (px > 2 && (box.w * px > safeArea.width || box.h * px > safeArea.height)) px--;
+  const cell = px * unit;
 
-  const gw = Math.ceil(frame.pixelWidth / px);
-  const gh = Math.ceil(frame.pixelHeight / px);
+  const gw = Math.ceil(frame.width / px);
+  const gh = Math.ceil(frame.height / px);
   const { surface, ctx: g } = getGrid(gw, gh);
   g.setTransform(1, 0, 0, 1, 0, 0);
   g.clearRect(0, 0, gw, gh);
 
-  const at = place({ w: (box.w * px) / unit, h: (box.h * px) / unit }, frame, layout);
-  const gx = Math.round((at.x * unit) / px);
-  const gy = Math.round((at.y * unit) / px);
-  const P = createPainter(g, gx, gy, px, gw, gh);
+  const at = place({ w: box.w * px, h: box.h * px }, frame, layout);
+  const gx = Math.round(at.x / px);
+  const gy = Math.round(at.y / px);
+  const P = createPainter(g, gx, gy, px, gw, gh, unit);
   scene.pixel.draw(P, t, { ...args, box });
 
   const smoothing = ctx.imageSmoothingEnabled;
   ctx.imageSmoothingEnabled = false;
-  ctx.drawImage(surface, 0, 0, gw, gh, 0, 0, gw * px, gh * px);
+  ctx.drawImage(surface, 0, 0, gw, gh, 0, 0, gw * cell, gh * cell);
   P.flush(ctx);
   ctx.imageSmoothingEnabled = smoothing;
-  return { x: gx * px, y: gy * px, width: box.w * px, height: box.h * px };
+  return { x: gx * cell, y: gy * cell, width: box.w * cell, height: box.h * cell };
 }
