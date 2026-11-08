@@ -12,10 +12,9 @@
 
 **Live:** [pixcue.furkankarli.com](https://pixcue.furkankarli.com)
 
-<!-- TODO: replace the placeholders with real recordings -->
-| Horizontal (YouTube)   | Vertical (Shorts, TikTok, Reels) |
-| ---------------------- | -------------------------------- |
-| _demo GIF placeholder_ | _demo GIF placeholder_           |
+| Horizontal (YouTube)                                          | Vertical (Shorts, TikTok, Reels)                                |
+| ------------------------------------------------------------- | --------------------------------------------------------------- |
+| ![A lower third in the tech theme](docs/media/horizontal.gif) | ![A subscribe button in the pop theme](docs/media/vertical.gif) |
 
 ## Features
 
@@ -30,6 +29,9 @@
   WebM or a PNG sequence. Pixcue asks which editor you use and picks the format.
 - **Platform-aware copy:** "Subscribe" on YouTube, "Follow" on TikTok and
   Instagram, in English and Turkish.
+- **Sound effects:** optional clicks, pops, whooshes and chimes in time with
+  the animation, in a style that matches each theme. They play in the preview
+  and go into the exported file.
 - **Share a setup as a link:** the whole editor state lives in the URL.
 - **Private by design:** everything runs in your browser. No uploads, no
   accounts, no server.
@@ -47,7 +49,9 @@
 | Anything else      | WebM (VP9 + alpha) or PNG sequence (zip) | Alpha channel |
 
 Every editor can also get the MP4. It is the one file phones and messaging
-apps open, so choose it whenever the graphic travels to a phone. Pixcue picks
+apps open, so choose it whenever the graphic travels to a phone. With sound
+effects on, the MOV and the PNG sequence always carry the sound; the MP4 does
+where the browser can encode AAC, and the sound is also offered as a WAV. Pixcue picks
 a key color (green, blue or magenta) that the graphic does not use, and a
 chroma-key mode removes soft shadows and see-through edges so keying stays
 clean.
@@ -210,7 +214,6 @@ npx wrangler deploy --config apps/studio/wrangler.jsonc --dry-run
 Not part of v0.1, planned for later:
 
 - OBS mode (browser source for live streams)
-- Sound effects
 - Pixel effects (pixelfx)
 - Visual template builder
 - Publishing the engine and exporters as npm packages
