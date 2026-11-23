@@ -13,7 +13,7 @@
     "typecheck": "tsc -p tsconfig.json && tsc -p test/tsconfig.json"
   },
   "devDependencies": {
-    "@napi-rs/canvas": "^1.1.0",
+    "@napi-rs/canvas": "^1.1.1",
     "@types/node": "^24.19.2"
   }
 }
